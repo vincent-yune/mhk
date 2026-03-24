@@ -1,0 +1,22 @@
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Java/Maven
+backend/target/
+backend/.mvn/wrapper/
+*.jar
+*.class
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# DB
+*.sql.bak
+
+# Misc
+.DS_Store
