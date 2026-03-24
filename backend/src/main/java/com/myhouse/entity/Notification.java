@@ -15,13 +15,12 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
     @Builder.Default
-    private NotificationType type = NotificationType.SYSTEM;
+    private String type = "SYSTEM";
 
     @Column(nullable = false, length = 200)
     private String title;
@@ -43,9 +42,5 @@ public class Notification {
     @PrePersist
     public void prePersist() {
         this.createdAt = java.time.LocalDateTime.now();
-    }
-
-    public enum NotificationType {
-        EXPIRY_WARN, REORDER, IOT_ALERT, COMMUNITY, TRADE, SYSTEM
     }
 }

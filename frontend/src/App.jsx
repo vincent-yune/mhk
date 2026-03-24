@@ -7,6 +7,8 @@ import HousePage from './pages/HousePage'
 import ItemPage from './pages/ItemPage'
 import IotPage from './pages/IotPage'
 import CommunityPage from './pages/CommunityPage'
+import ProfilePage from './pages/ProfilePage'
+import NotificationPage from './pages/NotificationPage'
 import ProtectedLayout from './components/ProtectedLayout'
 import './index.css'
 
@@ -29,6 +31,8 @@ export default function App() {
             <Route path="items" element={<ItemPage />} />
             <Route path="iot" element={<IotPage />} />
             <Route path="community" element={<CommunityPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="notifications" element={<NotificationPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
@@ -37,7 +41,7 @@ export default function App() {
         position="top-right"
         toastOptions={{
           duration: 3000,
-          style: { borderRadius: '10px', fontFamily: 'Noto Sans KR, sans-serif', fontSize: '14px' }
+          style: { borderRadius: '10px', fontFamily: '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif', fontSize: '14px' }
         }}
       />
     </QueryClientProvider>
