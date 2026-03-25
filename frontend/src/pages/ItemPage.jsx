@@ -61,8 +61,8 @@ export default function ItemPage() {
       purchasePrice: item.purchasePrice || '', expiryDate: item.expiryDate || '',
       warrantyExpire: item.warrantyExpire || '', isConsumable: item.isConsumable,
       reorderLevel: item.reorderLevel || '', status: item.status,
-      zone: item.zone ? { id: item.zone.id } : null,
-      category: item.category ? { id: item.category.id } : null,
+      zone: item.zoneId ? { id: item.zoneId } : null,
+      category: item.categoryId ? { id: item.categoryId } : null,
       description: item.description || ''
     })
     setShowModal(true)
@@ -170,13 +170,13 @@ export default function ItemPage() {
                   </div>
                   <div style={{ display: 'flex', gap: 12, fontSize: 13, color: '#64748B', flexWrap: 'wrap' }}>
                     {item.brand && <span>🏷️ {item.brand}</span>}
-                    {item.zone && <span>📍 {item.zone.name}</span>}
+                    {item.zoneName && <span>📍 {item.zoneName}</span>}
                     <span>수량: {item.quantity}{item.unit}</span>
                     {item.expiryDate && <span>유통기한: {item.expiryDate}</span>}
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span className={`badge ${STATUS_MAP[item.status]?.cls}`}>{STATUS_MAP[item.status]?.label}</span>
+                  <span className={`badge ${STATUS_MAP[item.status]?.cls || 'badge-gray'}`}>{STATUS_MAP[item.status]?.label || item.status}</span>
                   <button className="btn-icon" style={{ color: '#EF4444' }}
                     onClick={e => { e.stopPropagation(); handleDelete(item.id) }}>🗑️</button>
                 </div>
@@ -227,14 +227,14 @@ export default function ItemPage() {
                 <div className="grid-2">
                   <div className="form-group">
                     <label className="form-label">구역</label>
-                    <select className="form-select" value={form.zone?.id || ''} onChange={e => setForm({ ...form, zone: e.target.value ? { id: parseInt(e.target.value) } : null })}>
+                    <select className="form-select" value={form.zone?.id || ''} onChange={e => setForm({ ...form, zone: e.target.value ? { id: Number(e.target.value) } : null })}>
                       <option value="">구역 선택</option>
                       {zones.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
                     </select>
                   </div>
                   <div className="form-group">
                     <label className="form-label">카테고리</label>
-                    <select className="form-select" value={form.category?.id || ''} onChange={e => setForm({ ...form, category: e.target.value ? { id: parseInt(e.target.value) } : null })}>
+                    <select className="form-select" value={form.category?.id || ''} onChange={e => setForm({ ...form, category: e.target.value ? { id: Number(e.target.value) } : null })}>
                       <option value="">카테고리 선택</option>
                       {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>

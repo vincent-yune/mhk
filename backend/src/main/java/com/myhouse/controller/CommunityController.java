@@ -1,6 +1,7 @@
 package com.myhouse.controller;
 
 import com.myhouse.dto.response.ApiResponse;
+import com.myhouse.dto.response.CommunityPostResponse;
 import com.myhouse.entity.CommunityPost;
 import com.myhouse.service.CommunityService;
 import lombok.RequiredArgsConstructor;
@@ -18,31 +19,35 @@ public class CommunityController {
     private final CommunityService communityService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<CommunityPost>>> getPosts(
+    public ResponseEntity<ApiResponse<Page<CommunityPostResponse>>> getPosts(
             @RequestParam(required = false) String type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
-        return ResponseEntity.ok(ApiResponse.success(communityService.getPosts(type, page, size)));
+        Page<CommunityPostResponse> posts = communityService.getPosts(type, page, size)
+                .map(CommunityPostResponse::from);
+        return ResponseEntity.ok(ApiResponse.success(posts));
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<CommunityPost>> getPost(@PathVariable Long postId) {
-        return ResponseEntity.ok(ApiResponse.success(communityService.getPost(postId)));
+    public ResponseEntity<ApiResponse<CommunityPostResponse>> getPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(ApiResponse.success(CommunityPostResponse.from(communityService.getPost(postId))));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CommunityPost>> createPost(
+    public ResponseEntity<ApiResponse<CommunityPostResponse>> createPost(
             @RequestBody CommunityPost post,
             @AuthenticationPrincipal UserDetails ud) {
-        return ResponseEntity.ok(ApiResponse.success("게시글 등록 완료", communityService.createPost(ud.getUsername(), post)));
+        CommunityPostResponse saved = CommunityPostResponse.from(communityService.createPost(ud.getUsername(), post));
+        return ResponseEntity.ok(ApiResponse.success("게시글 등록 완료", saved));
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<ApiResponse<CommunityPost>> updatePost(
+    public ResponseEntity<ApiResponse<CommunityPostResponse>> updatePost(
             @PathVariable Long postId,
             @RequestBody CommunityPost post,
             @AuthenticationPrincipal UserDetails ud) {
-        return ResponseEntity.ok(ApiResponse.success("게시글 수정 완료", communityService.updatePost(postId, ud.getUsername(), post)));
+        CommunityPostResponse updated = CommunityPostResponse.from(communityService.updatePost(postId, ud.getUsername(), post));
+        return ResponseEntity.ok(ApiResponse.success("게시글 수정 완료", updated));
     }
 
     @DeleteMapping("/{postId}")

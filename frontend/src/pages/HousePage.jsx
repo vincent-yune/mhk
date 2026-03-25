@@ -142,6 +142,9 @@ export default function HousePage() {
                 <div style={{ fontSize: 28, marginBottom: 8 }}>{ZONE_ICONS[z.zoneType] || '📦'}</div>
                 <div style={{ fontWeight: 700, fontSize: 14 }}>{z.name}</div>
                 <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{ZONE_LABELS[z.zoneType]}</div>
+                <div style={{ marginTop: 8, background: '#E0E7FF', borderRadius: 20, padding: '2px 10px', fontSize: 12, fontWeight: 700, color: '#4F46E5', display: 'inline-block' }}>
+                  📦 {z.itemCount ?? 0}개
+                </div>
               </div>
             ))}
           </div>

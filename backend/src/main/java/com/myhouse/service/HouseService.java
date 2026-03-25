@@ -1,5 +1,7 @@
 package com.myhouse.service;
 
+import com.myhouse.dto.response.HouseResponse;
+import com.myhouse.dto.response.ZoneResponse;
 import com.myhouse.entity.*;
 import com.myhouse.exception.ResourceNotFoundException;
 import com.myhouse.exception.UnauthorizedException;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,60 +21,79 @@ public class HouseService {
     private final HouseRepository houseRepository;
     private final UserRepository userRepository;
     private final ZoneRepository zoneRepository;
+    private final ItemRepository itemRepository;
 
     @Transactional(readOnly = true)
-    public List<House> getMyHouses(String email) {
+    public List<HouseResponse> getMyHouses(String email) {
         User user = findUser(email);
-        return houseRepository.findByUserIdOrderByIsPrimaryDesc(user.getId());
+        List<House> houses = houseRepository.findByUserIdOrderByIsPrimaryDesc(user.getId());
+        return houses.stream().map(HouseResponse::from).collect(Collectors.toList());
     }
 
     @Transactional
-    public House createHouse(String email, House house) {
+    public HouseResponse createHouse(String email, House house) {
         User user = findUser(email);
         house.setUser(user);
         House saved = houseRepository.save(house);
-
-        // 기본 구역 자동 생성
         createDefaultZones(saved);
-        return saved;
+        return HouseResponse.from(saved);
     }
 
     @Transactional(readOnly = true)
-    public House getHouse(Long houseId, String email) {
-        House house = houseRepository.findById(houseId)
-                .orElseThrow(() -> new ResourceNotFoundException("집 정보를 찾을 수 없습니다."));
-        checkOwner(house, email);
-        return house;
+    public HouseResponse getHouse(Long houseId, String email) {
+        House house = findAndCheckOwner(houseId, email);
+        List<Zone> zones = zoneRepository.findByHouseIdOrderBySortOrder(houseId);
+
+        // 구역별 물품 수 조회
+        Map<Long, Long> itemCountByZone = itemRepository.findByHouseId(houseId)
+                .stream()
+                .filter(item -> item.getZone() != null)
+                .collect(Collectors.groupingBy(item -> item.getZone().getId(), Collectors.counting()));
+
+        List<ZoneResponse> zoneResponses = zones.stream()
+                .map(z -> ZoneResponse.from(z, itemCountByZone.getOrDefault(z.getId(), 0L).intValue()))
+                .collect(Collectors.toList());
+
+        return HouseResponse.from(house, zoneResponses);
     }
 
     @Transactional
-    public House updateHouse(Long houseId, String email, House updated) {
-        House house = getHouse(houseId, email);
+    public HouseResponse updateHouse(Long houseId, String email, House updated) {
+        House house = findAndCheckOwner(houseId, email);
         if (updated.getName() != null) house.setName(updated.getName());
         if (updated.getHouseType() != null) house.setHouseType(updated.getHouseType());
         if (updated.getAddress() != null) house.setAddress(updated.getAddress());
         if (updated.getArea() != null) house.setArea(updated.getArea());
         if (updated.getTheme() != null) house.setTheme(updated.getTheme());
-        return houseRepository.save(house);
+        return HouseResponse.from(houseRepository.save(house));
     }
 
     @Transactional
     public void deleteHouse(Long houseId, String email) {
-        House house = getHouse(houseId, email);
+        House house = findAndCheckOwner(houseId, email);
         houseRepository.delete(house);
     }
 
     @Transactional(readOnly = true)
-    public List<Zone> getZones(Long houseId, String email) {
-        getHouse(houseId, email); // 소유권 확인
-        return zoneRepository.findByHouseIdOrderBySortOrder(houseId);
+    public List<ZoneResponse> getZones(Long houseId, String email) {
+        findAndCheckOwner(houseId, email);
+        List<Zone> zones = zoneRepository.findByHouseIdOrderBySortOrder(houseId);
+
+        Map<Long, Long> itemCountByZone = itemRepository.findByHouseId(houseId)
+                .stream()
+                .filter(item -> item.getZone() != null)
+                .collect(Collectors.groupingBy(item -> item.getZone().getId(), Collectors.counting()));
+
+        return zones.stream()
+                .map(z -> ZoneResponse.from(z, itemCountByZone.getOrDefault(z.getId(), 0L).intValue()))
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public Zone addZone(Long houseId, String email, Zone zone) {
-        House house = getHouse(houseId, email);
+    public ZoneResponse addZone(Long houseId, String email, Zone zone) {
+        House house = findAndCheckOwner(houseId, email);
         zone.setHouse(house);
-        return zoneRepository.save(zone);
+        return ZoneResponse.from(zoneRepository.save(zone));
     }
 
     private void createDefaultZones(House house) {
@@ -93,14 +116,17 @@ public class HouseService {
         }
     }
 
-    private User findUser(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
-    }
-
-    private void checkOwner(House house, String email) {
+    private House findAndCheckOwner(Long houseId, String email) {
+        House house = houseRepository.findById(houseId)
+                .orElseThrow(() -> new ResourceNotFoundException("집 정보를 찾을 수 없습니다."));
         if (!house.getUser().getEmail().equals(email)) {
             throw new UnauthorizedException("접근 권한이 없습니다.");
         }
+        return house;
+    }
+
+    private User findUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
     }
 }
