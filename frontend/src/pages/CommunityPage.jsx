@@ -16,6 +16,26 @@ export default function CommunityPage() {
   const [selectedPost, setSelectedPost] = useState(null)
   const [form, setForm] = useState({ title: '', content: '', postType: 'SELL', price: '', isNegotiable: false, location: '' })
 
+  // 물품관리에서 커뮤니티 연계로 넘어왔을 때 자동으로 모달 열기
+  useEffect(() => {
+    const draft = sessionStorage.getItem('communityDraft')
+    if (draft) {
+      try {
+        const d = JSON.parse(draft)
+        setForm({
+          title: d.title || '',
+          content: d.content || '',
+          postType: d.postType || 'SELL',
+          price: d.price || '',
+          isNegotiable: d.isNegotiable || false,
+          location: d.location || ''
+        })
+        setShowModal(true)
+        sessionStorage.removeItem('communityDraft')
+      } catch (e) {}
+    }
+  }, [])
+
   useEffect(() => {
     loadPosts()
   }, [page, postType])

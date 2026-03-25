@@ -31,9 +31,13 @@ export const useAuthStore = create(
 export const useHouseStore = create((set, get) => ({
   selectedHouse: null,
   houses: [],
+  // HousePage → ItemPage 구역 자동 필터 연동용
+  pendingZoneFilter: null,   // { zoneId, zoneName } | null
   setHouses: (houses) => {
     const primary = houses.find(h => h.isPrimary) || houses[0]
     set({ houses, selectedHouse: get().selectedHouse || primary })
   },
   selectHouse: (house) => set({ selectedHouse: house }),
+  setPendingZoneFilter: (zone) => set({ pendingZoneFilter: zone }),
+  clearPendingZoneFilter: () => set({ pendingZoneFilter: null }),
 }))

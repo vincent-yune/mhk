@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Plus, Home, Edit2, Trash2, X } from 'lucide-react'
+import { Plus, Home, Edit2, Trash2, X, ChevronRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import { useHouseStore } from '../store/useStore'
 import toast from 'react-hot-toast'
@@ -9,7 +10,8 @@ const THEMES = { DEFAULT: '기본', MODERN: '모던', NATURAL: '자연', VINTAGE
 const EMOJI = { APARTMENT: '🏢', HOUSE: '🏠', VILLA: '🏘️', OFFICETEL: '🏙️', OTHER: '🏡' }
 
 export default function HousePage() {
-  const { houses, setHouses, selectedHouse, selectHouse } = useHouseStore()
+  const { houses, setHouses, selectedHouse, selectHouse, setPendingZoneFilter } = useHouseStore()
+  const navigate = useNavigate()
   const [zones, setZones] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editHouse, setEditHouse] = useState(null)
@@ -82,6 +84,11 @@ export default function HousePage() {
   const ZONE_ICONS = { LIVING_ROOM: '🛋️', KITCHEN: '🍳', BEDROOM: '🛏️', BATHROOM: '🚿', STUDY: '📚', BALCONY: '🌿', GARAGE: '🚗', OTHER: '📦' }
   const ZONE_LABELS = { LIVING_ROOM: '거실', KITCHEN: '주방', BEDROOM: '침실', BATHROOM: '욕실', STUDY: '서재', BALCONY: '베란다', GARAGE: '차고', OTHER: '기타' }
 
+  const handleZoneClick = (zone) => {
+    setPendingZoneFilter({ zoneId: zone.id, zoneName: zone.name })
+    navigate('/items')
+  }
+
   return (
     <div>
       {/* 헤더 */}
@@ -135,15 +142,31 @@ export default function HousePage() {
       {/* 선택된 집의 구역 */}
       {selectedHouse && zones.length > 0 && (
         <div className="card">
-          <div className="card-title" style={{ marginBottom: 16 }}>🗺️ 구역 현황 — {selectedHouse.name}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div className="card-title" style={{ margin: 0 }}>🗺️ 구역 현황 — {selectedHouse.name}</div>
+            <span style={{ fontSize: 12, color: '#94A3B8' }}>구역 클릭 시 물품 관리로 이동</span>
+          </div>
           <div className="grid-4">
             {zones.map(z => (
-              <div key={z.id} style={{ background: '#F8FAFC', borderRadius: 12, padding: 16, textAlign: 'center' }}>
+              <div key={z.id}
+                onClick={() => handleZoneClick(z)}
+                style={{
+                  background: '#F8FAFC', borderRadius: 12, padding: 16, textAlign: 'center',
+                  cursor: 'pointer', border: '1.5px solid #E2E8F0',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.borderColor = '#4F46E5' }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.borderColor = '#E2E8F0' }}
+              >
                 <div style={{ fontSize: 28, marginBottom: 8 }}>{ZONE_ICONS[z.zoneType] || '📦'}</div>
                 <div style={{ fontWeight: 700, fontSize: 14 }}>{z.name}</div>
                 <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{ZONE_LABELS[z.zoneType]}</div>
-                <div style={{ marginTop: 8, background: '#E0E7FF', borderRadius: 20, padding: '2px 10px', fontSize: 12, fontWeight: 700, color: '#4F46E5', display: 'inline-block' }}>
+                <div
+                  onClick={e => { e.stopPropagation(); handleZoneClick(z) }}
+                  style={{ marginTop: 8, background: '#E0E7FF', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 700, color: '#4F46E5', display: 'inline-flex', alignItems: 'center', gap: 3, cursor: 'pointer' }}
+                >
                   📦 {z.itemCount ?? 0}개
+                  <ChevronRight size={11} />
                 </div>
               </div>
             ))}
