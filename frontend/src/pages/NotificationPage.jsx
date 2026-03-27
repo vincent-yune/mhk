@@ -14,11 +14,11 @@ const NOTI_ICONS = {
 
 const NOTI_COLORS = {
   EXPIRY_WARN: { bg: '#FFF7ED', border: '#FED7AA', color: '#92400E' },
-  REORDER: { bg: '#EEF2FF', border: '#C7D2FE', color: '#3730A3' },
-  IOT_ALERT: { bg: '#ECFDF5', border: '#A7F3D0', color: '#065F46' },
+  REORDER: { bg: 'var(--primary-container)', border: '#C7D2FE', color: '#3730A3' },
+  IOT_ALERT: { bg: 'var(--secondary-container)', border: '#A7F3D0', color: '#065F46' },
   COMMUNITY: { bg: '#F0F9FF', border: '#BAE6FD', color: '#0C4A6E' },
   TRADE: { bg: '#FDF4FF', border: '#E9D5FF', color: '#6B21A8' },
-  SYSTEM: { bg: '#F8FAFC', border: '#E2E8F0', color: '#475569' },
+  SYSTEM: { bg: 'var(--surface)', border: 'var(--outline-variant)', color: '#475569' },
 }
 
 export default function NotificationPage() {
@@ -106,7 +106,7 @@ export default function NotificationPage() {
           <h2 className="page-title">🔔 알림</h2>
           <p className="page-subtitle">
             전체 {notifications.length}개
-            {unreadCount > 0 && <span style={{ color: '#4F46E5', fontWeight: 600 }}> · 읽지 않음 {unreadCount}개</span>}
+            {unreadCount > 0 && <span style={{ color: 'var(--primary)', fontWeight: 600 }}> · 읽지 않음 {unreadCount}개</span>}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -122,7 +122,7 @@ export default function NotificationPage() {
       </div>
 
       {/* 필터 탭 */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 16, background: '#F8FAFC', padding: 4, borderRadius: 10, width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 16, background: 'var(--surface)', padding: 4, borderRadius: 10, width: 'fit-content' }}>
         {[
           { id: 'all', label: `전체 (${notifications.length})` },
           { id: 'unread', label: `읽지 않음 (${unreadCount})` }
@@ -131,7 +131,7 @@ export default function NotificationPage() {
             padding: '6px 16px', border: 'none', cursor: 'pointer',
             background: filter === f.id ? 'white' : 'transparent',
             borderRadius: 8, fontSize: 13, fontWeight: filter === f.id ? 700 : 500,
-            color: filter === f.id ? '#4F46E5' : '#64748B',
+            color: filter === f.id ? 'var(--primary)' : 'var(--on-surface-variant)',
             boxShadow: filter === f.id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
             transition: 'all 0.2s'
           }}>
@@ -142,7 +142,7 @@ export default function NotificationPage() {
 
       {/* 알림 목록 */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px 0', color: '#94A3B8' }}>
+        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
           <RefreshCw size={32} style={{ animation: 'spin 1s linear infinite', marginBottom: 12 }} />
           <p>로딩 중...</p>
         </div>
@@ -160,7 +160,7 @@ export default function NotificationPage() {
             return (
               <div key={n.id} style={{
                 background: n.isRead ? 'white' : colors.bg,
-                border: `1.5px solid ${n.isRead ? '#E2E8F0' : colors.border}`,
+                border: `1.5px solid ${n.isRead ? 'var(--outline-variant)' : colors.border}`,
                 borderRadius: 12, padding: 16,
                 display: 'flex', gap: 14, alignItems: 'flex-start',
                 transition: 'all 0.2s',
@@ -172,7 +172,7 @@ export default function NotificationPage() {
                 <div style={{
                   width: 42, height: 42, borderRadius: '50%',
                   background: n.isRead ? '#F1F5F9' : colors.bg,
-                  border: `2px solid ${n.isRead ? '#E2E8F0' : colors.border}`,
+                  border: `2px solid ${n.isRead ? 'var(--outline-variant)' : colors.border}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 20, flexShrink: 0
                 }}>
@@ -184,21 +184,21 @@ export default function NotificationPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                     <h4 style={{
                       fontSize: 14, fontWeight: n.isRead ? 600 : 700,
-                      color: n.isRead ? '#475569' : '#1E293B', marginBottom: 4
+                      color: n.isRead ? '#475569' : 'var(--on-surface)', marginBottom: 4
                     }}>
                       {!n.isRead && (
                         <span style={{
                           display: 'inline-block', width: 6, height: 6, borderRadius: '50%',
-                          background: '#4F46E5', marginRight: 6, verticalAlign: 'middle'
+                          background: 'var(--primary)', marginRight: 6, verticalAlign: 'middle'
                         }} />
                       )}
                       {n.title}
                     </h4>
-                    <span style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0 }}>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>
                       {formatDate(n.createdAt)}
                     </span>
                   </div>
-                  <p style={{ fontSize: 13, color: n.isRead ? '#94A3B8' : '#475569', lineHeight: 1.5 }}>
+                  <p style={{ fontSize: 13, color: n.isRead ? 'var(--text-muted)' : '#475569', lineHeight: 1.5 }}>
                     {n.message}
                   </p>
                 </div>
@@ -207,11 +207,11 @@ export default function NotificationPage() {
                 <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
                   {!n.isRead && (
                     <button
-                      style={{ width: 28, height: 28, borderRadius: 6, border: 'none', background: '#EEF2FF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      style={{ width: 28, height: 28, borderRadius: 6, border: 'none', background: 'var(--primary-container)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                       onClick={e => { e.stopPropagation(); handleMarkRead(n.id) }}
                       title="읽음 표시"
                     >
-                      <Check size={13} color="#4F46E5" />
+                      <Check size={13} color="var(--primary)" />
                     </button>
                   )}
                   <button

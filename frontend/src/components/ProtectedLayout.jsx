@@ -1,17 +1,16 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuthStore, useHouseStore } from '../store/useStore'
-import Sidebar from './Sidebar'
+import BottomNav from './BottomNav'
 import Header from './Header'
 import { useEffect } from 'react'
 import api from '../api/axios'
 
 export default function ProtectedLayout() {
   const { isAuthenticated } = useAuthStore()
-  const { setHouses, selectedHouse } = useHouseStore()
+  const { setHouses } = useHouseStore()
 
   useEffect(() => {
     if (isAuthenticated) {
-      // 집 목록 로드
       api.get('/houses').then(res => {
         setHouses(res.data.data)
       }).catch(() => {})
@@ -24,13 +23,18 @@ export default function ProtectedLayout() {
 
   return (
     <div className="app-layout">
-      <Sidebar />
+      {/* Top header */}
+      <Header />
+
+      {/* Scrollable page content */}
       <div className="main-content">
-        <Header />
         <div className="page-content">
           <Outlet />
         </div>
       </div>
+
+      {/* Bottom navigation */}
+      <BottomNav />
     </div>
   )
 }

@@ -95,7 +95,7 @@ export default function HousePage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>내집 관리</h2>
-          <p style={{ color: '#64748B', fontSize: 14 }}>집 정보와 구역을 관리하세요</p>
+          <p style={{ color: 'var(--on-surface-variant)', fontSize: 14 }}>집 정보와 구역을 관리하세요</p>
         </div>
         <button className="btn btn-primary" onClick={openCreate}>
           <Plus size={16} /> 집 추가
@@ -120,7 +120,7 @@ export default function HousePage() {
                   <div style={{ fontSize: 40 }}>{EMOJI[h.houseType]}</div>
                   <div>
                     <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 4 }}>{h.name}</div>
-                    <div style={{ fontSize: 13, color: '#64748B', marginBottom: 4 }}>{HOUSE_TYPES[h.houseType]} · {h.address || '주소 미등록'}</div>
+                    <div style={{ fontSize: 13, color: 'var(--on-surface-variant)', marginBottom: 4 }}>{HOUSE_TYPES[h.houseType]} · {h.address || '주소 미등록'}</div>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       {h.area && <span className="badge badge-info">📐 {h.area}㎡</span>}
                       {h.rooms && <span className="badge badge-primary">🚪 {h.rooms}방</span>}
@@ -144,26 +144,26 @@ export default function HousePage() {
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div className="card-title" style={{ margin: 0 }}>🗺️ 구역 현황 — {selectedHouse.name}</div>
-            <span style={{ fontSize: 12, color: '#94A3B8' }}>구역 클릭 시 물품 관리로 이동</span>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>구역 클릭 시 물품 관리로 이동</span>
           </div>
           <div className="grid-4">
             {zones.map(z => (
               <div key={z.id}
                 onClick={() => handleZoneClick(z)}
                 style={{
-                  background: '#F8FAFC', borderRadius: 12, padding: 16, textAlign: 'center',
-                  cursor: 'pointer', border: '1.5px solid #E2E8F0',
+                  background: 'var(--surface)', borderRadius: 12, padding: 16, textAlign: 'center',
+                  cursor: 'pointer',
                   transition: 'all 0.15s'
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.borderColor = '#4F46E5' }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.borderColor = '#E2E8F0' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--primary-container)'; e.currentTarget.style.borderColor = 'var(--primary)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--outline-variant)' }}
               >
                 <div style={{ fontSize: 28, marginBottom: 8 }}>{ZONE_ICONS[z.zoneType] || '📦'}</div>
                 <div style={{ fontWeight: 700, fontSize: 14 }}>{z.name}</div>
-                <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{ZONE_LABELS[z.zoneType]}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{ZONE_LABELS[z.zoneType]}</div>
                 <div
                   onClick={e => { e.stopPropagation(); handleZoneClick(z) }}
-                  style={{ marginTop: 8, background: '#E0E7FF', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 700, color: '#4F46E5', display: 'inline-flex', alignItems: 'center', gap: 3, cursor: 'pointer' }}
+                  style={{ marginTop: 8, background: '#E0E7FF', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 700, color: 'var(--primary)', display: 'inline-flex', alignItems: 'center', gap: 3, cursor: 'pointer' }}
                 >
                   📦 {z.itemCount ?? 0}개
                   <ChevronRight size={11} />
@@ -220,9 +220,9 @@ export default function HousePage() {
                     {Object.entries(THEMES).map(([k, v]) => (
                       <button key={k} type="button" style={{
                         padding: '6px 14px', borderRadius: 20, border: '2px solid',
-                        borderColor: form.theme === k ? '#4F46E5' : '#E2E8F0',
-                        background: form.theme === k ? '#EEF2FF' : 'white',
-                        color: form.theme === k ? '#4F46E5' : '#64748B',
+                        borderColor: form.theme === k ? 'var(--primary)' : 'var(--outline-variant)',
+                        background: form.theme === k ? 'var(--primary-container)' : 'white',
+                        color: form.theme === k ? 'var(--primary)' : 'var(--on-surface-variant)',
                         fontSize: 13, fontWeight: 600, cursor: 'pointer'
                       }} onClick={() => setForm({ ...form, theme: k })}>{v}</button>
                     ))}

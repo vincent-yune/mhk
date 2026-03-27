@@ -39,11 +39,11 @@ function CommunityLinkButton({ item, onSelect, mini = false }) {
           display: 'flex', alignItems: 'center', gap: mini ? 0 : 4,
           padding: mini ? '5px 7px' : '5px 10px',
           borderRadius: 8, border: '1.5px solid #10B981',
-          background: open ? '#ECFDF5' : 'white',
-          color: '#10B981', fontSize: 12, fontWeight: 700,
+          background: open ? 'var(--secondary-container)' : 'white',
+          color: 'var(--secondary)', fontSize: 12, fontWeight: 700,
           cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s'
         }}
-        onMouseEnter={e => e.currentTarget.style.background = '#ECFDF5'}
+        onMouseEnter={e => e.currentTarget.style.background = 'var(--secondary-container)'}
         onMouseLeave={e => { if (!open) e.currentTarget.style.background = 'white' }}
       >
         <ShoppingBag size={13} />
@@ -52,10 +52,10 @@ function CommunityLinkButton({ item, onSelect, mini = false }) {
       {open && (
         <div style={{
           position: 'absolute', right: 0, top: 'calc(100% + 4px)', zIndex: 100,
-          background: 'white', border: '1px solid #E2E8F0', borderRadius: 10,
+          background: 'white', borderRadius: 10,
           boxShadow: '0 8px 24px rgba(0,0,0,0.12)', minWidth: 160, overflow: 'hidden'
         }}>
-          <div style={{ padding: '8px 12px 6px', fontSize: 11, color: '#94A3B8', fontWeight: 700, borderBottom: '1px solid #F1F5F9' }}>
+          <div style={{ padding: '8px 12px 6px', fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, borderBottom: '1px solid #F1F5F9' }}>
             📦 {item.name}
           </div>
           {options.map(opt => (
@@ -64,10 +64,10 @@ function CommunityLinkButton({ item, onSelect, mini = false }) {
               style={{
                 display: 'flex', alignItems: 'center', gap: 8, width: '100%',
                 padding: '9px 14px', background: 'none', border: 'none',
-                fontSize: 13, fontWeight: 600, color: '#1E293B', cursor: 'pointer',
+                fontSize: 13, fontWeight: 600, color: 'var(--on-surface)', cursor: 'pointer',
                 textAlign: 'left', transition: 'background 0.1s'
               }}
-              onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--surface)'}
               onMouseLeave={e => e.currentTarget.style.background = 'none'}
             >
               {opt.icon} {opt.label}
@@ -228,9 +228,9 @@ export default function ItemPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800 }}>구역별 물품 관리</h2>
-          <p style={{ color: '#64748B', fontSize: 14 }}>
+          <p style={{ color: 'var(--on-surface-variant)', fontSize: 14 }}>
             총 {items.length}개 물품
-            {selectedZoneName && <span style={{ marginLeft: 8, color: '#10B981', fontWeight: 700 }}>— {selectedZoneName} 필터 중</span>}
+            {selectedZoneName && <span style={{ marginLeft: 8, color: 'var(--secondary)', fontWeight: 700 }}>— {selectedZoneName} 필터 중</span>}
           </p>
         </div>
         <button className="btn btn-primary" onClick={openCreate}><Plus size={16} /> 물품 등록</button>
@@ -246,20 +246,20 @@ export default function ItemPage() {
           <button key={t.key} onClick={() => { setActiveTab(t.key); setSelectedZone(null) }}
             style={{
               padding: '8px 16px', borderRadius: 20, border: '1.5px solid',
-              borderColor: activeTab === t.key && !selectedZone ? '#4F46E5' : '#E2E8F0',
-              background: activeTab === t.key && !selectedZone ? '#EEF2FF' : 'white',
-              color: activeTab === t.key && !selectedZone ? '#4F46E5' : '#64748B',
+              borderColor: activeTab === t.key && !selectedZone ? 'var(--primary)' : 'var(--outline-variant)',
+              background: activeTab === t.key && !selectedZone ? 'var(--primary-container)' : 'white',
+              color: activeTab === t.key && !selectedZone ? 'var(--primary)' : 'var(--on-surface-variant)',
               fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
             }}>{t.icon} {t.label}</button>
         ))}
-        <div style={{ width: 1, height: 32, background: '#E2E8F0', margin: '0 4px', alignSelf: 'center' }} />
+        <div style={{ width: 1, height: 32, background: 'var(--outline-variant)', margin: '0 4px', alignSelf: 'center' }} />
         {zones.map(z => (
           <button key={z.id} onClick={() => { setSelectedZone(z.id); setActiveTab('all') }}
             style={{
               padding: '8px 16px', borderRadius: 20, border: '1.5px solid',
-              borderColor: selectedZone === z.id ? '#10B981' : '#E2E8F0',
-              background: selectedZone === z.id ? '#ECFDF5' : 'white',
-              color: selectedZone === z.id ? '#10B981' : '#64748B',
+              borderColor: selectedZone === z.id ? 'var(--secondary)' : 'var(--outline-variant)',
+              background: selectedZone === z.id ? 'var(--secondary-container)' : 'white',
+              color: selectedZone === z.id ? 'var(--secondary)' : 'var(--on-surface-variant)',
               fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
             }}>
             {z.name}
@@ -278,7 +278,7 @@ export default function ItemPage() {
 
       {/* 검색 */}
       <div style={{ position: 'relative', marginBottom: 16 }}>
-        <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+        <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
         <input className="form-input" style={{ paddingLeft: 40 }} placeholder="물품명, 브랜드 검색..."
           value={search} onChange={e => setSearch(e.target.value)} />
       </div>
@@ -308,7 +308,7 @@ export default function ItemPage() {
                       <span className="badge badge-danger">🛒 재주문 필요</span>
                     )}
                   </div>
-                  <div style={{ display: 'flex', gap: 12, fontSize: 13, color: '#64748B', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: 12, fontSize: 13, color: 'var(--on-surface-variant)', flexWrap: 'wrap' }}>
                     {item.brand && <span>🏷️ {item.brand}</span>}
                     {item.zoneName && <span>📍 {item.zoneName}</span>}
                     <span>수량: {item.quantity}{item.unit}</span>
@@ -339,7 +339,7 @@ export default function ItemPage() {
                 <span style={{ fontSize: 24 }}>{CATEGORY_ICONS[detailItem.categoryId] || '📦'}</span>
                 <div>
                   <div className="modal-title">{detailItem.name}</div>
-                  <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>물품 상세 정보</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>물품 상세 정보</div>
                 </div>
               </div>
               <button className="btn-icon" onClick={() => setShowDetailModal(false)}><X size={18} /></button>
@@ -360,7 +360,7 @@ export default function ItemPage() {
               </div>
 
               {/* 정보 그리드 */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px', background: '#F8FAFC', borderRadius: 10, padding: 16, marginBottom: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px', background: 'var(--surface)', borderRadius: 10, padding: 16, marginBottom: 16 }}>
                 {[
                   { label: '브랜드', value: detailItem.brand },
                   { label: '모델', value: detailItem.model },
@@ -372,27 +372,27 @@ export default function ItemPage() {
                   { label: '재주문 기준', value: detailItem.reorderLevel ? `${detailItem.reorderLevel}${detailItem.unit} 이하` : null },
                 ].filter(r => r.value).map(row => (
                   <div key={row.label}>
-                    <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{row.label}</div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#1E293B', marginTop: 2 }}>{row.value}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{row.label}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--on-surface)', marginTop: 2 }}>{row.value}</div>
                   </div>
                 ))}
               </div>
 
               {detailItem.description && (
-                <div style={{ background: '#F8FAFC', borderRadius: 10, padding: 12, marginBottom: 16 }}>
-                  <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, marginBottom: 4 }}>메모</div>
+                <div style={{ background: 'var(--surface)', borderRadius: 10, padding: 12, marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 4 }}>메모</div>
                   <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.6 }}>{detailItem.description}</div>
                 </div>
               )}
 
               {/* 커뮤니티 연계 섹션 */}
-              <div style={{ background: '#ECFDF5', borderRadius: 10, padding: 14, border: '1px solid #D1FAE5' }}>
+              <div style={{ background: 'var(--secondary-container)', borderRadius: 10, padding: 14, border: '1px solid #D1FAE5' }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#065F46', marginBottom: 10 }}>
                   🏪 커뮤니티에서 이 물품 거래하기
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {[
-                    { type: 'SELL', icon: '💰', label: '판매 글 올리기', bg: '#EEF2FF', color: '#4F46E5', border: '#C7D2FE' },
+                    { type: 'SELL', icon: '💰', label: '판매 글 올리기', bg: 'var(--primary-container)', color: 'var(--primary)', border: '#C7D2FE' },
                     { type: 'FREE', icon: '🎁', label: '나눔 글 올리기', bg: '#FFF7ED', color: '#F59E0B', border: '#FDE68A' },
                     { type: 'RENT', icon: '🔄', label: '대여 글 올리기', bg: '#FDF4FF', color: '#A855F7', border: '#E9D5FF' },
                   ].map(opt => (
@@ -501,7 +501,7 @@ export default function ItemPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                   <input type="checkbox" id="consumable" checked={form.isConsumable}
                     onChange={e => setForm({ ...form, isConsumable: e.target.checked })} />
-                  <label htmlFor="consumable" style={{ fontSize: 13, fontWeight: 600, color: '#64748B', cursor: 'pointer' }}>
+                  <label htmlFor="consumable" style={{ fontSize: 13, fontWeight: 600, color: 'var(--on-surface-variant)', cursor: 'pointer' }}>
                     소모품 (재주문 알림 사용)
                   </label>
                 </div>

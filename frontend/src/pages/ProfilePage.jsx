@@ -98,7 +98,7 @@ export default function ProfilePage() {
             <div style={{
               position: 'absolute', bottom: 0, right: 0,
               width: 26, height: 26, borderRadius: '50%',
-              background: '#4F46E5', border: '2px solid white',
+              background: 'var(--primary)', border: '2px solid white',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer'
             }}>
@@ -108,8 +108,8 @@ export default function ProfilePage() {
 
           {/* 기본 정보 */}
           <div style={{ flex: 1, minWidth: 200 }}>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1E293B', marginBottom: 4 }}>{user?.name}</h2>
-            <p style={{ color: '#64748B', fontSize: 14, marginBottom: 8 }}>{user?.email}</p>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--on-surface)', marginBottom: 4 }}>{user?.name}</h2>
+            <p style={{ color: 'var(--on-surface-variant)', fontSize: 14, marginBottom: 8 }}>{user?.email}</p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 4,
@@ -121,7 +121,7 @@ export default function ProfilePage() {
               </span>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 4,
-                background: '#ECFDF5', color: '#059669', fontWeight: 600,
+                background: 'var(--secondary-container)', color: '#059669', fontWeight: 600,
                 fontSize: 12, padding: '4px 10px', borderRadius: 20,
                 border: '1.5px solid #A7F3D0'
               }}>
@@ -129,7 +129,7 @@ export default function ProfilePage() {
               </span>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 4,
-                background: '#EEF2FF', color: '#4F46E5', fontWeight: 600,
+                background: 'var(--primary-container)', color: 'var(--primary)', fontWeight: 600,
                 fontSize: 12, padding: '4px 10px', borderRadius: 20,
                 border: '1.5px solid #C7D2FE'
               }}>
@@ -159,16 +159,16 @@ export default function ProfilePage() {
 
         {/* 등급 프로그레스 */}
         {grade.nextGrade && (
-          <div style={{ marginTop: 20, padding: '16px', background: '#F8FAFC', borderRadius: 12 }}>
+          <div style={{ marginTop: 20, padding: '16px', background: 'var(--surface)', borderRadius: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#1E293B' }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--on-surface)' }}>
                 다음 등급까지: {GRADE_INFO[grade.nextGrade].emoji} {GRADE_INFO[grade.nextGrade].label}
               </span>
-              <span style={{ fontSize: 12, color: '#64748B' }}>
+              <span style={{ fontSize: 12, color: 'var(--on-surface-variant)' }}>
                 {user?.trustScore || 0} / {grade.nextScore}점
               </span>
             </div>
-            <div style={{ height: 8, background: '#E2E8F0', borderRadius: 4, overflow: 'hidden' }}>
+            <div style={{ height: 8, background: 'var(--outline-variant)', borderRadius: 4, overflow: 'hidden' }}>
               <div style={{
                 height: '100%',
                 width: `${Math.min(100, ((user?.trustScore || 0) / grade.nextScore) * 100)}%`,
@@ -189,7 +189,7 @@ export default function ProfilePage() {
           <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
             padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer',
             fontSize: 14, fontWeight: activeTab === tab.id ? 700 : 500,
-            color: activeTab === tab.id ? '#4F46E5' : '#64748B',
+            color: activeTab === tab.id ? 'var(--primary)' : 'var(--on-surface-variant)',
             borderBottom: activeTab === tab.id ? '2px solid #4F46E5' : '2px solid transparent',
             marginBottom: -2, transition: 'all 0.2s'
           }}>
@@ -201,7 +201,7 @@ export default function ProfilePage() {
       {/* 개인정보 탭 */}
       {activeTab === 'profile' && (
         <div className="card">
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: '#1E293B' }}>기본 정보</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: 'var(--on-surface)' }}>기본 정보</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
             <div className="form-group">
               <label className="form-label">
@@ -211,15 +211,15 @@ export default function ProfilePage() {
                 <input className="form-input" value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })} />
               ) : (
-                <div style={{ padding: '10px 0', fontSize: 15, color: '#1E293B', fontWeight: 500 }}>{user?.name}</div>
+                <div style={{ padding: '10px 0', fontSize: 15, color: 'var(--on-surface)', fontWeight: 500 }}>{user?.name}</div>
               )}
             </div>
             <div className="form-group">
               <label className="form-label">
                 <Mail size={14} style={{ marginRight: 6 }} />이메일
               </label>
-              <div style={{ padding: '10px 0', fontSize: 15, color: '#64748B' }}>{user?.email}
-                <span style={{ marginLeft: 8, fontSize: 11, background: '#ECFDF5', color: '#059669', padding: '2px 8px', borderRadius: 10 }}>인증됨</span>
+              <div style={{ padding: '10px 0', fontSize: 15, color: 'var(--on-surface-variant)' }}>{user?.email}
+                <span style={{ marginLeft: 8, fontSize: 11, background: 'var(--secondary-container)', color: '#059669', padding: '2px 8px', borderRadius: 10 }}>인증됨</span>
               </div>
             </div>
             <div className="form-group">
@@ -230,8 +230,8 @@ export default function ProfilePage() {
                 <input className="form-input" value={form.phone} placeholder="010-0000-0000"
                   onChange={e => setForm({ ...form, phone: e.target.value })} />
               ) : (
-                <div style={{ padding: '10px 0', fontSize: 15, color: '#1E293B', fontWeight: 500 }}>
-                  {user?.phone || <span style={{ color: '#94A3B8' }}>미등록</span>}
+                <div style={{ padding: '10px 0', fontSize: 15, color: 'var(--on-surface)', fontWeight: 500 }}>
+                  {user?.phone || <span style={{ color: 'var(--text-muted)' }}>미등록</span>}
                 </div>
               )}
             </div>
@@ -242,7 +242,7 @@ export default function ProfilePage() {
       {/* 보안 설정 탭 */}
       {activeTab === 'security' && (
         <div className="card">
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: '#1E293B' }}>🔒 비밀번호 변경</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: 'var(--on-surface)' }}>🔒 비밀번호 변경</h3>
           {!showPwChange ? (
             <button className="btn btn-secondary" onClick={() => setShowPwChange(true)}>
               비밀번호 변경하기

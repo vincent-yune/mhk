@@ -3,7 +3,7 @@ import { Plus, Search, X, Eye, Heart } from 'lucide-react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
 
-const POST_TYPES = { SELL: { label: '판매', color: '#EEF2FF', text: '#4F46E5', icon: '💰' }, BUY: { label: '구매', color: '#ECFDF5', text: '#10B981', icon: '🛒' }, SHARE: { label: '나눔', color: '#FFF7ED', text: '#F59E0B', icon: '🎁' }, RENT: { label: '대여', color: '#FDF4FF', text: '#A855F7', icon: '🔄' }, FREE: { label: '무료', color: '#FEF2F2', text: '#EF4444', icon: '🆓' } }
+const POST_TYPES = { SELL: { label: '판매', color: 'var(--primary-container)', text: 'var(--primary)', icon: '💰' }, BUY: { label: '구매', color: 'var(--secondary-container)', text: 'var(--secondary)', icon: '🛒' }, SHARE: { label: '나눔', color: '#FFF7ED', text: '#F59E0B', icon: '🎁' }, RENT: { label: '대여', color: '#FDF4FF', text: '#A855F7', icon: '🔄' }, FREE: { label: '무료', color: '#FEF2F2', text: '#EF4444', icon: '🆓' } }
 const STATUS_MAP = { ACTIVE: { label: '거래중', cls: 'badge-active' }, RESERVED: { label: '예약중', cls: 'badge-warning' }, COMPLETED: { label: '완료', cls: 'badge-gray' }, CLOSED: { label: '마감', cls: 'badge-gray' } }
 
 export default function CommunityPage() {
@@ -84,7 +84,7 @@ export default function CommunityPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800 }}>이웃과 물품 거래</h2>
-          <p style={{ color: '#64748B', fontSize: 14 }}>신뢰 기반 로컬 커뮤니티</p>
+          <p style={{ color: 'var(--on-surface-variant)', fontSize: 14 }}>신뢰 기반 로컬 커뮤니티</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}><Plus size={16} /> 게시글 등록</button>
       </div>
@@ -93,13 +93,13 @@ export default function CommunityPage() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
         <button onClick={() => { setPostType(''); setPage(0) }}
           style={{ padding: '6px 16px', borderRadius: 20, border: '1.5px solid', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-            borderColor: !postType ? '#4F46E5' : '#E2E8F0', background: !postType ? '#EEF2FF' : 'white', color: !postType ? '#4F46E5' : '#64748B' }}>
+            borderColor: !postType ? 'var(--primary)' : 'var(--outline-variant)', background: !postType ? 'var(--primary-container)' : 'white', color: !postType ? 'var(--primary)' : 'var(--on-surface-variant)' }}>
           전체
         </button>
         {Object.entries(POST_TYPES).map(([k, v]) => (
           <button key={k} onClick={() => { setPostType(k); setPage(0) }}
             style={{ padding: '6px 16px', borderRadius: 20, border: '1.5px solid', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-              borderColor: postType === k ? v.text : '#E2E8F0', background: postType === k ? v.color : 'white', color: postType === k ? v.text : '#64748B' }}>
+              borderColor: postType === k ? v.text : 'var(--outline-variant)', background: postType === k ? v.color : 'white', color: postType === k ? v.text : 'var(--on-surface-variant)' }}>
             {v.icon} {v.label}
           </button>
         ))}
@@ -107,7 +107,7 @@ export default function CommunityPage() {
 
       {/* 검색 */}
       <div style={{ position: 'relative', marginBottom: 16 }}>
-        <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+        <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
         <input className="form-input" style={{ paddingLeft: 40 }} placeholder="게시글 검색..." value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
@@ -130,19 +130,19 @@ export default function CommunityPage() {
                       <span className={`badge ${STATUS_MAP[post.status]?.cls}`}>{STATUS_MAP[post.status]?.label}</span>
                     </div>
                     <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.title}</h3>
-                    <p style={{ fontSize: 13, color: '#64748B', marginBottom: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.content}</p>
+                    <p style={{ fontSize: 13, color: 'var(--on-surface-variant)', marginBottom: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.content}</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: 16, fontWeight: 800, color: '#4F46E5' }}>
+                      <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--primary)' }}>
                         {post.price ? `${Number(post.price).toLocaleString()}원` : '가격문의'}
-                        {post.isNegotiable && <span style={{ fontSize: 11, fontWeight: 500, color: '#94A3B8', marginLeft: 6 }}>협의가능</span>}
+                        {post.isNegotiable && <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', marginLeft: 6 }}>협의가능</span>}
                       </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span style={{ fontSize: 12, color: '#94A3B8', display: 'flex', alignItems: 'center', gap: 3 }}><Eye size={13} /> {post.viewCount}</span>
-                        <button style={{ fontSize: 12, color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer' }}
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}><Eye size={13} /> {post.viewCount}</span>
+                        <button style={{ fontSize: 12, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
                           onClick={e => handleDelete(post.id, e)}>🗑️</button>
                       </div>
                     </div>
-                    {post.location && <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 6 }}>📍 {post.location}</div>}
+                    {post.location && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>📍 {post.location}</div>}
                   </div>
                 )
               })}
@@ -155,7 +155,7 @@ export default function CommunityPage() {
               {Array.from({ length: totalPages }, (_, i) => (
                 <button key={i} onClick={() => setPage(i)}
                   style={{ width: 32, height: 32, borderRadius: 8, border: '1.5px solid', cursor: 'pointer', fontWeight: 600, fontSize: 13,
-                    borderColor: page === i ? '#4F46E5' : '#E2E8F0', background: page === i ? '#EEF2FF' : 'white', color: page === i ? '#4F46E5' : '#64748B' }}>
+                    borderColor: page === i ? 'var(--primary)' : 'var(--outline-variant)', background: page === i ? 'var(--primary-container)' : 'white', color: page === i ? 'var(--primary)' : 'var(--on-surface-variant)' }}>
                   {i + 1}
                 </button>
               ))}
@@ -173,21 +173,21 @@ export default function CommunityPage() {
               <button className="btn-icon" onClick={() => setSelectedPost(null)}><X size={16} /></button>
             </div>
             <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 8 }}>{selectedPost.title}</h3>
-            <p style={{ fontSize: 14, color: '#64748B', lineHeight: 1.7, marginBottom: 16 }}>{selectedPost.content}</p>
+            <p style={{ fontSize: 14, color: 'var(--on-surface-variant)', lineHeight: 1.7, marginBottom: 16 }}>{selectedPost.content}</p>
             <div className="divider" />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#94A3B8' }}>가격</span>
-                <span style={{ fontWeight: 700, color: '#4F46E5' }}>
+                <span style={{ color: 'var(--text-muted)' }}>가격</span>
+                <span style={{ fontWeight: 700, color: 'var(--primary)' }}>
                   {selectedPost.price ? `${Number(selectedPost.price).toLocaleString()}원` : '가격문의'}
                 </span>
               </div>
               {selectedPost.location && <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#94A3B8' }}>거래장소</span>
+                <span style={{ color: 'var(--text-muted)' }}>거래장소</span>
                 <span style={{ fontWeight: 600 }}>📍 {selectedPost.location}</span>
               </div>}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#94A3B8' }}>조회수</span>
+                <span style={{ color: 'var(--text-muted)' }}>조회수</span>
                 <span>{selectedPost.viewCount}</span>
               </div>
             </div>
@@ -215,8 +215,8 @@ export default function CommunityPage() {
                     {Object.entries(POST_TYPES).map(([k, v]) => (
                       <button key={k} type="button" style={{
                         padding: '6px 14px', borderRadius: 20, border: '1.5px solid', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-                        borderColor: form.postType === k ? v.text : '#E2E8F0',
-                        background: form.postType === k ? v.color : 'white', color: form.postType === k ? v.text : '#64748B'
+                        borderColor: form.postType === k ? v.text : 'var(--outline-variant)',
+                        background: form.postType === k ? v.color : 'white', color: form.postType === k ? v.text : 'var(--on-surface-variant)'
                       }} onClick={() => setForm({ ...form, postType: k })}>{v.icon} {v.label}</button>
                     ))}
                   </div>
@@ -241,7 +241,7 @@ export default function CommunityPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <input type="checkbox" id="negotiable" checked={form.isNegotiable} onChange={e => setForm({ ...form, isNegotiable: e.target.checked })} />
-                  <label htmlFor="negotiable" style={{ fontSize: 13, fontWeight: 600, color: '#64748B', cursor: 'pointer' }}>가격 협의 가능</label>
+                  <label htmlFor="negotiable" style={{ fontSize: 13, fontWeight: 600, color: 'var(--on-surface-variant)', cursor: 'pointer' }}>가격 협의 가능</label>
                 </div>
               </div>
               <div className="modal-footer">

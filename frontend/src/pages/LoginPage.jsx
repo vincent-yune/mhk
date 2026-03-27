@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { Home, Lock, Mail, User, Phone } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import { useAuthStore } from '../store/useStore'
 import toast from 'react-hot-toast'
@@ -8,7 +7,7 @@ import toast from 'react-hot-toast'
 export default function LoginPage() {
   const navigate = useNavigate()
   const { login } = useAuthStore()
-  const [tab, setTab] = useState('login') // login | signup
+  const [tab, setTab] = useState('login')
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ email: '', password: '', name: '', phone: '' })
 
@@ -24,9 +23,7 @@ export default function LoginPage() {
       navigate('/dashboard')
     } catch (err) {
       toast.error(err.response?.data?.message || '로그인에 실패했습니다.')
-    } finally {
-      setLoading(false)
-    }
+    } finally { setLoading(false) }
   }
 
   const handleSignup = async e => {
@@ -39,33 +36,35 @@ export default function LoginPage() {
       navigate('/dashboard')
     } catch (err) {
       toast.error(err.response?.data?.message || '회원가입에 실패했습니다.')
-    } finally {
-      setLoading(false)
-    }
+    } finally { setLoading(false) }
   }
 
   return (
     <div className="auth-page">
       <div className="auth-card">
+
+        {/* Logo */}
         <div className="auth-logo">
           <div className="logo-circle">🏠</div>
           <h1>MyHouse</h1>
           <p>집의 모든 것을 한눈에 관리</p>
         </div>
 
-        {/* 탭 */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, background: '#F8FAFC', borderRadius: 12, padding: 4 }}>
+        {/* Tab Switcher */}
+        <div style={{
+          display: 'flex', gap: 4, marginBottom: 28,
+          background: 'var(--surface-container-low)',
+          borderRadius: 14, padding: 4
+        }}>
           {['login', 'signup'].map(t => (
-            <button key={t}
-              onClick={() => setTab(t)}
-              style={{
-                flex: 1, padding: '8px', border: 'none', borderRadius: 10, cursor: 'pointer',
-                background: tab === t ? 'white' : 'transparent',
-                fontWeight: 700, fontSize: 14,
-                color: tab === t ? '#4F46E5' : '#64748B',
-                boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-                transition: 'all 0.2s'
-              }}>
+            <button key={t} onClick={() => setTab(t)} style={{
+              flex: 1, padding: '9px', border: 'none', borderRadius: 10, cursor: 'pointer',
+              background: tab === t ? 'var(--surface-container-lowest)' : 'transparent',
+              fontWeight: 700, fontSize: 14, fontFamily: 'Manrope, sans-serif',
+              color: tab === t ? 'var(--primary)' : 'var(--on-surface-variant)',
+              boxShadow: tab === t ? 'var(--shadow-ambient)' : 'none',
+              transition: 'all 0.2s'
+            }}>
               {t === 'login' ? '로그인' : '회원가입'}
             </button>
           ))}
@@ -75,20 +74,22 @@ export default function LoginPage() {
           <form onSubmit={handleLogin}>
             <div className="form-group">
               <label className="form-label">이메일</label>
-              <input name="email" type="email" className="form-input" placeholder="example@myhouse.com"
+              <input name="email" type="email" className="form-input"
+                placeholder="example@myhouse.com"
                 value={form.email} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label className="form-label">비밀번호</label>
-              <input name="password" type="password" className="form-input" placeholder="••••••••"
+              <input name="password" type="password" className="form-input"
+                placeholder="••••••••"
                 value={form.password} onChange={handleChange} required />
             </div>
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 8 }} disabled={loading}>
+            <div style={{ height: 8 }} />
+            <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={loading}>
               {loading ? '로그인 중...' : '🔑 로그인'}
             </button>
-            {/* 테스트 계정 */}
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#94A3B8', marginTop: 16 }}>
-              테스트: test@myhouse.com / test1234
+            <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--on-surface-variant)', marginTop: 20 }}>
+              테스트 계정: demo@myhouse.com / demo1234
             </p>
           </form>
         ) : (
@@ -113,7 +114,8 @@ export default function LoginPage() {
               <input name="phone" type="tel" className="form-input" placeholder="010-0000-0000"
                 value={form.phone} onChange={handleChange} />
             </div>
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 8 }} disabled={loading}>
+            <div style={{ height: 8 }} />
+            <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={loading}>
               {loading ? '가입 중...' : '🏠 회원가입'}
             </button>
           </form>

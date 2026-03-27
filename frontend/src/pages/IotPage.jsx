@@ -74,7 +74,7 @@ export default function IotPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800 }}>IoT 기기 관리</h2>
-          <p style={{ color: '#64748B', fontSize: 14 }}>총 {devices.length}개 기기</p>
+          <p style={{ color: 'var(--on-surface-variant)', fontSize: 14 }}>총 {devices.length}개 기기</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}><Plus size={16} /> 기기 추가</button>
       </div>
@@ -82,12 +82,12 @@ export default function IotPage() {
       {/* 요약 통계 */}
       <div className="grid-3" style={{ marginBottom: 24 }}>
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: '#DCFCE7' }}><Wifi size={22} color="#10B981" /></div>
-          <div><div className="stat-value" style={{ color: '#10B981' }}>{online}</div><div className="stat-label">온라인</div></div>
+          <div className="stat-icon" style={{ background: '#DCFCE7' }}><Wifi size={22} color="var(--secondary)" /></div>
+          <div><div className="stat-value" style={{ color: 'var(--secondary)' }}>{online}</div><div className="stat-label">온라인</div></div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: '#F1F5F9' }}><WifiOff size={22} color="#94A3B8" /></div>
-          <div><div className="stat-value" style={{ color: '#94A3B8' }}>{offline}</div><div className="stat-label">오프라인</div></div>
+          <div className="stat-icon" style={{ background: '#F1F5F9' }}><WifiOff size={22} color="var(--text-muted)" /></div>
+          <div><div className="stat-value" style={{ color: 'var(--text-muted)' }}>{offline}</div><div className="stat-label">오프라인</div></div>
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ background: '#FEF3C7' }}>💤</div>
@@ -100,16 +100,16 @@ export default function IotPage() {
         <div className="card-title" style={{ marginBottom: 16 }}>⚡ 자동화 시나리오</div>
         <div className="grid-4">
           {[
-            { icon: '🏠', label: '귀가 모드', desc: '조명 켜기 + 에어컨 ON', color: '#EEF2FF' },
+            { icon: '🏠', label: '귀가 모드', desc: '조명 켜기 + 에어컨 ON', color: 'var(--primary-container)' },
             { icon: '🌙', label: '취침 모드', desc: '전체 조명 OFF + 잠금', color: '#F5F3FF' },
             { icon: '🚪', label: '외출 모드', desc: '전원 차단 + 보안 ON', color: '#FFF7ED' },
-            { icon: '☀️', label: '기상 모드', desc: '조명 서서히 켜기', color: '#ECFDF5' },
+            { icon: '☀️', label: '기상 모드', desc: '조명 서서히 켜기', color: 'var(--secondary-container)' },
           ].map((s, i) => (
             <div key={i} style={{ background: s.color, borderRadius: 12, padding: 16, cursor: 'pointer' }}
               onClick={() => toast('시나리오 실행 기능 준비 중!', { icon: '🚧' })}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>{s.icon}</div>
               <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{s.label}</div>
-              <div style={{ fontSize: 12, color: '#64748B' }}>{s.desc}</div>
+              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)' }}>{s.desc}</div>
             </div>
           ))}
         </div>
@@ -134,10 +134,10 @@ export default function IotPage() {
                 </div>
               </div>
               <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>{d.name}</div>
-              <div style={{ fontSize: 12, color: '#64748B', marginBottom: 4 }}>{DEVICE_LABELS[d.deviceType]} {d.manufacturer && `· ${d.manufacturer}`}</div>
-              {d.zone && <div style={{ fontSize: 12, color: '#94A3B8', marginBottom: 12 }}>📍 {d.zone.name}</div>}
+              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginBottom: 4 }}>{DEVICE_LABELS[d.deviceType]} {d.manufacturer && `· ${d.manufacturer}`}</div>
+              {d.zone && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>📍 {d.zone.name}</div>}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                <span style={{ fontSize: 11, color: '#94A3B8' }}>{PLATFORM_ICONS[d.platform]} {d.platform}</span>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{PLATFORM_ICONS[d.platform]} {d.platform}</span>
                 <button className={`iot-toggle ${d.status === 'ONLINE' ? 'on' : ''}`}
                   onClick={() => handleToggle(d)}
                   title={d.status === 'ONLINE' ? '끄기' : '켜기'} />
