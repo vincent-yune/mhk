@@ -1,5 +1,6 @@
 package com.myhouse.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import javax.persistence.*;
@@ -24,7 +25,7 @@ public class IotDevice extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "zone_id")
-    @JsonIgnoreProperties({"house", "items"})
+    @JsonIgnoreProperties({"house", "items", "hibernateLazyInitializer", "handler"})
     private Zone zone;
 
     @Column(nullable = false, length = 100)
@@ -46,6 +47,7 @@ public class IotDevice extends BaseEntity {
     @Column(length = 200)
     private String smartThingsDeviceId;
 
+    @JsonIgnore
     @Column(columnDefinition = "TEXT")
     private String smartThingsCapabilities;
 
@@ -60,6 +62,7 @@ public class IotDevice extends BaseEntity {
     @Builder.Default
     private Boolean isActive = true;
 
+    @JsonIgnore
     @Column(columnDefinition = "JSON")
     private String settings;
 

@@ -298,7 +298,8 @@ function SmartThingsConnectModal({ onClose, onConnected }) {
 function SmartThingsImportModal({ onClose, onImported, houseId }) {
   const [stDevices, setStDevices] = useState([])
   const [loading, setLoading] = useState(true)
-  const [importing, setImporting] = useState(null)
+  const [importing, setImporting] = useState(new Set())  // 여러 기기 동시 처리
+  const [imported, setImported] = useState(new Set())    // import 완료된 기기 추적
   const [syncing, setSyncing] = useState(false)
 
   useEffect(() => { loadStDevices() }, [])
@@ -306,8 +307,15 @@ function SmartThingsImportModal({ onClose, onImported, houseId }) {
   const loadStDevices = async () => {
     setLoading(true)
     try {
-      const res = await api.get('/smartthings/devices')
+      const res = await api.get(`/smartthings/devices?houseId=${houseId}`)
       setStDevices(res.data.data || [])
+      // 이미 연결된 기기 초기화
+      const linked = new Set(
+        (res.data.data || [])
+          .filter(d => d.alreadyLinked)
+          .map(d => d.deviceId)
+      )
+      setImported(linked)
     } catch (err) {
       toast.error('SmartThings 기기 목록 조회 실패')
     } finally {
@@ -316,15 +324,26 @@ function SmartThingsImportModal({ onClose, onImported, houseId }) {
   }
 
   const handleImport = async (device) => {
-    setImporting(device.deviceId)
+    if (importing.has(device.deviceId) || imported.has(device.deviceId)) return
+
+    setImporting(prev => new Set([...prev, device.deviceId]))
     try {
       await api.post(`/smartthings/devices/${device.deviceId}/import`, { houseId })
-      toast.success(`'${device.label || device.name}' 연결 완료!`)
-      onImported()
+      toast.success(`'${device.label || device.name}' 등록 완료!`)
+      setImported(prev => new Set([...prev, device.deviceId]))
+      onImported()   // 부모 목록 즉시 갱신
     } catch (err) {
       toast.error(err.response?.data?.message || '기기 연결 실패')
     } finally {
-      setImporting(null)
+      setImporting(prev => { const s = new Set(prev); s.delete(device.deviceId); return s })
+    }
+  }
+
+  const handleImportAll = async () => {
+    const notLinked = stDevices.filter(d => !imported.has(d.deviceId) && !importing.has(d.deviceId))
+    if (notLinked.length === 0) { toast('모든 기기가 이미 등록되었습니다.', { icon: '✅' }); return }
+    for (const device of notLinked) {
+      await handleImport(device)
     }
   }
 
@@ -334,7 +353,6 @@ function SmartThingsImportModal({ onClose, onImported, houseId }) {
       const res = await api.post(`/smartthings/sync/${houseId}`)
       toast.success(res.data.message || '동기화 완료!')
       onImported()
-      onClose()
     } catch (err) {
       toast.error('동기화 실패')
     } finally {
@@ -343,84 +361,142 @@ function SmartThingsImportModal({ onClose, onImported, houseId }) {
   }
 
   const dType = (typeIcon) => DEVICE_TYPE_MAP[typeIcon] || DEVICE_TYPE_MAP.OTHER
+  const linkedCount = stDevices.filter(d => imported.has(d.deviceId)).length
+  const totalCount = stDevices.length
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxHeight: '90vh' }}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
         <div className="modal-handle" />
-        <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 8,
-              background: 'linear-gradient(135deg, #1428A0, #1e3a8a)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <span style={{ color: 'white', fontWeight: 900, fontSize: 11, fontFamily: 'Manrope, sans-serif' }}>S</span>
+
+        {/* Header */}
+        <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid var(--outline-variant)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: 'linear-gradient(135deg, #1428A0, #1e3a8a)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <span style={{ color: 'white', fontWeight: 900, fontSize: 14, fontFamily: 'Manrope, sans-serif' }}>S</span>
+              </div>
+              <div>
+                <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 16 }}>
+                  삼성 기기 가져오기
+                </div>
+                {!loading && (
+                  <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 1 }}>
+                    {totalCount}개 발견 · {linkedCount}개 등록됨
+                  </div>
+                )}
+              </div>
             </div>
-            <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 16 }}>
-              SmartThings 기기 가져오기
-            </span>
+            <button onClick={onClose} style={{
+              width: 32, height: 32, borderRadius: '50%', background: 'var(--surface-container-low)',
+              border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <MSI name="close" size={18} color="var(--on-surface-variant)" />
+            </button>
           </div>
-          <button onClick={onClose} style={{
-            width: 32, height: 32, borderRadius: '50%', background: 'var(--surface-container-low)',
-            border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <MSI name="close" size={18} color="var(--on-surface-variant)" />
-          </button>
+
+          {/* 전체 등록 버튼 */}
+          {!loading && totalCount > 0 && (
+            <button
+              onClick={handleImportAll}
+              disabled={linkedCount === totalCount}
+              style={{
+                width: '100%', padding: '10px 0',
+                background: linkedCount === totalCount
+                  ? 'var(--surface-container-high)'
+                  : 'linear-gradient(135deg, #1428A0, #1e3a8a)',
+                color: linkedCount === totalCount ? 'var(--on-surface-variant)' : 'white',
+                border: 'none', borderRadius: 12,
+                fontWeight: 700, fontSize: 13, cursor: linkedCount === totalCount ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}
+            >
+              {linkedCount === totalCount ? (
+                <><MSI name="check_circle" size={16} />모든 기기 등록 완료</>
+              ) : (
+                <><MSI name="add_link" size={16} />전체 등록 ({totalCount - linkedCount}개)</>
+              )}
+            </button>
+          )}
         </div>
 
-        <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+        {/* 기기 목록 */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 20px' }}>
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--on-surface-variant)' }}>
+            <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--on-surface-variant)' }}>
               <div style={{
-                width: 32, height: 32, border: '3px solid var(--surface-container-high)',
+                width: 36, height: 36, border: '3px solid var(--surface-container-high)',
                 borderTopColor: '#1428A0', borderRadius: '50%',
                 animation: 'spin 0.8s linear infinite',
-                margin: '0 auto 12px',
+                margin: '0 auto 16px',
               }} />
-              <div style={{ fontSize: 14 }}>Samsung SmartThings에서<br />기기 목록 불러오는 중...</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>Samsung SmartThings에서</div>
+              <div style={{ fontSize: 13, color: 'var(--on-surface-variant)', marginTop: 4 }}>기기 목록 불러오는 중...</div>
             </div>
           ) : stDevices.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--on-surface-variant)' }}>
-              <MSI name="devices_other" size={48} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 12px' }} />
-              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 15 }}>
+            <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--on-surface-variant)' }}>
+              <MSI name="devices_other" size={52} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 16px' }} />
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16 }}>
                 연결된 삼성 기기 없음
               </div>
-              <div style={{ fontSize: 13, marginTop: 6 }}>
-                SmartThings 앱에서 기기를 먼저 등록해주세요.
+              <div style={{ fontSize: 13, marginTop: 8, lineHeight: 1.6 }}>
+                SmartThings 앱에서 기기를 먼저<br />등록해주세요.
               </div>
+              <a
+                href="https://www.samsung.com/global/galaxy/apps/smartthings/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  marginTop: 16, padding: '10px 20px',
+                  background: 'rgba(20,40,160,0.08)',
+                  borderRadius: 20, color: '#1428A0',
+                  fontWeight: 700, fontSize: 13, textDecoration: 'none',
+                }}
+              >
+                <MSI name="open_in_new" size={14} color="#1428A0" />
+                SmartThings 앱 열기
+              </a>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginBottom: 4 }}>
-                SmartThings에서 {stDevices.length}개 기기 발견
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {stDevices.map(device => {
                 const dt = dType(device.deviceTypeIcon)
-                const isImporting = importing === device.deviceId
+                const isImporting = importing.has(device.deviceId)
+                const isLinked = imported.has(device.deviceId)
+
                 return (
                   <div key={device.deviceId} style={{
                     display: 'flex', alignItems: 'center', gap: 12,
                     padding: '14px 16px',
-                    background: 'var(--surface-container-low)',
+                    background: isLinked ? 'rgba(0,110,28,0.05)' : 'var(--surface-container-low)',
                     borderRadius: 16,
-                    border: '1px solid rgba(20,40,160,0.08)',
+                    border: isLinked
+                      ? '1.5px solid rgba(0,110,28,0.2)'
+                      : '1px solid rgba(20,40,160,0.08)',
+                    transition: 'all 0.2s',
                   }}>
-                    {/* Device icon */}
+                    {/* 기기 아이콘 */}
                     <div style={{
-                      width: 44, height: 44, borderRadius: 14,
-                      background: dt.color,
+                      width: 48, height: 48, borderRadius: 14,
+                      background: isLinked ? '#b6f2be' : dt.color,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
+                      flexShrink: 0, position: 'relative',
                     }}>
-                      <MSI name={dt.icon} fill size={22} color={dt.tc} />
+                      <MSI name={isLinked ? 'check' : dt.icon} fill size={24} color={isLinked ? '#006e1c' : dt.tc} />
                     </div>
 
-                    {/* Info */}
+                    {/* 기기 정보 */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
-                        fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13,
-                        marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14,
+                        color: isLinked ? '#006e1c' : 'var(--on-surface)',
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        marginBottom: 2,
                       }}>
                         {device.label || device.name}
                       </div>
@@ -429,44 +505,63 @@ function SmartThingsImportModal({ onClose, onImported, houseId }) {
                         {device.manufacturer && ` · ${device.manufacturer}`}
                         {device.model && ` · ${device.model}`}
                       </div>
-                      {/* SmartThings badge */}
                       <div style={{
                         display: 'inline-flex', alignItems: 'center', gap: 4,
                         marginTop: 4, padding: '2px 8px',
-                        background: 'rgba(20,40,160,0.08)', borderRadius: 20,
+                        background: isLinked ? 'rgba(0,110,28,0.1)' : 'rgba(20,40,160,0.08)',
+                        borderRadius: 20,
                       }}>
-                        <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#1428A0' }} />
-                        <span style={{ fontSize: 9, color: '#1428A0', fontWeight: 700 }}>SmartThings</span>
+                        <div style={{ width: 5, height: 5, borderRadius: '50%', background: isLinked ? '#006e1c' : '#1428A0' }} />
+                        <span style={{ fontSize: 9, color: isLinked ? '#006e1c' : '#1428A0', fontWeight: 700 }}>
+                          {isLinked ? '등록됨' : 'SmartThings'}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Connect button */}
-                    <button
-                      onClick={() => handleImport(device)}
-                      disabled={isImporting}
-                      style={{
-                        flexShrink: 0,
-                        padding: '8px 14px',
-                        background: isImporting ? 'var(--surface-container-high)' : 'linear-gradient(135deg, #1428A0, #1e3a8a)',
-                        color: isImporting ? 'var(--on-surface-variant)' : 'white',
-                        border: 'none', borderRadius: 12,
-                        fontWeight: 700, fontSize: 12, cursor: isImporting ? 'not-allowed' : 'pointer',
-                        display: 'flex', alignItems: 'center', gap: 4,
-                      }}
-                    >
-                      {isImporting ? (
-                        <span style={{
-                          width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)',
-                          borderTopColor: 'white', borderRadius: '50%',
-                          display: 'inline-block', animation: 'spin 0.8s linear infinite',
-                        }} />
-                      ) : (
-                        <>
-                          <MSI name="add_link" size={14} />
-                          연결
-                        </>
-                      )}
-                    </button>
+                    {/* 연결/등록 버튼 */}
+                    {isLinked ? (
+                      <div style={{
+                        flexShrink: 0, width: 32, height: 32, borderRadius: '50%',
+                        background: 'rgba(0,110,28,0.1)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <MSI name="check" size={18} color="#006e1c" />
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleImport(device)}
+                        disabled={isImporting}
+                        style={{
+                          flexShrink: 0,
+                          padding: '9px 16px',
+                          background: isImporting
+                            ? 'var(--surface-container-high)'
+                            : 'linear-gradient(135deg, #1428A0, #1e3a8a)',
+                          color: isImporting ? 'var(--on-surface-variant)' : 'white',
+                          border: 'none', borderRadius: 12,
+                          fontWeight: 700, fontSize: 12,
+                          cursor: isImporting ? 'not-allowed' : 'pointer',
+                          display: 'flex', alignItems: 'center', gap: 5,
+                          minWidth: 60,
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {isImporting ? (
+                          <span style={{
+                            width: 14, height: 14,
+                            border: '2px solid rgba(255,255,255,0.3)',
+                            borderTopColor: 'white', borderRadius: '50%',
+                            display: 'inline-block',
+                            animation: 'spin 0.8s linear infinite',
+                          }} />
+                        ) : (
+                          <>
+                            <MSI name="add" size={15} />
+                            등록
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 )
               })}
@@ -474,25 +569,34 @@ function SmartThingsImportModal({ onClose, onImported, houseId }) {
           )}
         </div>
 
-        <div className="modal-footer">
+        {/* Footer */}
+        <div style={{ padding: '12px 20px', borderTop: '1px solid var(--outline-variant)', flexShrink: 0, display: 'flex', gap: 8 }}>
           <button
             onClick={handleSync}
-            disabled={syncing}
+            disabled={syncing || linkedCount === 0}
             style={{
               flex: 1, padding: 12,
-              background: syncing ? 'var(--surface-container-high)' : 'linear-gradient(135deg, #1428A0, #1e3a8a)',
-              color: syncing ? 'var(--on-surface-variant)' : 'white',
+              background: syncing || linkedCount === 0 ? 'var(--surface-container-high)' : 'var(--surface-container-low)',
+              color: syncing || linkedCount === 0 ? 'var(--on-surface-variant)' : 'var(--on-surface)',
               border: 'none', borderRadius: 12,
-              fontWeight: 700, fontSize: 13, cursor: syncing ? 'not-allowed' : 'pointer',
+              fontWeight: 700, fontSize: 13,
+              cursor: syncing || linkedCount === 0 ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             }}
           >
-            {syncing ? '동기화 중...' : (
-              <><MSI name="sync" size={16} />상태 동기화</>
-            )}
+            <MSI name="sync" size={16} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
+            {syncing ? '동기화 중...' : '상태 동기화'}
           </button>
-          <button onClick={onClose} className="btn btn-secondary" style={{ flex: 1 }}>
-            닫기
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1, padding: 12,
+              background: 'linear-gradient(135deg, #1428A0, #1e3a8a)',
+              color: 'white', border: 'none', borderRadius: 12,
+              fontWeight: 700, fontSize: 13, cursor: 'pointer',
+            }}
+          >
+            완료
           </button>
         </div>
       </div>

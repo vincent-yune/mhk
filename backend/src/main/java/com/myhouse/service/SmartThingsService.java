@@ -288,27 +288,54 @@ public class SmartThingsService {
         String label = ((String) device.getOrDefault("label", "")).toLowerCase();
         @SuppressWarnings("unchecked")
         List<String> caps = (List<String>) device.getOrDefault("capabilities", Collections.emptyList());
+        String deviceType = (String) device.getOrDefault("type", "");
 
-        if (category != null) {
+        // HUB 타입은 OTHER로
+        if ("HUB".equalsIgnoreCase(deviceType)) return "OTHER";
+
+        // 1순위: SmartThings category 필드
+        if (category != null && !category.isEmpty()) {
             switch (category) {
-                case "Refrigerator": return "REFRIGERATOR";
-                case "Washer": case "WasherDryer": return "WASHER";
-                case "AirConditioner": case "AirPurifier": return "AC";
+                case "Refrigerator":                        return "REFRIGERATOR";
+                case "Washer": case "WasherDryer":          return "WASHER";
+                case "Dryer":                               return "WASHER";
+                case "AirConditioner":                      return "AC";
+                case "AirPurifier": case "AirQualitySensor": return "AC";
                 case "Television": case "RemoteController": return "TV";
-                case "Light": case "SmartBulb": return "LIGHT";
-                case "Thermostat": return "THERMOSTAT";
-                case "SmartLock": case "Lock": return "LOCK";
-                case "Camera": return "CAMERA";
+                case "Light": case "SmartBulb": case "LEDStrip": return "LIGHT";
+                case "Thermostat": case "TemperatureSensor": return "THERMOSTAT";
+                case "SmartLock": case "Lock":              return "LOCK";
+                case "Camera": case "VideoCamera":          return "CAMERA";
+                case "Dishwasher":                          return "WASHER";
+                case "Microwave": case "Oven": case "Range": return "OTHER";
+                case "RobotCleaner":                        return "OTHER";
             }
         }
 
-        if (name.contains("fridge") || name.contains("refrigerator") || label.contains("냉장고")) return "REFRIGERATOR";
-        if (name.contains("washer") || name.contains("dryer") || label.contains("세탁")) return "WASHER";
-        if (name.contains("air") || name.contains("ac ") || label.contains("에어컨") || label.contains("에어 컨")) return "AC";
-        if (name.contains("tv") || name.contains("television") || label.contains("tv")) return "TV";
-        if (caps.contains("switch") && caps.contains("switchLevel")) return "LIGHT";
-        if (caps.contains("thermostat") || caps.contains("temperatureControl")) return "THERMOSTAT";
+        // 2순위: capabilities 기반 감지
+        if (caps.contains("samsungvd.pictureMode") || caps.contains("tvChannel") ||
+                caps.contains("audioVolume") || caps.contains("mediaInputSource")) return "TV";
+        if (caps.contains("refrigerationSetpoint") || caps.contains("samsungce.fridgeMode")) return "REFRIGERATOR";
+        if (caps.contains("washerOperatingState") || caps.contains("dryerOperatingState")) return "WASHER";
+        if (caps.contains("airConditionerMode") || caps.contains("airConditionerFanMode")) return "AC";
         if (caps.contains("lock")) return "LOCK";
+        if (caps.contains("thermostat") || caps.contains("thermostatMode")) return "THERMOSTAT";
+        if (caps.contains("imageCapture") || caps.contains("videoCapture")) return "CAMERA";
+        if (caps.contains("switchLevel") || caps.contains("colorControl") || caps.contains("colorTemperature")) return "LIGHT";
+
+        // 3순위: 이름/라벨 기반 한국어+영어 키워드
+        if (name.contains("fridge") || name.contains("refrigerator") || label.contains("냉장고") || label.contains("비스포크")) return "REFRIGERATOR";
+        if (name.contains("washer") || name.contains("dryer") || label.contains("세탁") || label.contains("건조")) return "WASHER";
+        if (name.contains("air conditioner") || name.contains(" ac") || label.contains("에어컨") || label.contains("무풍")) return "AC";
+        if (name.contains("qled") || name.contains("oled") || name.contains("tv") || name.contains("television") ||
+                label.contains("qled") || label.contains("oled") || label.contains("tv")) return "TV";
+        if (name.contains("light") || name.contains("bulb") || label.contains("조명") || label.contains("전등")) return "LIGHT";
+        if (name.contains("lock") || name.contains("door") || label.contains("잠금") || label.contains("도어록")) return "LOCK";
+        if (name.contains("cam") || name.contains("camera") || label.contains("카메라")) return "CAMERA";
+        if (name.contains("hub")) return "OTHER";
+
+        // 4순위: switch 있으면 기본 LIGHT 처리
+        if (caps.contains("switch")) return "LIGHT";
 
         return "OTHER";
     }

@@ -77,12 +77,35 @@ public class SmartThingsController {
         return ResponseEntity.ok(ApiResponse.success("SmartThings 연결이 해제되었습니다.", null));
     }
 
-    // ─── SmartThings 디바이스 목록 조회 (클라우드에서) ───────────────────────
+    // ─── SmartThings 디바이스 목록 조회 (클라우드에서, 이미 등록된 기기 표시 포함) ─────
 
     @GetMapping("/devices")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getSmartThingsDevices(
+            @RequestParam(required = false) Long houseId,
             @AuthenticationPrincipal UserDetails ud) {
+
         List<Map<String, Object>> devices = smartThingsService.getSmartThingsDevices(ud.getUsername());
+
+        // Hub 타입 제외 (SmartThings Hub 자체는 등록 불필요)
+        devices = devices.stream()
+                .filter(d -> !"HUB".equalsIgnoreCase((String) d.getOrDefault("type", "")))
+                .collect(Collectors.toList());
+
+        // 특정 집의 이미 등록된 SmartThings 기기 ID 목록 가져오기
+        if (houseId != null) {
+            List<String> alreadyLinked = iotDeviceRepository
+                    .findByHouseIdAndIsActiveTrue(houseId)
+                    .stream()
+                    .map(IotDevice::getSmartThingsDeviceId)
+                    .filter(id -> id != null && !id.isEmpty())
+                    .collect(Collectors.toList());
+
+            for (Map<String, Object> d : devices) {
+                String deviceId = (String) d.get("deviceId");
+                d.put("alreadyLinked", alreadyLinked.contains(deviceId));
+            }
+        }
+
         return ResponseEntity.ok(ApiResponse.success(devices));
     }
 
