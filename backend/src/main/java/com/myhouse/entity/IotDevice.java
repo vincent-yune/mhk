@@ -43,6 +43,12 @@ public class IotDevice extends BaseEntity {
     @Column(length = 200)
     private String deviceUid;
 
+    @Column(length = 200)
+    private String smartThingsDeviceId;
+
+    @Column(columnDefinition = "TEXT")
+    private String smartThingsCapabilities;
+
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Platform platform = Platform.OTHER;

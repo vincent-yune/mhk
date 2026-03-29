@@ -50,6 +50,10 @@ public class User extends BaseEntity {
     @Builder.Default
     private Boolean isActive = true;
 
+    @Column(length = 500)
+    @JsonIgnore
+    private String smartThingsToken;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     @JsonIgnore

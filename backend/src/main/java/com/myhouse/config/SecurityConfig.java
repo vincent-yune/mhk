@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/community/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                .antMatchers("/api/smartthings/**").authenticated()
                 .anyRequest().authenticated()
             .and()
             .addFilterBefore(new JwtAuthenticationFilter(tokenProvider, userDetailsService),
