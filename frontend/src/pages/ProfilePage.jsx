@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react'
-import { User, Mail, Phone, Star, Shield, Edit2, Save, X, Camera } from 'lucide-react'
 import api from '../api/axios'
 import { useAuthStore } from '../store/useStore'
 import toast from 'react-hot-toast'
+
+function MSI({ name, fill = false, size = 24, color, style = {} }) {
+  return (
+    <span className="material-symbols-outlined" style={{
+      fontSize: size,
+      fontVariationSettings: fill ? `'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' ${size}` : `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' ${size}`,
+      color: color || 'inherit', lineHeight: 1, display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', ...style,
+    }}>{name}</span>
+  )
+}
 
 const GRADE_INFO = {
   BRONZE: { label: '브론즈', color: '#CD7F32', bg: '#FDF4EB', emoji: '🥉', nextGrade: 'SILVER', nextScore: 100 },
@@ -75,34 +84,34 @@ export default function ProfilePage() {
   }
 
   return (
-    <div>
-      {/* 헤더 */}
-      <div className="page-header">
-        <h2 className="page-title">👤 내 프로필</h2>
-        <p className="page-subtitle">회원 정보 및 활동 내역을 확인하세요</p>
-      </div>
+    <div style={{ paddingBottom: 24 }}>
+      {/* ── Profile Hero ── */}
+      <div style={{ padding: '28px 20px 20px', background: 'var(--surface-container-lowest)' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--tertiary)', marginBottom: 4 }}>RESIDENCE PROFILE</div>
+        <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, letterSpacing: '-0.4px', marginBottom: 16 }}>내 프로필</h2>
 
       {/* 프로필 카드 */}
-      <div className="card" style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--surface-container-low)', borderRadius: 20, padding: 16, marginBottom: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
           {/* 아바타 */}
           <div style={{ position: 'relative' }}>
             <div style={{
-              width: 88, height: 88, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
+              width: 72, height: 72, borderRadius: '50%',
+              background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'white', fontSize: 36, fontWeight: 700, flexShrink: 0
+              color: 'white', fontSize: 28, fontWeight: 800, flexShrink: 0,
+              fontFamily: 'Manrope, sans-serif',
             }}>
               {user?.name?.[0] || 'U'}
             </div>
             <div style={{
               position: 'absolute', bottom: 0, right: 0,
-              width: 26, height: 26, borderRadius: '50%',
+              width: 22, height: 22, borderRadius: '50%',
               background: 'var(--primary)', border: '2px solid white',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer'
             }}>
-              <Camera size={12} color="white" />
+              <MSI name="photo_camera" fill size={12} color="white" />
             </div>
           </div>
 
@@ -143,15 +152,18 @@ export default function ProfilePage() {
             {editing ? (
               <div style={{ display: 'flex', gap: 8 }}>
                 <button className="btn btn-primary" onClick={handleSave} disabled={loading}>
-                  <Save size={14} /> {loading ? '저장 중...' : '저장'}
+                  <MSI name="save" fill size={14} /> {loading ? '저장 중...' : '저장'}
                 </button>
                 <button className="btn btn-secondary" onClick={() => { setEditing(false); setForm({ name: user.name, phone: user.phone || '' }) }}>
-                  <X size={14} /> 취소
+                  <MSI name="close" size={14} /> 취소
                 </button>
               </div>
             ) : (
-              <button className="btn btn-secondary" onClick={() => setEditing(true)}>
-                <Edit2 size={14} /> 편집
+              <button
+                onClick={() => setEditing(true)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'var(--surface-container-high)', border: 'none', borderRadius: 20, cursor: 'pointer', fontWeight: 600, fontSize: 13, color: 'var(--on-surface-variant)' }}
+              >
+                <MSI name="edit" size={16} /> 편집
               </button>
             )}
           </div>
@@ -179,21 +191,28 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+      </div>{/* close hero section */}
 
       {/* 탭 */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '2px solid #E2E8F0' }}>
+      <div style={{ padding: '16px 20px 0' }}>
+      <div style={{ display: 'flex', background: 'var(--surface-container-low)', borderRadius: 14, padding: 4, marginBottom: 16, gap: 2 }}>
         {[
-          { id: 'profile', label: '📋 개인정보' },
-          { id: 'security', label: '🔒 보안 설정' },
+          { id: 'profile', label: '개인정보', icon: 'person' },
+          { id: 'security', label: '보안 설정', icon: 'lock' },
         ].map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-            padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer',
-            fontSize: 14, fontWeight: activeTab === tab.id ? 700 : 500,
-            color: activeTab === tab.id ? 'var(--primary)' : 'var(--on-surface-variant)',
-            borderBottom: activeTab === tab.id ? '2px solid #4F46E5' : '2px solid transparent',
-            marginBottom: -2, transition: 'all 0.2s'
-          }}>
-            {tab.label}
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              flex: 1, padding: '9px', borderRadius: 10, border: 'none', cursor: 'pointer',
+              fontSize: 13, fontWeight: activeTab === tab.id ? 700 : 500,
+              background: activeTab === tab.id ? 'var(--surface-container-lowest)' : 'transparent',
+              color: activeTab === tab.id ? 'var(--primary)' : 'var(--on-surface-variant)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+              boxShadow: activeTab === tab.id ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
+            }}
+          >
+            <MSI name={tab.icon} fill={activeTab === tab.id} size={16} />{tab.label}
           </button>
         ))}
       </div>
@@ -204,9 +223,7 @@ export default function ProfilePage() {
           <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: 'var(--on-surface)' }}>기본 정보</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
             <div className="form-group">
-              <label className="form-label">
-                <User size={14} style={{ marginRight: 6 }} />이름
-              </label>
+              <label className="form-label">이름</label>
               {editing ? (
                 <input className="form-input" value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })} />
@@ -215,17 +232,13 @@ export default function ProfilePage() {
               )}
             </div>
             <div className="form-group">
-              <label className="form-label">
-                <Mail size={14} style={{ marginRight: 6 }} />이메일
-              </label>
+              <label className="form-label">이메일</label>
               <div style={{ padding: '10px 0', fontSize: 15, color: 'var(--on-surface-variant)' }}>{user?.email}
                 <span style={{ marginLeft: 8, fontSize: 11, background: 'var(--secondary-container)', color: '#059669', padding: '2px 8px', borderRadius: 10 }}>인증됨</span>
               </div>
             </div>
             <div className="form-group">
-              <label className="form-label">
-                <Phone size={14} style={{ marginRight: 6 }} />전화번호
-              </label>
+              <label className="form-label">전화번호</label>
               {editing ? (
                 <input className="form-input" value={form.phone} placeholder="010-0000-0000"
                   onChange={e => setForm({ ...form, phone: e.target.value })} />
@@ -285,6 +298,7 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+      </div>{/* close padding wrapper */}
     </div>
   )
 }

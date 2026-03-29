@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-surface": "#2e3132",
+              "on-background": "#191c1d",
+              "inverse-primary": "#8ecdff",
+              "on-error-container": "#93000a",
+              "surface-container-lowest": "#ffffff",
+              "outline": "#707a6c",
+              "on-primary-fixed-variant": "#004b71",
+              "on-secondary-container": "#00731e",
+              "on-primary-fixed": "#001e30",
+              "on-tertiary": "#ffffff",
+              "outline-variant": "#bfcaba",
+              "on-secondary": "#ffffff",
+              "on-primary": "#ffffff",
+              "secondary": "#006e1c",
+              "secondary-fixed-dim": "#78dc77",
+              "on-tertiary-container": "#ffedf0",
+              "on-error": "#ffffff",
+              "background": "#f8fafb",
+              "tertiary": "#923357",
+              "on-tertiary-fixed-variant": "#7f2448",
+              "primary-fixed": "#cbe6ff",
+              "surface-container-high": "#e6e8e9",
+              "surface": "#f8fafb",
+              "tertiary-container": "#b14b6f",
+              "surface-tint": "#006494",
+              "surface-bright": "#f8fafb",
+              "error": "#ba1a1a",
+              "on-secondary-fixed-variant": "#005313",
+              "tertiary-fixed-dim": "#ffb1c7",
+              "surface-variant": "#e1e3e4",
+              "secondary-container": "#91f78e",
+              "on-secondary-fixed": "#002204",
+              "surface-container-low": "#f2f4f5",
+              "primary": "#005b87",
+              "on-surface-variant": "#40493d",
+              "surface-dim": "#d8dadb",
+              "on-surface": "#191c1d",
+              "surface-container-highest": "#e1e3e4",
+              "on-primary-container": "#e7f3ff",
+              "primary-fixed-dim": "#8ecdff",
+              "primary-container": "#2374a5",
+              "error-container": "#ffdad6",
+              "secondary-fixed": "#94f990",
+              "on-tertiary-fixed": "#3f001c",
+              "inverse-on-surface": "#eff1f2",
+              "tertiary-fixed": "#ffd9e2",
+              "surface-container": "#eceeef"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-nav {
+        backdrop-filter: blur(20px);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 z-50 w-full bg-slate-50 dark:bg-slate-900 flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-4">
+<button class="text-sky-700 dark:text-sky-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors p-2 rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-manrope font-bold text-sky-800 dark:text-sky-300 text-xl">Refrigerator</h1>
+</div>
+<button class="text-sky-700 dark:text-sky-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors p-2 rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<main class="pt-24 px-6 max-w-5xl mx-auto">
+<!-- Search & Editorial Header -->
+<section class="mb-10">
+<h2 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-2">Inventory</h2>
+<p class="text-on-surface-variant font-body mb-8">Manage your fresh supplies and track shelf life.</p>
+<div class="relative group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-4 pl-12 pr-4 text-on-surface focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline-variant" placeholder="Search categories or items..." type="text"/>
+</div>
+</section>
+<!-- Category Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Vegetables -->
+<div class="md:col-span-2 bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between min-h-[180px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:bg-surface-container-low transition-colors group">
+<div class="flex justify-between items-start">
+<div class="w-14 h-14 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container text-3xl">eco</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-3xl font-bold text-on-surface">12</span>
+<span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">Items</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline text-xl font-bold mb-1">Vegetables</h3>
+<div class="flex items-center gap-2">
+<span class="flex h-2 w-2 rounded-full bg-error animate-pulse"></span>
+<span class="text-sm text-error font-medium">3 items expiring today</span>
+</div>
+</div>
+</div>
+<!-- Fruits -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary text-2xl">nutrition</span>
+</div>
+<span class="text-xl font-bold text-on-surface">8</span>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold">Fruits</h3>
+<p class="text-sm text-on-surface-variant">All fresh</p>
+</div>
+</div>
+<!-- Meat & Poultry -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between min-h-[160px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed-variant text-2xl">set_meal</span>
+</div>
+<span class="text-xl font-bold text-on-surface">4</span>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold">Meat &amp; Poultry</h3>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span class="text-xs text-on-surface-variant">1 item expiring in 2d</span>
+</div>
+</div>
+</div>
+<!-- Seafood -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between min-h-[160px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-sky-700 text-2xl">water_drop</span>
+</div>
+<span class="text-xl font-bold text-on-surface">2</span>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold">Seafood</h3>
+<p class="text-sm text-on-surface-variant">Optimal temp</p>
+</div>
+</div>
+<!-- Dairy -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between min-h-[160px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface text-2xl">egg_alt</span>
+</div>
+<span class="text-xl font-bold text-on-surface">6</span>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold">Dairy</h3>
+<p class="text-sm text-on-surface-variant">Stock low</p>
+</div>
+</div>
+<!-- Eggs -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between min-h-[160px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-amber-700 text-2xl">cooking</span>
+</div>
+<span class="text-xl font-bold text-on-surface">12</span>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold">Eggs</h3>
+<p class="text-sm text-on-surface-variant">Fresh till Jun 12</p>
+</div>
+</div>
+<!-- Beverages -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between min-h-[160px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-700 text-2xl">local_bar</span>
+</div>
+<span class="text-xl font-bold text-on-surface">15</span>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold">Beverages</h3>
+<p class="text-sm text-on-surface-variant">Chilled</p>
+</div>
+</div>
+<!-- Condiments -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between min-h-[160px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-outline-variant/10 hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-orange-700 text-2xl">liquor</span>
+</div>
+<span class="text-xl font-bold text-on-surface">24</span>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold">Condiments</h3>
+<p class="text-sm text-on-surface-variant">Stable</p>
+</div>
+</div>
+<!-- Frozen Food -->
+<div class="md:col-span-3 bg-primary-container p-8 rounded-xl flex items-center justify-between shadow-[0_4px_24px_rgba(0,0,0,0.04)] text-on-primary-container relative overflow-hidden group">
+<div class="relative z-10">
+<div class="flex items-center gap-4 mb-2">
+<div class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-3xl">ac_unit</span>
+</div>
+<div>
+<h3 class="font-headline text-2xl font-bold">Frozen Food</h3>
+<p class="text-on-primary-container/80">Deep chill maintained at -18°C</p>
+</div>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-end">
+<span class="text-4xl font-extrabold">32</span>
+<span class="text-sm font-medium uppercase tracking-widest opacity-70">Total Stock</span>
+</div>
+<!-- Abstract decorative element -->
+<div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+</div>
+</section>
+<!-- Low Stock Alert Overlay (Visual Interest) -->
+<div class="mt-12 p-6 bg-tertiary-fixed rounded-xl flex items-center gap-4 border border-tertiary-container/20">
+<span class="material-symbols-outlined text-on-tertiary-fixed text-3xl">notification_important</span>
+<div class="flex-1">
+<h4 class="font-headline font-bold text-on-tertiary-fixed">Smart Reminder</h4>
+<p class="text-on-tertiary-fixed-variant text-sm">Milk and Tomatoes are running low. Add to your shopping list?</p>
+</div>
+<button class="bg-tertiary text-on-tertiary px-6 py-2.5 rounded-full font-label text-sm font-semibold shadow-sm active:scale-95 transition-transform">
+                Add Items
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.04)] rounded-t-3xl">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-sky-600 dark:hover:text-sky-300 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-inter text-xs font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-sky-600 dark:hover:text-sky-300 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">thermostat</span>
+<span class="font-inter text-xs font-medium">Climate</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-sky-100 dark:bg-sky-900/40 text-sky-800 dark:text-sky-200 rounded-2xl px-5 py-2 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">kitchen</span>
+<span class="font-inter text-xs font-medium">Kitchen</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-sky-600 dark:hover:text-sky-300 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">shield</span>
+<span class="font-inter text-xs font-medium">Security</span>
+</a>
+</nav>
+<!-- Contextual Floating Action Button -->
+<button class="fixed right-6 bottom-28 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined">add</span>
+</button>
+</body></html>

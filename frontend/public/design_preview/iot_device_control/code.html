@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MyHouse - Device Control</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary": "#ffffff",
+              "on-primary-container": "#e7f3ff",
+              "primary-fixed": "#cbe6ff",
+              "on-tertiary-fixed": "#3f001c",
+              "tertiary": "#923357",
+              "inverse-primary": "#8ecdff",
+              "tertiary-fixed": "#ffd9e2",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#bfcaba",
+              "surface": "#f8fafb",
+              "on-error": "#ffffff",
+              "background": "#f8fafb",
+              "secondary-container": "#91f78e",
+              "secondary-fixed-dim": "#78dc77",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed-variant": "#005313",
+              "primary-fixed-dim": "#8ecdff",
+              "surface-container-high": "#e6e8e9",
+              "surface-container-low": "#f2f4f5",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#2e3132",
+              "on-secondary-container": "#00731e",
+              "primary-container": "#2374a5",
+              "tertiary-fixed-dim": "#ffb1c7",
+              "outline": "#707a6c",
+              "on-secondary-fixed": "#002204",
+              "on-error-container": "#93000a",
+              "on-surface": "#191c1d",
+              "surface-variant": "#e1e3e4",
+              "primary": "#005b87",
+              "on-background": "#191c1d",
+              "on-secondary": "#ffffff",
+              "surface-bright": "#f8fafb",
+              "surface-tint": "#006494",
+              "on-surface-variant": "#40493d",
+              "surface-container-highest": "#e1e3e4",
+              "on-tertiary-container": "#ffedf0",
+              "error": "#ba1a1a",
+              "tertiary-container": "#b14b6f",
+              "secondary-fixed": "#94f990",
+              "surface-container": "#eceeef",
+              "on-primary-fixed-variant": "#004b71",
+              "surface-dim": "#d8dadb",
+              "on-primary-fixed": "#001e30",
+              "secondary": "#006e1c",
+              "on-tertiary-fixed-variant": "#7f2448",
+              "inverse-on-surface": "#eff1f2"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-card {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="home_pin">home_pin</span>
+<h1 class="text-xl font-bold text-blue-900 dark:text-blue-100 tracking-tight font-headline">MyHouse</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors p-2 rounded-full active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-7xl mx-auto">
+<!-- Header Section -->
+<section class="mb-10">
+<h2 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface mb-2">Connected Devices</h2>
+<p class="text-on-surface-variant">Manage and monitor your smart ecosystem from one place.</p>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Thermostat - Large Feature Card -->
+<div class="md:col-span-2 md:row-span-2 bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/20 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="thermostat" data-weight="fill" style="font-variation-settings: 'FILL' 1;">thermostat</span>
+</div>
+<div>
+<h3 class="text-xl font-bold font-headline">Nest Learning</h3>
+<p class="text-sm text-on-surface-variant">Living Room</p>
+</div>
+</div>
+<span class="bg-secondary-container text-on-secondary-container text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Heating
+                        </span>
+</div>
+<div class="flex items-center justify-center py-6">
+<div class="relative w-48 h-48 rounded-full border-[12px] border-surface-container-highest flex items-center justify-center">
+<div class="text-center">
+<span class="text-6xl font-bold font-headline tracking-tighter">72°</span>
+<p class="text-sm font-medium text-on-surface-variant uppercase tracking-widest mt-1">Target</p>
+</div>
+<!-- Interaction Handle Mockup -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-surface-container-lowest rounded-full shadow-lg border-2 border-primary"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-8">
+<div class="flex gap-2">
+<button class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+<button class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<button class="px-6 py-3 rounded-xl bg-primary text-on-primary font-semibold flex items-center gap-2 active:scale-95 transition-all">
+                        Settings <span class="material-symbols-outlined text-sm" data-icon="settings">settings</span>
+</button>
+</div>
+</div>
+<!-- Lighting Card -->
+<div class="md:col-span-2 bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-outline-variant/20">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
+<span class="material-symbols-outlined" data-icon="lightbulb" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<h3 class="font-bold font-headline">Smart Lighting</h3>
+</div>
+<div class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary-container">
+<span class="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-on-primary transition"></span>
+</div>
+</div>
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-on-surface-variant w-8">Dim</span>
+<div class="flex-1 h-3 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4 rounded-full"></div>
+</div>
+<span class="text-xs font-bold text-on-surface-variant">75%</span>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1.5 rounded-lg bg-surface-container-high text-xs font-semibold">Morning</span>
+<span class="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold">Focus</span>
+<span class="px-3 py-1.5 rounded-lg bg-surface-container-high text-xs font-semibold">Relax</span>
+</div>
+</div>
+</div>
+<!-- Security Camera Card -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant/20 flex flex-col">
+<div class="relative aspect-video w-full bg-slate-900">
+<img alt="Security Feed" class="w-full h-full object-cover opacity-80" data-alt="wide angle security camera view of a modern minimalist living room with clean lines and soft natural daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWT-hMlPCRFxyLUEXN4M_ixXzkm1x3tiJdIFwQEol66luAUo1xs2Uw5ZF54MnM_TPtZpyHrzUMr1mmVM1eyrVeZwc9VoAkM2DAwh95w7USsy3y9WG8Hmq2bJrMHqEjTUcLR8cJWGxc78I0KjqTpADF5F0ewnVv6wfyURdtOJWie6GEUqRkSwaB5NoqY-uY0A2JtsPAFAmGDQ7v11EFI3Lr3iIinQ43R5A9x86BfHrO2XfsYsbtv2SERyyArjllXEH1yYO85u9UTqU"/>
+<div class="absolute top-3 left-3 flex items-center gap-2 bg-black/40 backdrop-blur-md px-2 py-1 rounded-md">
+<span class="w-2 h-2 rounded-full bg-red-500"></span>
+<span class="text-[10px] text-white font-bold tracking-widest uppercase">Live</span>
+</div>
+</div>
+<div class="p-5 flex flex-col justify-between flex-1">
+<div>
+<h3 class="font-bold font-headline">Front Porch</h3>
+<p class="text-xs text-on-surface-variant">No movement detected</p>
+</div>
+<button class="mt-4 w-full py-2.5 rounded-xl border border-outline-variant/30 text-xs font-bold hover:bg-surface-container-low transition-colors">
+                        View History
+                    </button>
+</div>
+</div>
+<!-- Air Purifier Card -->
+<div class="bg-surface-container-lowest rounded-3xl p-5 shadow-sm border border-outline-variant/20 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+<span class="material-symbols-outlined" data-icon="air">air</span>
+</div>
+<div class="relative inline-flex h-5 w-9 items-center rounded-full bg-surface-container-highest">
+<span class="inline-block h-3 w-3 translate-x-1 transform rounded-full bg-on-surface-variant transition"></span>
+</div>
+</div>
+<div class="mt-4">
+<h3 class="font-bold font-headline">Air Purifier</h3>
+<div class="mt-2 flex items-baseline gap-1">
+<span class="text-2xl font-bold font-headline">12</span>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">AQI Excellent</span>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container-low">
+<div class="flex justify-between items-center text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
+<span>Filter Life</span>
+<span>84%</span>
+</div>
+<div class="mt-1.5 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[84%] rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Lock Status Card -->
+<div class="bg-surface-container-lowest rounded-3xl p-5 shadow-sm border border-outline-variant/20 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-xl bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="more_vert">more_vert</span>
+</div>
+<div class="mt-4">
+<h3 class="font-bold font-headline">Main Door</h3>
+<p class="text-sm font-medium text-secondary mt-1">Locked</p>
+</div>
+<button class="mt-6 w-full py-3 rounded-2xl bg-surface-container-high text-on-surface font-bold text-sm active:scale-95 transition-all">
+                    Unlock
+                </button>
+</div>
+<!-- Add Device Placeholder -->
+<div class="border-2 border-dashed border-outline-variant/40 rounded-3xl p-5 flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low/50 transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full border-2 border-dashed border-outline-variant group-hover:scale-110 transition-transform flex items-center justify-center mb-3">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</div>
+<span class="text-sm font-bold font-headline">Add Device</span>
+</div>
+</div>
+<!-- Automation Recommendation - Asymmetric Section -->
+<section class="mt-16 bg-primary-container rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden">
+<div class="relative z-10 md:w-1/2">
+<span class="text-on-primary-container/70 text-xs font-bold uppercase tracking-[0.2em] mb-4 block">Recommended Automation</span>
+<h2 class="text-3xl font-bold font-headline text-on-primary-container mb-6 leading-tight">"Good Night" Scene</h2>
+<p class="text-on-primary-container/80 mb-8 leading-relaxed">Lower the temperature to 68°, lock all doors, and dim the lights to 10% with a single tap.</p>
+<button class="bg-surface-container-lowest text-primary px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all active:scale-95">
+                    Activate Scene
+                </button>
+</div>
+<!-- Abstract background shape -->
+<div class="absolute top-0 right-0 w-1/2 h-full hidden md:block">
+<div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+<img alt="Automation background" class="w-full h-full object-cover mix-blend-overlay opacity-40" data-alt="tranquil bedroom interior at night with soft warm lamp light and navy blue wall tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGaErJK3gkEwEd2GKVMVNC6muyNmcL-VZT4HtEKNSeWkx4TwIPrAuJL85gzQupu10qrRf11-pTuIuJU2x0bfaXt5s0kEPnjoHchLyufzaFXp6YGsJ6pPN6iexwd7PXlkyJ1DaMTG5dFD0lFw4WwZGdKrZnU54xGNVbgD1kSxQjJXxfWWza6CJqn6VypLBNLzG8sHDSeHD2Aw4rDA0Ms7Uit8KGR4nmuWE0ji7VFe1Inf5JnF8CbuuEFLZj2IT1rq7CYrT4_RVUOgc"/>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-2xl z-50 rounded-t-3xl shadow-[0_-4px_24px_rgba(0,0,0,0.04)]">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-inter text-[11px] font-medium tracking-wide mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-blue-100/50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-2xl px-5 py-2 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy" data-weight="fill" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-inter text-[11px] font-medium tracking-wide mt-1">Devices</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span class="font-inter text-[11px] font-medium tracking-wide mt-1">Market</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+<span class="font-inter text-[11px] font-medium tracking-wide mt-1">Services</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-inter text-[11px] font-medium tracking-wide mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

@@ -1,9 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
-import { Plus, Search, X, ShoppingBag } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import { useHouseStore } from '../store/useStore'
 import toast from 'react-hot-toast'
+
+function MSI({ name, fill = false, size = 24, color, style = {} }) {
+  return (
+    <span className="material-symbols-outlined" style={{
+      fontSize: size,
+      fontVariationSettings: fill ? `'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' ${size}` : `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' ${size}`,
+      color: color || 'inherit', lineHeight: 1, display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', ...style,
+    }}>{name}</span>
+  )
+}
 
 const STATUS_MAP = {
   ACTIVE: { label: '보유중', cls: 'badge-active' },
@@ -38,15 +47,13 @@ function CommunityLinkButton({ item, onSelect, mini = false }) {
         style={{
           display: 'flex', alignItems: 'center', gap: mini ? 0 : 4,
           padding: mini ? '5px 7px' : '5px 10px',
-          borderRadius: 8, border: '1.5px solid #10B981',
-          background: open ? 'var(--secondary-container)' : 'white',
+          borderRadius: 10, border: 'none',
+          background: open ? 'var(--secondary-container)' : 'var(--surface-container-low)',
           color: 'var(--secondary)', fontSize: 12, fontWeight: 700,
           cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s'
         }}
-        onMouseEnter={e => e.currentTarget.style.background = 'var(--secondary-container)'}
-        onMouseLeave={e => { if (!open) e.currentTarget.style.background = 'white' }}
       >
-        <ShoppingBag size={13} />
+        <MSI name="storefront" fill size={14} color="var(--secondary)" />
         {!mini && <span>커뮤니티</span>}
       </button>
       {open && (
@@ -219,116 +226,178 @@ export default function ItemPage() {
   const filtered = items.filter(i => i.name.includes(search) || (i.brand || '').includes(search))
 
   if (!selectedHouse) {
-    return <div className="empty-state"><div className="empty-state-icon">📦</div><h3>집을 먼저 선택해주세요</h3></div>
+    return (
+      <div style={{ textAlign: 'center', padding: '80px 24px', color: 'var(--on-surface-variant)' }}>
+        <MSI name="inventory_2" size={52} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 12px' }} />
+        <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 700 }}>집을 먼저 선택해주세요</h3>
+      </div>
+    )
   }
 
   return (
-    <div>
-      {/* 헤더 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <div>
-          <h2 style={{ fontSize: 20, fontWeight: 800 }}>구역별 물품 관리</h2>
-          <p style={{ color: 'var(--on-surface-variant)', fontSize: 14 }}>
-            총 {items.length}개 물품
-            {selectedZoneName && <span style={{ marginLeft: 8, color: 'var(--secondary)', fontWeight: 700 }}>— {selectedZoneName} 필터 중</span>}
-          </p>
-        </div>
-        <button className="btn btn-primary" onClick={openCreate}><Plus size={16} /> 물품 등록</button>
-      </div>
+    <div style={{ paddingBottom: 24 }}>
 
-      {/* 탭 + 구역 필터 */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 4 }}>
-        {[
-          { key: 'all', label: '전체', icon: '📦' },
-          { key: 'expiring', label: '유통기한 임박', icon: '⏰' },
-          { key: 'reorder', label: '재주문 필요', icon: '🛒' },
-        ].map(t => (
-          <button key={t.key} onClick={() => { setActiveTab(t.key); setSelectedZone(null) }}
+      {/* ── Hero ── */}
+      <div style={{ padding: '28px 20px 20px', background: 'var(--surface-container-lowest)' }}>
+        <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--on-surface)', marginBottom: 4 }}>
+          Inventory Sanctuary
+        </h2>
+        <p style={{ color: 'var(--on-surface-variant)', fontSize: 13, lineHeight: 1.5 }}>
+          집의 모든 물품을 스마트하게 관리하세요.
+          {selectedZoneName && <span style={{ marginLeft: 6, color: 'var(--secondary)', fontWeight: 700 }}>— {selectedZoneName}</span>}
+        </p>
+
+        {/* Search + add */}
+        <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+          <div style={{ flex: 1, position: 'relative' }}>
+            <MSI name="search" size={18} color="var(--on-surface-variant)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', opacity: 0.6 }} />
+            <input
+              className="form-input"
+              style={{ paddingLeft: 40, borderRadius: 16 }}
+              placeholder="물품명, 브랜드 검색..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <button
+            onClick={openCreate}
             style={{
-              padding: '8px 16px', borderRadius: 20, border: '1.5px solid',
-              borderColor: activeTab === t.key && !selectedZone ? 'var(--primary)' : 'var(--outline-variant)',
-              background: activeTab === t.key && !selectedZone ? 'var(--primary-container)' : 'white',
-              color: activeTab === t.key && !selectedZone ? 'var(--primary)' : 'var(--on-surface-variant)',
-              fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
-            }}>{t.icon} {t.label}</button>
-        ))}
-        <div style={{ width: 1, height: 32, background: 'var(--outline-variant)', margin: '0 4px', alignSelf: 'center' }} />
-        {zones.map(z => (
-          <button key={z.id} onClick={() => { setSelectedZone(z.id); setActiveTab('all') }}
-            style={{
-              padding: '8px 16px', borderRadius: 20, border: '1.5px solid',
-              borderColor: selectedZone === z.id ? 'var(--secondary)' : 'var(--outline-variant)',
-              background: selectedZone === z.id ? 'var(--secondary-container)' : 'white',
-              color: selectedZone === z.id ? 'var(--secondary)' : 'var(--on-surface-variant)',
-              fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
-            }}>
-            {z.name}
-            {selectedZone === z.id && <span style={{ marginLeft: 4, fontSize: 11 }}>✓</span>}
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '10px 16px',
+              background: 'linear-gradient(135deg, var(--primary-light), var(--primary))',
+              color: 'white', border: 'none', borderRadius: 16,
+              fontWeight: 600, fontSize: 13, cursor: 'pointer', flexShrink: 0,
+            }}
+          >
+            <MSI name="add_circle" size={16} />추가
           </button>
-        ))}
-        {selectedZone && (
-          <button onClick={() => setSelectedZone(null)}
-            style={{
-              padding: '8px 12px', borderRadius: 20, border: '1.5px solid #EF4444',
-              background: 'white', color: '#EF4444', fontSize: 12, fontWeight: 700,
-              cursor: 'pointer', whiteSpace: 'nowrap'
-            }}>✕ 필터 해제</button>
-        )}
-      </div>
-
-      {/* 검색 */}
-      <div style={{ position: 'relative', marginBottom: 16 }}>
-        <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-        <input className="form-input" style={{ paddingLeft: 40 }} placeholder="물품명, 브랜드 검색..."
-          value={search} onChange={e => setSearch(e.target.value)} />
-      </div>
-
-      {/* 물품 목록 */}
-      {filtered.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-state-icon">📦</div>
-          <h3>등록된 물품이 없습니다</h3>
-          <p>물품을 등록해보세요!</p>
         </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {filtered.map(item => {
-            const isExpiring = item.expiryDate && new Date(item.expiryDate) <= new Date(Date.now() + 14 * 86400000)
+      </div>
+
+      {/* ── Filter Chips ── */}
+      <div style={{ padding: '12px 20px 0' }}>
+        <div className="scroll-row" style={{ paddingBottom: 4 }}>
+          {[
+            { key: 'all', label: '전체', icon: 'inventory_2' },
+            { key: 'expiring', label: '유통기한 임박', icon: 'schedule' },
+            { key: 'reorder', label: '재주문 필요', icon: 'shopping_cart' },
+          ].map(t => {
+            const active = activeTab === t.key && !selectedZone
             return (
-              <div key={item.id} className="item-card" onClick={() => openDetail(item)}
-                style={{ cursor: 'pointer' }}>
-                <div className="item-icon-box">
-                  {CATEGORY_ICONS[item.categoryId] || '📦'}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontWeight: 700, fontSize: 15 }}>{item.name}</span>
-                    {isExpiring && <span className="badge badge-warning">⏰ 유통기한 임박</span>}
-                    {item.isConsumable && item.quantity <= (item.reorderLevel || 0) && (
-                      <span className="badge badge-danger">🛒 재주문 필요</span>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', gap: 12, fontSize: 13, color: 'var(--on-surface-variant)', flexWrap: 'wrap' }}>
-                    {item.brand && <span>🏷️ {item.brand}</span>}
-                    {item.zoneName && <span>📍 {item.zoneName}</span>}
-                    <span>수량: {item.quantity}{item.unit}</span>
-                    {item.expiryDate && <span>유통기한: {item.expiryDate}</span>}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span className={`badge ${STATUS_MAP[item.status]?.cls || 'badge-gray'}`}>
-                    {STATUS_MAP[item.status]?.label || item.status}
-                  </span>
-                  {/* 커뮤니티 연계 버튼 */}
-                  <CommunityLinkButton item={item} onSelect={handleCommunityLink} mini={true} />
-                  <button className="btn-icon" style={{ color: '#EF4444' }}
-                    onClick={e => handleDelete(item.id, e)}>🗑️</button>
-                </div>
-              </div>
+              <button
+                key={t.key}
+                onClick={() => { setActiveTab(t.key); setSelectedZone(null) }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '7px 14px', borderRadius: 20, border: 'none', flexShrink: 0,
+                  background: active ? 'var(--primary-container)' : 'var(--surface-container-lowest)',
+                  color: active ? 'var(--primary)' : 'var(--on-surface-variant)',
+                  fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                <MSI name={t.icon} fill={active} size={14} />{t.label}
+              </button>
             )
           })}
+          <div style={{ width: 1, height: 20, background: 'var(--outline-variant)', alignSelf: 'center', flexShrink: 0 }} />
+          {zones.map(z => (
+            <button
+              key={z.id}
+              onClick={() => { setSelectedZone(z.id); setActiveTab('all') }}
+              style={{
+                padding: '7px 14px', borderRadius: 20, border: 'none', flexShrink: 0,
+                background: selectedZone === z.id ? 'var(--secondary-container)' : 'var(--surface-container-lowest)',
+                color: selectedZone === z.id ? 'var(--secondary)' : 'var(--on-surface-variant)',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              }}
+            >{z.name}{selectedZone === z.id ? ' ✓' : ''}</button>
+          ))}
+          {selectedZone && (
+            <button
+              onClick={() => setSelectedZone(null)}
+              style={{ padding: '7px 12px', borderRadius: 20, border: 'none', flexShrink: 0, background: 'rgba(186,26,26,0.08)', color: 'var(--error)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+            >✕ 필터 해제</button>
+          )}
         </div>
-      )}
+      </div>
+
+      {/* ── Item List ── */}
+      <div style={{ padding: '16px 20px 0' }}>
+        {filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--on-surface-variant)' }}>
+            <MSI name="inventory_2" size={52} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 12px' }} />
+            <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 700, color: 'var(--on-surface)', marginBottom: 8 }}>등록된 물품이 없습니다</div>
+            <p style={{ fontSize: 13 }}>물품을 등록해보세요!</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {filtered.map(item => {
+              const isExpiring = item.expiryDate && new Date(item.expiryDate) <= new Date(Date.now() + 14 * 86400000)
+              const needsReorder = item.isConsumable && item.quantity <= (item.reorderLevel || 0)
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => openDetail(item)}
+                  style={{
+                    background: 'var(--surface-container-lowest)',
+                    borderRadius: 18, padding: '14px 16px',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    cursor: 'pointer', transition: 'transform 0.15s',
+                  }}
+                  onTouchStart={e => e.currentTarget.style.transform = 'scale(0.98)'}
+                  onTouchEnd={e => e.currentTarget.style.transform = ''}
+                >
+                  {/* Icon box */}
+                  <div style={{
+                    width: 46, height: 46, borderRadius: 14,
+                    background: 'var(--surface-container-low)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 22, flexShrink: 0,
+                  }}>
+                    {CATEGORY_ICONS[item.categoryId] || '📦'}
+                  </div>
+
+                  {/* Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                      <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</span>
+                      {isExpiring && (
+                        <span style={{ background: '#fef3c7', color: '#92400e', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 8, flexShrink: 0 }}>임박</span>
+                      )}
+                      {needsReorder && (
+                        <span style={{ background: 'var(--error-container)', color: 'var(--error)', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 8, flexShrink: 0 }}>재주문</span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, fontSize: 11, color: 'var(--on-surface-variant)', flexWrap: 'wrap' }}>
+                      {item.brand && <span>{item.brand}</span>}
+                      {item.zoneName && <span>· {item.zoneName}</span>}
+                      <span>· {item.quantity}{item.unit}</span>
+                    </div>
+                  </div>
+
+                  {/* Status + actions */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
+                    <span style={{
+                      padding: '3px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600,
+                      background: item.status === 'ACTIVE' ? 'var(--secondary-container)' : item.status === 'BROKEN' ? 'var(--error-container)' : 'var(--surface-container-high)',
+                      color: item.status === 'ACTIVE' ? 'var(--secondary)' : item.status === 'BROKEN' ? 'var(--error)' : 'var(--on-surface-variant)',
+                    }}>{STATUS_MAP[item.status]?.label || item.status}</span>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <CommunityLinkButton item={item} onSelect={handleCommunityLink} mini={true} />
+                      <button
+                        onClick={e => handleDelete(item.id, e)}
+                        style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(186,26,26,0.08)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <MSI name="delete" size={13} color="var(--error)" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>{/* close Item List padding */}
 
       {/* ─── 물품 상세 모달 ─── */}
       {showDetailModal && detailItem && (
@@ -342,7 +411,7 @@ export default function ItemPage() {
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>물품 상세 정보</div>
                 </div>
               </div>
-              <button className="btn-icon" onClick={() => setShowDetailModal(false)}><X size={18} /></button>
+              <button className="btn-icon" onClick={() => setShowDetailModal(false)}><MSI name="close" size={18} color="var(--on-surface-variant)" /></button>
             </div>
 
             <div className="modal-body">
@@ -431,7 +500,7 @@ export default function ItemPage() {
           <div className="modal" style={{ maxWidth: 600 }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <div className="modal-title">{editItem ? '물품 수정' : '새 물품 등록'}</div>
-              <button className="btn-icon" onClick={() => setShowModal(false)}><X size={18} /></button>
+              <button className="btn-icon" onClick={() => setShowModal(false)}><MSI name="close" size={18} color="var(--on-surface-variant)" /></button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="modal-body">

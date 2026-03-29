@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Icon Library - Lumina Habitat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-surface": "#2e3132",
+              "error-container": "#ffdad6",
+              "surface-bright": "#f8fafb",
+              "primary-fixed": "#cbe6ff",
+              "on-secondary-fixed-variant": "#005313",
+              "on-surface-variant": "#40493d",
+              "inverse-on-surface": "#eff1f2",
+              "secondary-container": "#91f78e",
+              "on-tertiary": "#ffffff",
+              "primary": "#005b87",
+              "on-tertiary-fixed-variant": "#7f2448",
+              "on-primary-fixed-variant": "#004b71",
+              "on-tertiary-fixed": "#3f001c",
+              "surface-tint": "#006494",
+              "error": "#ba1a1a",
+              "on-primary-fixed": "#001e30",
+              "inverse-primary": "#8ecdff",
+              "tertiary": "#923357",
+              "on-primary-container": "#e7f3ff",
+              "primary-container": "#2374a5",
+              "tertiary-fixed": "#ffd9e2",
+              "tertiary-fixed-dim": "#ffb1c7",
+              "on-secondary": "#ffffff",
+              "primary-fixed-dim": "#8ecdff",
+              "outline": "#707a6c",
+              "surface-container-highest": "#e1e3e4",
+              "background": "#f8fafb",
+              "surface": "#f8fafb",
+              "secondary": "#006e1c",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-container": "#b14b6f",
+              "on-tertiary-container": "#ffedf0",
+              "on-error-container": "#93000a",
+              "secondary-fixed-dim": "#78dc77",
+              "surface-container-low": "#f2f4f5",
+              "surface-dim": "#d8dadb",
+              "secondary-fixed": "#94f990",
+              "outline-variant": "#bfcaba",
+              "on-background": "#191c1d",
+              "surface-container": "#eceeef",
+              "surface-container-high": "#e6e8e9",
+              "on-primary": "#ffffff",
+              "on-secondary-fixed": "#002204",
+              "surface-variant": "#e1e3e4",
+              "on-error": "#ffffff",
+              "on-secondary-container": "#00731e",
+              "on-surface": "#191c1d"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-card:hover .icon-bg {
+            transform: scale(1.05);
+            transition: transform 0.2s ease-out;
+        }
+    </style>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<header class="w-full top-0 sticky z-50 bg-[#f8fafb] dark:bg-slate-950 flex items-center justify-between px-6 py-4">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#005b87] dark:text-sky-400">menu</span>
+<h1 class="text-xl font-bold text-[#005b87] dark:text-sky-400 font-headline tracking-tight">Lumina Habitat</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex gap-6 mr-4">
+<span class="text-[#005b87] font-bold font-label cursor-pointer">Home</span>
+<span class="text-[#40493d] dark:text-slate-400 font-label hover:bg-[#e6e8e9] dark:hover:bg-slate-800 transition-colors px-2 py-1 rounded-lg cursor-pointer">Devices</span>
+<span class="text-[#40493d] dark:text-slate-400 font-label hover:bg-[#e6e8e9] dark:hover:bg-slate-800 transition-colors px-2 py-1 rounded-lg cursor-pointer">Automations</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close-up studio portrait of a friendly professional man with a neat beard and smiling eyes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlnSGdp0Pa-jSO5CEAWoUfztF__5j3qM5r-C8aI5OtHHcCQ9ZrBrwiJK92eOsp6Qct3kdV47KVzGlNrfkJ5cVliNkcGb6SZVtHLPvASjvLpFezC77TkLdk3gSIOD8Ud1LKu5B9SV81G42ktXwwhV-WizmXFj0lkK_taoWiTT59-moUP_zwIkVKjAs3RmwBdgqYTVsbKPKDDxg4vEPeh0EcZ6c4O5CSxHQgqpxLWtDSPOt2TskUuPlIjH2f3VZAOmkeiXGl0okoaCQ"/>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 pt-12 pb-32">
+<div class="mb-16">
+<h2 class="font-headline font-extrabold text-4xl lg:text-5xl tracking-tight text-on-surface mb-4">Icon Library</h2>
+<p class="text-on-surface-variant text-lg max-w-2xl font-body">A curated collection of visual identifiers for your smart home ecosystem. Each icon is designed for maximum clarity and editorial precision.</p>
+</div>
+<!-- Kitchen & Pantry Section -->
+<section class="mb-20">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline font-bold text-2xl text-on-surface">Kitchen &amp; Pantry</h3>
+<span class="h-px flex-grow mx-6 bg-surface-container-highest opacity-30"></span>
+</div>
+<!-- Grains & Staples -->
+<div class="mb-12">
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-fixed"></span> Grains &amp; Staples
+            </h4>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-primary-fixed/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">bakery_dining</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Bread</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-primary-fixed/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">dinner_dining</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Pasta</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-primary-fixed/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">rice_bowl</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Rice</span>
+</div>
+</div>
+</div>
+<!-- Meat & Proteins -->
+<div class="mb-12">
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed"></span> Meat &amp; Proteins
+            </h4>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-tertiary-fixed/40 flex items-center justify-center text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined text-3xl">egg</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Eggs</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-secondary-fixed/40 flex items-center justify-center text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined text-3xl">set_meal</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Fish</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">kebab_dining</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Steak</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">catching_pokemon</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Crab</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">takeout_dining</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Sushi</span>
+</div>
+</div>
+</div>
+<!-- Fruits & Veggies -->
+<div class="mb-12">
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span> Fresh Produce
+            </h4>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-error-container/40 flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined text-3xl">nutrition</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Apple</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-secondary-fixed/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl">restaurant</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Carrot</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-primary-fixed/40 flex items-center justify-center text-on-primary-fixed-variant">
+<span class="material-symbols-outlined text-3xl">water_drop</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Milk</span>
+</div>
+</div>
+</div>
+<!-- Condiments & Spices -->
+<div class="mb-12">
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span> Condiments &amp; Spices
+            </h4>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-3xl">grain</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Salt &amp; Pepper</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-3xl">opacity</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Oil</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-3xl">honey_adds</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Honey</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-3xl">prescriptions</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Jam</span>
+</div>
+</div>
+</div>
+<!-- Snacks & Sweets -->
+<div class="mb-12">
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span> Snacks &amp; Sweets
+            </h4>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-tertiary-fixed/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">cookie</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Cookies</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-tertiary-fixed/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">icecream</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Ice Cream</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-tertiary-fixed/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">grid_guides</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Chocolate</span>
+</div>
+</div>
+</div>
+<!-- Beverages -->
+<div class="mb-12">
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim"></span> Beverages
+            </h4>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-primary-fixed/40 flex items-center justify-center text-on-primary-fixed-variant">
+<span class="material-symbols-outlined text-3xl">water_bottle</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Water Bottle</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">wine_bar</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Wine</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-primary-fixed/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">coffee</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Coffee</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-primary-fixed/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">tea_snack</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Tea</span>
+</div>
+<div class="icon-card flex flex-col items-center gap-3">
+<div class="icon-bg w-16 h-16 rounded-full bg-primary-fixed/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">sports_bar</span>
+</div>
+<span class="font-label text-sm text-on-surface-variant font-medium">Beer</span>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-20">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline font-bold text-2xl text-on-surface">Living &amp; Furniture</h3>
+<span class="h-px flex-grow mx-6 bg-surface-container-highest opacity-30"></span>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all hover:bg-surface-container-high cursor-default">
+<span class="material-symbols-outlined text-4xl text-primary">chair</span>
+<span class="font-label text-sm font-semibold">Sofa</span>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all hover:bg-surface-container-high cursor-default">
+<span class="material-symbols-outlined text-4xl text-primary">chair_alt</span>
+<span class="font-label text-sm font-semibold">Armchair</span>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all hover:bg-surface-container-high cursor-default">
+<span class="material-symbols-outlined text-4xl text-primary">table_restaurant</span>
+<span class="font-label text-sm font-semibold">Coffee Table</span>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all hover:bg-surface-container-high cursor-default">
+<span class="material-symbols-outlined text-4xl text-primary">menu_book</span>
+<span class="font-label text-sm font-semibold">Bookshelf</span>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all hover:bg-surface-container-high cursor-default">
+<span class="material-symbols-outlined text-4xl text-primary">floor_lamp</span>
+<span class="font-label text-sm font-semibold">Floor Lamp</span>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all hover:bg-surface-container-high cursor-default">
+<span class="material-symbols-outlined text-4xl text-primary">grid_view</span>
+<span class="font-label text-sm font-semibold">Rug</span>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all hover:bg-surface-container-high cursor-default">
+<span class="material-symbols-outlined text-4xl text-primary">tv_gen</span>
+<span class="font-label text-sm font-semibold">TV Stand</span>
+</div>
+</div>
+</section>
+<section class="mb-20">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline font-bold text-2xl text-on-surface">Electronics &amp; Tech</h3>
+<span class="h-px flex-grow mx-6 bg-surface-container-highest opacity-30"></span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-xl flex items-center gap-5 hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="w-12 h-12 flex items-center justify-center bg-primary-container/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">tv</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Smart TV</p>
+<p class="font-label text-xs text-on-surface-variant">Entertainment hub</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-xl flex items-center gap-5 hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="w-12 h-12 flex items-center justify-center bg-primary-container/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">laptop_mac</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Laptop</p>
+<p class="font-label text-xs text-on-surface-variant">Workstation node</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-xl flex items-center gap-5 hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="w-12 h-12 flex items-center justify-center bg-primary-container/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">tablet_android</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Tablet</p>
+<p class="font-label text-xs text-on-surface-variant">Control surface</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-xl flex items-center gap-5 hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="w-12 h-12 flex items-center justify-center bg-primary-container/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">sports_esports</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Gaming Console</p>
+<p class="font-label text-xs text-on-surface-variant">Leisure unit</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-xl flex items-center gap-5 hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="w-12 h-12 flex items-center justify-center bg-primary-container/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">speaker</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Speaker</p>
+<p class="font-label text-xs text-on-surface-variant">Audio output</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-xl flex items-center gap-5 hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="w-12 h-12 flex items-center justify-center bg-primary-container/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">videocam</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Smart Camera</p>
+<p class="font-label text-xs text-on-surface-variant">Visual security</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-xl flex items-center gap-5 hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="w-12 h-12 flex items-center justify-center bg-primary-container/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">router</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Router</p>
+<p class="font-label text-xs text-on-surface-variant">Network core</p>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-20">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline font-bold text-2xl text-on-surface">Appliances</h3>
+<span class="h-px flex-grow mx-6 bg-surface-container-highest opacity-30"></span>
+</div>
+<div class="flex flex-wrap gap-8">
+<div class="flex items-center gap-3 px-6 py-4 bg-secondary-container/10 rounded-2xl border border-secondary/10">
+<span class="material-symbols-outlined text-secondary">kitchen</span>
+<span class="font-headline font-semibold text-on-surface">Refrigerator</span>
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,110,28,0.5)]"></div>
+</div>
+<div class="flex items-center gap-3 px-6 py-4 bg-secondary-container/10 rounded-2xl border border-secondary/10">
+<span class="material-symbols-outlined text-secondary">local_laundry_service</span>
+<span class="font-headline font-semibold text-on-surface">Washing Machine</span>
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,110,28,0.5)]"></div>
+</div>
+<div class="flex items-center gap-3 px-6 py-4 bg-secondary-container/10 rounded-2xl border border-secondary/10">
+<span class="material-symbols-outlined text-secondary">dishwasher</span>
+<span class="font-headline font-semibold text-on-surface">Dishwasher</span>
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,110,28,0.5)]"></div>
+</div>
+<div class="flex items-center gap-3 px-6 py-4 bg-secondary-container/10 rounded-2xl border border-secondary/10">
+<span class="material-symbols-outlined text-secondary">microwave</span>
+<span class="font-headline font-semibold text-on-surface">Microwave</span>
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,110,28,0.5)]"></div>
+</div>
+<div class="flex items-center gap-3 px-6 py-4 bg-secondary-container/10 rounded-2xl border border-secondary/10">
+<span class="material-symbols-outlined text-secondary">air_purifier</span>
+<span class="font-headline font-semibold text-on-surface">Air Purifier</span>
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,110,28,0.5)]"></div>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl z-50 rounded-t-[1.5rem] shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
+<div class="flex flex-col items-center justify-center text-[#40493d] dark:text-slate-500 px-5 py-2 font-['Inter'] text-xs font-medium hover:opacity-80 transition-all duration-200 active:scale-90">
+<span class="material-symbols-outlined">home</span>
+<span>Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#40493d] dark:text-slate-500 px-5 py-2 font-['Inter'] text-xs font-medium hover:opacity-80 transition-all duration-200 active:scale-90">
+<span class="material-symbols-outlined">grid_view</span>
+<span>Devices</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#40493d] dark:text-slate-500 px-5 py-2 font-['Inter'] text-xs font-medium hover:opacity-80 transition-all duration-200 active:scale-90">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span>Automations</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-[#005b87]/10 text-[#005b87] dark:bg-sky-500/20 dark:text-sky-300 rounded-2xl px-5 py-2 font-['Inter'] text-xs font-medium hover:opacity-80 transition-all duration-200 active:scale-90">
+<span class="material-symbols-outlined">category</span>
+<span>Library</span>
+</div>
+</nav>
+</body></html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MyHouse - Home Services &amp; Commerce</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary": "#ffffff",
+              "on-primary-container": "#e7f3ff",
+              "primary-fixed": "#cbe6ff",
+              "on-tertiary-fixed": "#3f001c",
+              "tertiary": "#923357",
+              "inverse-primary": "#8ecdff",
+              "tertiary-fixed": "#ffd9e2",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#bfcaba",
+              "surface": "#f8fafb",
+              "on-error": "#ffffff",
+              "background": "#f8fafb",
+              "secondary-container": "#91f78e",
+              "secondary-fixed-dim": "#78dc77",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed-variant": "#005313",
+              "primary-fixed-dim": "#8ecdff",
+              "surface-container-high": "#e6e8e9",
+              "surface-container-low": "#f2f4f5",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#2e3132",
+              "on-secondary-container": "#00731e",
+              "primary-container": "#2374a5",
+              "tertiary-fixed-dim": "#ffb1c7",
+              "outline": "#707a6c",
+              "on-secondary-fixed": "#002204",
+              "on-error-container": "#93000a",
+              "on-surface": "#191c1d",
+              "surface-variant": "#e1e3e4",
+              "primary": "#005b87",
+              "on-background": "#191c1d",
+              "on-secondary": "#ffffff",
+              "surface-bright": "#f8fafb",
+              "surface-tint": "#006494",
+              "on-surface-variant": "#40493d",
+              "surface-container-highest": "#e1e3e4",
+              "on-tertiary-container": "#ffedf0",
+              "error": "#ba1a1a",
+              "tertiary-container": "#b14b6f",
+              "secondary-fixed": "#94f990",
+              "surface-container": "#eceeef",
+              "on-primary-fixed-variant": "#004b71",
+              "surface-dim": "#d8dadb",
+              "on-primary-fixed": "#001e30",
+              "secondary": "#006e1c",
+              "on-tertiary-fixed-variant": "#7f2448",
+              "inverse-on-surface": "#eff1f2"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-effect {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="home_pin">home_pin</span>
+<h1 class="text-xl font-bold text-blue-900 dark:text-blue-100 tracking-tight font-headline">MyHouse</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-slate-200/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-slate-500" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-5xl mx-auto space-y-12">
+<!-- Hero Section: Real Estate Value -->
+<section class="relative overflow-hidden rounded-xl bg-surface-container-low p-8 flex flex-col md:flex-row items-center gap-8">
+<div class="z-10 flex-1 space-y-4">
+<div class="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold">
+<span class="material-symbols-outlined text-sm mr-1" data-icon="trending_up">trending_up</span>
+                    Market Value Rising
+                </div>
+<h2 class="text-3xl font-headline font-bold text-on-surface leading-tight">Your home estimated at <span class="text-primary">$842,500</span></h2>
+<p class="text-on-surface-variant max-w-md">Based on local sales in Portland, Oregon. Your equity has grown by 4.2% this quarter.</p>
+<div class="flex gap-3 pt-2">
+<button class="px-6 py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-xl font-semibold shadow-lg shadow-primary/10 active:scale-95 transition-all">Full Report</button>
+<button class="px-6 py-3 bg-surface-container-high text-on-primary-fixed-variant rounded-xl font-semibold active:scale-95 transition-all">Market Trends</button>
+</div>
+</div>
+<div class="relative w-full md:w-1/2 h-64 rounded-xl overflow-hidden shadow-2xl">
+<img alt="Modern luxury house interior with large windows" class="w-full h-full object-cover" data-alt="clean modern living room with large floor to ceiling windows overlooking a lush green garden at sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP52TjILV6KkJc5-gwi_anRXtAGlk-aRP40K7dCnQBWGRtnWKx862u964ThaILGP6wfUrG2s3R8kNlVFxQjUSGizwVgOJJGVq9eM950UHByADP7HZbHJCl4buLpqHlCQYydgpRnLPrNIR42XjqMeDcICLhdWGkiOygMv94Fs_IWzQqniZ9UwFHTcZ89W3bhcnimcYi5PcMkVBKYRAy51lc63uOD5NfCbDF6LyZZUe03pE06agh_TFuYI-wsP6aBNZTd88C_9QTCuo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<div class="glass-effect bg-white/20 px-3 py-1 rounded-full text-white text-xs backdrop-blur-md">Local Market</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid: Home Services & Commerce -->
+<section class="space-y-6">
+<h3 class="text-2xl font-headline font-bold px-1">Discover Services</h3>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Shop Home Items -->
+<div class="md:col-span-8 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/20 hover:shadow-xl transition-shadow group relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-xl font-headline font-bold">Shop Home Items</h4>
+<p class="text-on-surface-variant">Curated furniture and decor from top brands.</p>
+</div>
+<span class="material-symbols-outlined text-primary p-3 bg-primary-fixed rounded-xl" data-icon="storefront">storefront</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="space-y-2">
+<div class="aspect-square rounded-lg bg-surface-container-low overflow-hidden">
+<img alt="Minimalist chair" data-alt="minimalist velvet mustard yellow accent chair in a bright white studio setting with soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC2F-LKvIy1U68xlmumbsSnip0pIE2bcmm_Dx1MbYvL6FIqgMN4vce5RSqceQr-eRgLvrJID9QMm0LeiOoKNWq0RCfvK04RxPtC_JGrMLBixpRotrKZTbTuNAwojcHlfIsik9tpD9It6_26nJXE9rV4LsqHoAbqxjTWqcSHe1dmflueHJ6O1M5IeVtAlQp6BV_ANAjG6D4TK4HXwbPWdQnHt0hDjEs4HygrDw7wzwBzmpWvrbuN1yHZtkx620NcR4J9ztbPBftBLE"/>
+</div>
+<p class="text-xs font-medium text-center">Seating</p>
+</div>
+<div class="space-y-2">
+<div class="aspect-square rounded-lg bg-surface-container-low overflow-hidden">
+<img alt="Modern lamp" data-alt="sleek matte black floor lamp with warm amber light glow in a cozy contemporary reading nook" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBji1GS_uvPW0VJkGwN_RohlagI7Pg10HJNie78LnRmbxdEo1xE_SzoGkMfhyZ-__Sh7h6xII8m2gYVrb-upTLyqhEM4vasqoeGkgS-ZQDqRN4FfkjVnTZH0n7xqeg4QDn5-WZ7_dG3gGUOTmUqNu8S-PEAtkU6ZPD-FAdvKvcDIYbRtPCtRZRLJhohHIOM2AwVOaRAQC4BM1oHaSmvTS8mvUUcFCenn38TPYsHmnDfeY6sDSOyqcG5T2W0ZwwB2Tiu5dZFq2KUap8"/>
+</div>
+<p class="text-xs font-medium text-center">Lighting</p>
+</div>
+<div class="space-y-2">
+<div class="aspect-square rounded-lg bg-surface-container-low overflow-hidden">
+<img alt="Decorative vase" data-alt="organic shaped ceramic vases on a wooden shelf with dried pampas grass and soft sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjcGpXcmWGeJDJvLwQpF98pmF5kC6NoUmg6WNZc95D8NFQG7xAej5Y3lVaC-uvCgCjYrkimxWUlk8hQ00miSIFjYpu6R55EJr0bXcLLhcmwYpTZFPznhZNwJz9hrSAoNd5EeVyiuV1bRRDidatxd9Lly2bS1C3uM8MokFcOAxOA1pWTJFa_Ry_mtP2Xu6sguKlzxF5AIrzqvR5KlcdQBVjc45dvNUubwHauhHSiQylJkxeCOm3Z8pI1az8kqvrtiZGOpEupbKG1qc"/>
+</div>
+<p class="text-xs font-medium text-center">Decor</p>
+</div>
+<div class="space-y-2">
+<div class="aspect-square rounded-lg bg-surface-container-low overflow-hidden flex items-center justify-center bg-primary-fixed/30 border-2 border-dashed border-primary/20">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</div>
+<p class="text-xs font-medium text-center">Browse All</p>
+</div>
+</div>
+</div>
+<!-- Interior Design -->
+<div class="md:col-span-4 bg-tertiary-fixed/20 p-6 rounded-xl border border-tertiary-fixed/40 flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-tertiary mb-4" data-icon="palette">palette</span>
+<h4 class="text-xl font-headline font-bold">Interior Design</h4>
+<p class="text-on-surface-variant text-sm mt-2">Professional consultations and personalized room boards.</p>
+</div>
+<div class="mt-6 space-y-3">
+<div class="flex items-center gap-3 p-2 rounded-lg bg-white/60">
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden">
+<img alt="Designer Profile" data-alt="portrait of a professional female interior designer in a modern office smiling warmly" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuR4baQjKw5FZfCXrYRCdAQhGhCaO7TQIBHpHw1S_ZmJ7oBgSmkcaPk6y1Kp8nNAfo7_L2s8Vq4V-odFZ_AKwWN-st07SWFylLtQrLfO3P0KtpqMjZgKlrUee6Gt3kfxo_kM1RZET8_EeaYZNNHg9D3Y55DPbja0c91UgRh7AQ5prHHFvOsStGqoqWfQiInzjKj_mf__NdsbJzBTS-OCi4UVm5296cr0hQwNrJfUfUNwPwlDrqyl4dr_H4sZdsM3PRqtkvUXkSA34"/>
+</div>
+<div class="flex-1">
+<p class="text-xs font-bold">Elena Vance</p>
+<p class="text-[10px] text-on-surface-variant">Top Rated • Luxury Modern</p>
+</div>
+<span class="material-symbols-outlined text-sm text-tertiary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<button class="w-full py-2 bg-tertiary text-on-tertiary rounded-lg text-sm font-semibold active:scale-95 transition-all">Book Consult</button>
+</div>
+</div>
+<!-- Home Maintenance -->
+<div class="md:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
+<div class="bg-surface-container-low p-6 rounded-xl flex items-center gap-4 group hover:bg-surface-container-high transition-colors">
+<div class="p-4 bg-surface-container-lowest rounded-full group-hover:bg-primary group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined" data-icon="plumbing">plumbing</span>
+</div>
+<div>
+<h5 class="font-bold">Plumbing</h5>
+<p class="text-xs text-on-surface-variant">42 professionals nearby</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex items-center gap-4 group hover:bg-surface-container-high transition-colors">
+<div class="p-4 bg-surface-container-lowest rounded-full group-hover:bg-primary group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined" data-icon="electrical_services">electrical_services</span>
+</div>
+<div>
+<h5 class="font-bold">Electrical</h5>
+<p class="text-xs text-on-surface-variant">Available now</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex items-center gap-4 group hover:bg-surface-container-high transition-colors">
+<div class="p-4 bg-surface-container-lowest rounded-full group-hover:bg-primary group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined" data-icon="cleaning_services">cleaning_services</span>
+</div>
+<div>
+<h5 class="font-bold">Cleaning</h5>
+<p class="text-xs text-on-surface-variant">Recurring plans</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Real Estate Market - Local Prices -->
+<section class="space-y-6">
+<div class="flex justify-between items-end">
+<h3 class="text-2xl font-headline font-bold px-1">Local Real Estate</h3>
+<a class="text-primary font-semibold text-sm" href="#">View Map</a>
+</div>
+<div class="flex overflow-x-auto gap-6 pb-4 scrollbar-hide">
+<div class="min-w-[280px] bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/10 shadow-sm">
+<div class="h-40 bg-slate-200 relative">
+<img alt="Property 1" class="w-full h-full object-cover" data-alt="modern suburban home with clean architectural lines and green lawn during golden hour" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADZzSD5uAkdS2-i4G6fXgexUAtZSNqfleT0l6OhE1iJomg4B5Le8iemZ4r89jUZyreTQJNRD0hB77ZXPNGXrG5lPmgJiYvxOTfgtrlzFJmCRMqjYqERNJamCYaGm7K7tT-jl6CaKbx5DTyojnqk2pbtR7piUYV6Ra6j8JDBR3nJEM2PTrDab--RdRGOUlgUlM7uRLUZGFg1tFPV4em21DCkUsHt06KkVq7YCP-LIkcvK9u4qpJvfGDO6qcDpWbYCDwg7ZiCOg3Zbw"/>
+<div class="absolute top-3 right-3 glass-effect bg-black/40 text-white px-2 py-1 rounded text-[10px] font-bold">FOR SALE</div>
+</div>
+<div class="p-4 space-y-1">
+<h6 class="font-bold">$1,240,000</h6>
+<p class="text-xs text-on-surface-variant truncate">452 Oak Ridge Dr, Lake Oswego</p>
+<div class="flex gap-3 pt-2 text-[10px] text-on-surface-variant font-medium">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="bed">bed</span> 4</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="bathtub">bathtub</span> 3</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="square_foot">square_foot</span> 2,840 sqft</span>
+</div>
+</div>
+</div>
+<div class="min-w-[280px] bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/10 shadow-sm">
+<div class="h-40 bg-slate-200 relative">
+<img alt="Property 2" class="w-full h-full object-cover" data-alt="contemporary luxury house with glass walls and large swimming pool at night with warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZBqkgGhG1P5xzPnBC3XghvFQ-FdwFBL54FAi42vqcjI2z3f35ghAuyZ-DDZ4kF9SIN_t1ZILHT0jMs6jdlNJLiXKiE-l8IjjH9O61GBQk3FYVGUc8EPYFGU_93fHQoEJ2V-7Om8qc-C4SsFzSuAOKKCPUAHoPG5mQRgADXHHe-OWXmTEcZF1crXfD2E05Bo09L_kACtwYWqPk0rUCHOkaHGQB7g_DO4a1tWn4kxAm3pkJ4Ts5GL9kHafUKF_3r1BeUhss-tTViWI"/>
+<div class="absolute top-3 right-3 glass-effect bg-secondary text-white px-2 py-1 rounded text-[10px] font-bold uppercase">Trending</div>
+</div>
+<div class="p-4 space-y-1">
+<h6 class="font-bold">$985,000</h6>
+<p class="text-xs text-on-surface-variant truncate">1229 NW Marshall St, Pearl District</p>
+<div class="flex gap-3 pt-2 text-[10px] text-on-surface-variant font-medium">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="bed">bed</span> 2</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="bathtub">bathtub</span> 2</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="square_foot">square_foot</span> 1,450 sqft</span>
+</div>
+</div>
+</div>
+<div class="min-w-[280px] bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/10 shadow-sm">
+<div class="h-40 bg-slate-200 relative">
+<img alt="Property 3" class="w-full h-full object-cover" data-alt="modern minimalist house with flat roof and desert landscaping in bright daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4ye1ioXAd35u4A0lhgAIdDrMjuQ7KF6mDLBGAPbwlOV7KT7GjgmxZTw4qpvvVmI2RND-lNm6DVUVwPzGcEUb54RJp2siPxkEZcYt_gkBvIZQkiBIwhE6IRuZ_t1IG88smZ0jKkOuZRJmW0IZSlaYZZN1R6zJyNhztSE3GkvN9TaItxT6Kj1102Fj5XKOlKOZVaAEs7xotUcU0eUdm30YuJXY9hWIcXKAsHFS5tooVe8R-A4Ky8gfhx6P2lbiwjiUXXUVBWeTBhTw"/>
+<div class="absolute top-3 right-3 glass-effect bg-black/40 text-white px-2 py-1 rounded text-[10px] font-bold">NEW LISTING</div>
+</div>
+<div class="p-4 space-y-1">
+<h6 class="font-bold">$749,000</h6>
+<p class="text-xs text-on-surface-variant truncate">883 SE Ankeny St, Portland</p>
+<div class="flex gap-3 pt-2 text-[10px] text-on-surface-variant font-medium">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="bed">bed</span> 3</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="bathtub">bathtub</span> 2</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="square_foot">square_foot</span> 1,920 sqft</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-2xl z-50 rounded-t-3xl shadow-[0_-4px_24px_rgba(0,0,0,0.04)]">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="smart_toy">smart_toy</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Devices</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="storefront">storefront</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Market</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-blue-100/50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-2xl px-5 py-2 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="build">build</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Services</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Profile</span>
+</a>
+</nav>
+<!-- Contextual FAB -->
+<button class="fixed right-6 bottom-28 w-14 h-14 bg-gradient-to-tr from-primary to-primary-container text-on-primary rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</body></html>

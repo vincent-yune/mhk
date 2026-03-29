@@ -1,17 +1,16 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Bell } from 'lucide-react'
 import { useAuthStore } from '../store/useStore'
 import { useState, useEffect } from 'react'
 import api from '../api/axios'
 
 const PAGE_TITLES = {
-  '/dashboard':     'MyHouse',
+  '/dashboard':     null,  // shows logo
   '/house':         '내집 관리',
   '/items':         '물품 관리',
-  '/iot':           'IoT 기기',
+  '/iot':           '기기 제어',
   '/community':     '커뮤니티',
   '/notifications': '알림',
-  '/profile':       '내 프로필',
+  '/profile':       '프로필',
 }
 
 export default function Header() {
@@ -21,7 +20,7 @@ export default function Header() {
   const [unreadCount, setUnreadCount] = useState(0)
 
   const isHome = location.pathname === '/dashboard'
-  const title = PAGE_TITLES[location.pathname] || 'MyHouse'
+  const title = PAGE_TITLES[location.pathname]
 
   useEffect(() => {
     api.get('/notifications/count').then(res => {
@@ -30,31 +29,64 @@ export default function Header() {
   }, [location.pathname])
 
   return (
-    <div className="header" style={{ borderBottom: 'none' }}>
+    <header style={{
+      height: 'var(--header-height)',
+      background: 'rgba(248, 250, 251, 0.85)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 20px',
+      flexShrink: 0,
+      position: 'relative',
+      zIndex: 50,
+      borderBottom: 'none',
+    }}>
       {/* Left: logo or title */}
       {isHome ? (
-        <div className="header-logo">
-          <div className="header-logo-icon">🏠</div>
-          <h1 className="header-logo" style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 800, letterSpacing: '-0.3px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="material-symbols-outlined" style={{ color: '#005b87', fontSize: 26, fontVariationSettings: "'FILL' 1" }}>
+            home_pin
+          </span>
+          <h1 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 18, fontWeight: 800, color: '#003a58', letterSpacing: '-0.4px' }}>
             MyHouse
           </h1>
         </div>
       ) : (
-        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 18, fontWeight: 700, color: 'var(--on-surface)', letterSpacing: '-0.3px' }}>
-          {title}
+        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 17, fontWeight: 700, color: 'var(--on-surface)', letterSpacing: '-0.3px' }}>
+          {title || 'MyHouse'}
         </div>
       )}
 
       {/* Right: actions */}
-      <div className="header-actions">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Notification bell */}
         <button
-          className="btn-icon"
           onClick={() => navigate('/notifications')}
-          style={{ position: 'relative' }}
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'transparent',
+            border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            position: 'relative',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,91,135,0.08)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <Bell size={18} />
+          <span className="material-symbols-outlined" style={{ color: '#40493d', fontSize: 22 }}>
+            notifications
+          </span>
           {unreadCount > 0 && (
-            <span className="notification-badge">
+            <span style={{
+              position: 'absolute', top: 4, right: 4,
+              minWidth: 14, height: 14, borderRadius: 7,
+              background: 'var(--error)', color: 'white',
+              fontSize: 8, fontWeight: 800,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0 3px', border: '1.5px solid white',
+            }}>
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
@@ -66,15 +98,17 @@ export default function Header() {
           style={{
             width: 34, height: 34, borderRadius: '50%',
             background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
-            border: 'none', cursor: 'pointer',
+            border: '2px solid rgba(203,230,255,0.6)',
+            cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: 'white', fontSize: 13, fontWeight: 800,
-            flexShrink: 0
+            flexShrink: 0,
+            fontFamily: 'Manrope, sans-serif',
           }}
         >
           {user?.name?.[0] || 'U'}
         </button>
       </div>
-    </div>
+    </header>
   )
 }

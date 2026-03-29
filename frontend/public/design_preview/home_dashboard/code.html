@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MyHouse - Home Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#e7f3ff",
+                        "primary-fixed": "#cbe6ff",
+                        "on-tertiary-fixed": "#3f001c",
+                        "tertiary": "#923357",
+                        "inverse-primary": "#8ecdff",
+                        "tertiary-fixed": "#ffd9e2",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#bfcaba",
+                        "surface": "#f8fafb",
+                        "on-error": "#ffffff",
+                        "background": "#f8fafb",
+                        "secondary-container": "#91f78e",
+                        "secondary-fixed-dim": "#78dc77",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#005313",
+                        "primary-fixed-dim": "#8ecdff",
+                        "surface-container-high": "#e6e8e9",
+                        "surface-container-low": "#f2f4f5",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-container": "#00731e",
+                        "primary-container": "#2374a5",
+                        "tertiary-fixed-dim": "#ffb1c7",
+                        "outline": "#707a6c",
+                        "on-secondary-fixed": "#002204",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#191c1d",
+                        "surface-variant": "#e1e3e4",
+                        "primary": "#005b87",
+                        "on-background": "#191c1d",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8fafb",
+                        "surface-tint": "#006494",
+                        "on-surface-variant": "#40493d",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-tertiary-container": "#ffedf0",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#b14b6f",
+                        "secondary-fixed": "#94f990",
+                        "surface-container": "#eceeef",
+                        "on-primary-fixed-variant": "#004b71",
+                        "surface-dim": "#d8dadb",
+                        "on-primary-fixed": "#001e30",
+                        "secondary": "#006e1c",
+                        "on-tertiary-fixed-variant": "#7f2448",
+                        "inverse-on-surface": "#eff1f2"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="home_pin">home_pin</span>
+<h1 class="text-xl font-bold text-blue-900 dark:text-blue-100 tracking-tight">MyHouse</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-slate-500" data-icon="notifications">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="portrait of a smiling man in a clean modern apartment setting, soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh2suePR4NFFLigSGFUVYVi00iGrmKILKpEujDYePL_8cxg2uEZnsclME8QIr4Oq1flXrE9AvWPt2y5mjqgHwK8uxVgIKnVA6sP46Ijlwlt12EL66K_OIQP5a4lBAfL0el0d5q4VMgbCpC7e5mpKOUGvP-qMRA91hdONlJCmXkrD3Y4qNY9sRHolNbTls8Wj0Ul4Djy_N0ZOORdQ5xcKKoG4gIZVJZRG85xJOMR6VOhQhbvbcM4AWd-S9La-cGjy0W200LL8WEcEQ"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-5xl mx-auto">
+<!-- Welcome Hero Section (Asymmetrical Layout) -->
+<section class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="space-y-2">
+<h2 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface">Hello, Alex</h2>
+<p class="text-on-surface-variant text-lg">Your sanctuary is curated and ready.</p>
+</div>
+<!-- Status Card (Bento-style element) -->
+<div class="bg-surface-container-low rounded-xl p-6 flex items-center gap-4 border border-outline-variant/10 shadow-sm md:w-80">
+<div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="verified_user" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">System Status</p>
+<p class="text-sm text-on-surface-variant">3 items need attention</p>
+</div>
+</div>
+</section>
+<!-- Main Dashboard Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Quick IoT Controls (Left Column) -->
+<div class="md:col-span-8 space-y-8">
+<!-- Climate Section (Featured Glassmorphism Card) -->
+<div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary to-primary-container p-8 text-on-primary shadow-lg">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-9xl" data-icon="thermostat">thermostat</span>
+</div>
+<div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+<div>
+<span class="text-xs font-bold uppercase tracking-widest opacity-80 mb-2 block">Living Room Climate</span>
+<div class="flex items-baseline gap-1">
+<span class="text-6xl font-headline font-extrabold">22</span>
+<span class="text-2xl font-bold">°C</span>
+</div>
+<p class="mt-4 flex items-center gap-2 opacity-90">
+<span class="material-symbols-outlined text-sm" data-icon="air">air</span>
+                                Humidity: 45%
+                            </p>
+</div>
+<div class="w-full md:w-64 space-y-4">
+<div class="flex justify-between text-sm font-medium">
+<span>Adjust Temperature</span>
+<span>24°C Max</span>
+</div>
+<div class="h-3 w-full bg-on-primary/20 rounded-full relative">
+<div class="absolute h-full w-3/4 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]"></div>
+<div class="absolute top-1/2 left-3/4 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-lg border-2 border-primary cursor-pointer"></div>
+</div>
+<div class="flex justify-between items-center pt-2">
+<button class="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+<span class="font-headline font-bold">Eco Mode Active</span>
+<button class="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Lighting Grid (Asymmetrical Grid) -->
+<div>
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-headline font-bold text-on-surface">Lighting Scenes</h3>
+<button class="text-primary font-medium text-sm flex items-center gap-1 hover:underline">
+                            All Rooms <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<!-- Scene 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl flex flex-col gap-4 shadow-sm border border-outline-variant/10 group active:scale-95 transition-all">
+<div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
+<span class="material-symbols-outlined" data-icon="light_mode" style="font-variation-settings: 'FILL' 1;">light_mode</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Reading</p>
+<p class="text-xs text-on-surface-variant">Warm • 60%</p>
+</div>
+</div>
+<!-- Scene 2 -->
+<div class="bg-primary/5 p-5 rounded-xl flex flex-col gap-4 shadow-sm border-2 border-primary/20 group active:scale-95 transition-all">
+<div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="nightlight" style="font-variation-settings: 'FILL' 1;">nightlight</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Cinema</p>
+<p class="text-xs text-primary font-semibold">Active</p>
+</div>
+</div>
+<!-- Scene 3 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl flex flex-col gap-4 shadow-sm border border-outline-variant/10 group active:scale-95 transition-all">
+<div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined" data-icon="wb_sunny">wb_sunny</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Morning</p>
+<p class="text-xs text-on-surface-variant">Scheduled</p>
+</div>
+</div>
+<!-- Scene 4 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl flex flex-col gap-4 shadow-sm border border-outline-variant/10 group active:scale-95 transition-all">
+<div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Dining</p>
+<p class="text-xs text-on-surface-variant">Off</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity & History (Right Column) -->
+<aside class="md:col-span-4 space-y-6">
+<div class="bg-surface-container-low rounded-xl p-6 h-full border border-outline-variant/5">
+<h3 class="text-lg font-headline font-bold text-on-surface mb-6">Recent Activity</h3>
+<div class="space-y-6">
+<!-- Activity Item 1 -->
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-secondary-container/50 flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-sm" data-icon="countertops">countertops</span>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface">New item added to Kitchen</p>
+<p class="text-xs text-on-surface-variant">Smart Fridge • 12 mins ago</p>
+</div>
+</div>
+<!-- Activity Item 2 -->
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined text-sm" data-icon="filter_alt">filter_alt</span>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface">Air purifier replaced filters</p>
+<p class="text-xs text-on-surface-variant">Maintenance • 2 hours ago</p>
+</div>
+</div>
+<!-- Activity Item 3 -->
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
+<span class="material-symbols-outlined text-sm" data-icon="door_front">door_front</span>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface">Front Door unlocked</p>
+<p class="text-xs text-on-surface-variant">Guest Access • 4 hours ago</p>
+</div>
+</div>
+<!-- Activity Item 4 -->
+<div class="flex gap-4 opacity-60">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600">
+<span class="material-symbols-outlined text-sm" data-icon="bolt">bolt</span>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface">Energy report available</p>
+<p class="text-xs text-on-surface-variant">Weekly Sync • Yesterday</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-3 rounded-xl bg-surface-container-high text-on-primary-fixed-variant text-sm font-bold hover:bg-surface-container-highest transition-colors">
+                        View All History
+                    </button>
+</div>
+</aside>
+</div>
+<!-- Devices Horizontal Carousel (Secondary Section) -->
+<section class="mt-12">
+<h3 class="text-xl font-headline font-bold text-on-surface mb-6">Connected Devices</h3>
+<div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-6 px-6">
+<!-- Device 1 -->
+<div class="flex-shrink-0 w-44 bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-sm">
+<span class="material-symbols-outlined text-secondary mb-4" data-icon="nest_cam_wired_stand">nest_cam_wired_stand</span>
+<p class="font-bold text-on-surface">Front Door Cam</p>
+<p class="text-xs text-secondary font-medium mt-1">Live • Online</p>
+</div>
+<!-- Device 2 -->
+<div class="flex-shrink-0 w-44 bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-sm">
+<span class="material-symbols-outlined text-blue-500 mb-4" data-icon="router">router</span>
+<p class="font-bold text-on-surface">Main Hub 2.0</p>
+<p class="text-xs text-secondary font-medium mt-1">Excellent Signal</p>
+</div>
+<!-- Device 3 -->
+<div class="flex-shrink-0 w-44 bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-sm">
+<span class="material-symbols-outlined text-amber-500 mb-4" data-icon="curtains">curtains</span>
+<p class="font-bold text-on-surface">Smart Blinds</p>
+<p class="text-xs text-on-surface-variant mt-1">Open 40%</p>
+</div>
+<!-- Device 4 -->
+<div class="flex-shrink-0 w-44 bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-sm">
+<span class="material-symbols-outlined text-red-400 mb-4" data-icon="detector_smoke">detector_smoke</span>
+<p class="font-bold text-on-surface">Smoke Sensor</p>
+<p class="text-xs text-error font-medium mt-1">Low Battery</p>
+</div>
+<!-- Device 5 -->
+<div class="flex-shrink-0 w-44 bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-sm">
+<span class="material-symbols-outlined text-slate-400 mb-4" data-icon="add_circle">add_circle</span>
+<p class="font-bold text-on-surface">Add New</p>
+<p class="text-xs text-on-surface-variant mt-1">Pair Device</p>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-2xl z-50 rounded-t-3xl shadow-[0_-4px_24px_rgba(0,0,0,0.04)]">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center bg-blue-100/50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-2xl px-5 py-2 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Home</span>
+</a>
+<!-- Devices -->
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Devices</span>
+</a>
+<!-- Market -->
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Market</span>
+</a>
+<!-- Services -->
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Services</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Profile</span>
+</a>
+</nav>
+<!-- Contextual FAB (Only on Dashboard/Home as per instructions) -->
+<button class="fixed bottom-28 right-6 w-14 h-14 bg-gradient-to-tr from-primary to-primary-container text-on-primary rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform duration-200 z-40">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+</body></html>

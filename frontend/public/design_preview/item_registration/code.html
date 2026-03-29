@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add New Item - MyHouse</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed-dim": "#8ecdff",
+              "secondary-fixed": "#94f990",
+              "on-secondary-fixed": "#002204",
+              "on-primary-fixed-variant": "#004b71",
+              "on-secondary-container": "#00731e",
+              "inverse-primary": "#8ecdff",
+              "on-secondary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed": "#ffd9e2",
+              "surface-dim": "#d8dadb",
+              "on-surface-variant": "#40493d",
+              "tertiary-container": "#b14b6f",
+              "on-secondary-fixed-variant": "#005313",
+              "surface-container-high": "#e6e8e9",
+              "tertiary-fixed-dim": "#ffb1c7",
+              "secondary-fixed-dim": "#78dc77",
+              "error-container": "#ffdad6",
+              "surface-tint": "#006494",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#ffedf0",
+              "primary": "#005b87",
+              "surface-bright": "#f8fafb",
+              "on-error-container": "#93000a",
+              "on-background": "#191c1d",
+              "on-primary": "#ffffff",
+              "outline": "#707a6c",
+              "surface-variant": "#e1e3e4",
+              "surface": "#f8fafb",
+              "outline-variant": "#bfcaba",
+              "on-error": "#ffffff",
+              "surface-container-highest": "#e1e3e4",
+              "inverse-surface": "#2e3132",
+              "on-surface": "#191c1d",
+              "error": "#ba1a1a",
+              "secondary": "#006e1c",
+              "tertiary": "#923357",
+              "surface-container": "#eceeef",
+              "surface-container-low": "#f2f4f5",
+              "on-primary-container": "#e7f3ff",
+              "on-tertiary-fixed-variant": "#7f2448",
+              "inverse-on-surface": "#eff1f2",
+              "primary-fixed": "#cbe6ff",
+              "primary-container": "#2374a5",
+              "background": "#f8fafb",
+              "secondary-container": "#91f78e",
+              "on-tertiary-fixed": "#3f001c",
+              "on-primary-fixed": "#001e30"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-slate-50 sticky top-0 z-50 flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<button class="hover:bg-slate-200/50 transition-colors p-2 rounded-full scale-95 active:opacity-80 transition-all text-cyan-800">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold text-cyan-900">Add New Item</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-semibold text-cyan-700 tracking-wider">STEP 1/2</span>
+</div>
+</header>
+<main class="max-w-2xl mx-auto px-6 py-8">
+<!-- Bento-style Layout for Form -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Image Upload Section (Asymmetric Span) -->
+<section class="md:col-span-12 lg:col-span-5 flex flex-col gap-4">
+<div class="group relative aspect-square w-full rounded-xl overflow-hidden bg-surface-container-low flex flex-col items-center justify-center border-2 border-dashed border-outline-variant/30 hover:border-primary/50 transition-all cursor-pointer">
+<img class="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" data-alt="Modern minimalist living room interior with clean white walls and natural wooden furniture in soft daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxJ00XUIbzjv6yg1ARGiJlIIeunfwSAI7E7qwUwjOFZUsjezIOF76diI4a3yRU9F13GPYiyW6wdQINMrc09VX2v3HIeCtVdO8EoCo1VppY7ZnYvgE5GDdT-NJ37sKrz0HXh-g7QHrDnMtCfmO37sVLm33Dbjdkr6uJyYmza0jdnvnJFhlS7Cc8K9rRa9kdlhqD1HQBVIcHUM16COIqdKgSj2kbJECxMhz6fkdR65wRRMWXRgzMMFtctwA9jm9JAbFKopxjD0ZswdQ"/>
+<div class="z-10 flex flex-col items-center gap-3">
+<div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container shadow-sm">
+<span class="material-symbols-outlined text-3xl" data-icon="add_a_photo">add_a_photo</span>
+</div>
+<p class="font-headline font-bold text-on-surface text-center px-4">Upload Item Image</p>
+<p class="text-xs text-on-surface-variant">JPG or PNG up to 10MB</p>
+</div>
+</div>
+</section>
+<!-- Product Details Form -->
+<section class="md:col-span-12 lg:col-span-7 flex flex-col gap-6">
+<!-- Room Selection -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-3">Room Selection</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface focus:ring-2 focus:ring-primary/20 appearance-none font-medium">
+<option value="">Select a location...</option>
+<option>Living Room</option>
+<option>Kitchen</option>
+<option>Bedroom</option>
+<option>Home Office</option>
+<option>Bathroom</option>
+</select>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Main Form Fields -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] space-y-5">
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest">Product Name</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20" placeholder="e.g. Ergonomic Desk Chair" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest">Manufacturer</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20" placeholder="e.g. Steelcase" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest">Model</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20" placeholder="e.g. Gesture" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest">Price</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">$</span>
+<input class="w-full bg-surface-container-low border-none rounded-lg pl-8 pr-4 py-3 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20" placeholder="0.00" type="number"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest">Registration Date</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface focus:ring-2 focus:ring-primary/20" type="date"/>
+</div>
+</div>
+</div>
+<!-- Options -->
+<div class="bg-secondary-container/20 p-5 rounded-xl flex items-center justify-between group cursor-pointer border border-secondary/10">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="rebase_edit">rebase_edit</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Repurchase intent</p>
+<p class="text-xs text-on-surface-variant">Would you buy this item again?</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<!-- Action Button -->
+<button class="mt-4 w-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold py-5 rounded-xl shadow-lg shadow-primary/20 scale-100 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+<span class="material-symbols-outlined" data-icon="save">save</span>
+                    Register Item
+                </button>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-white/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.04)] rounded-t-3xl border-t border-white/20">
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-cyan-600 transition-colors px-4 py-2" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="text-xs font-medium font-body">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-cyan-50 text-cyan-700 rounded-xl px-4 py-2" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="text-xs font-medium font-body">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-cyan-600 transition-colors px-4 py-2" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="meeting_room">meeting_room</span>
+<span class="text-xs font-medium font-body">Rooms</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-cyan-600 transition-colors px-4 py-2" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="text-xs font-medium font-body">Settings</span>
+</a>
+</nav>
+</body></html>

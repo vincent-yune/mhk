@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MyHouse Marketplace &amp; Community</title>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary": "#ffffff",
+              "on-primary-container": "#e7f3ff",
+              "primary-fixed": "#cbe6ff",
+              "on-tertiary-fixed": "#3f001c",
+              "tertiary": "#923357",
+              "inverse-primary": "#8ecdff",
+              "tertiary-fixed": "#ffd9e2",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#bfcaba",
+              "surface": "#f8fafb",
+              "on-error": "#ffffff",
+              "background": "#f8fafb",
+              "secondary-container": "#91f78e",
+              "secondary-fixed-dim": "#78dc77",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed-variant": "#005313",
+              "primary-fixed-dim": "#8ecdff",
+              "surface-container-high": "#e6e8e9",
+              "surface-container-low": "#f2f4f5",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#2e3132",
+              "on-secondary-container": "#00731e",
+              "primary-container": "#2374a5",
+              "tertiary-fixed-dim": "#ffb1c7",
+              "outline": "#707a6c",
+              "on-secondary-fixed": "#002204",
+              "on-error-container": "#93000a",
+              "on-surface": "#191c1d",
+              "surface-variant": "#e1e3e4",
+              "primary": "#005b87",
+              "on-background": "#191c1d",
+              "on-secondary": "#ffffff",
+              "surface-bright": "#f8fafb",
+              "surface-tint": "#006494",
+              "on-surface-variant": "#40493d",
+              "surface-container-highest": "#e1e3e4",
+              "on-tertiary-container": "#ffedf0",
+              "error": "#ba1a1a",
+              "tertiary-container": "#b14b6f",
+              "secondary-fixed": "#94f990",
+              "surface-container": "#eceeef",
+              "on-primary-fixed-variant": "#004b71",
+              "surface-dim": "#d8dadb",
+              "on-primary-fixed": "#001e30",
+              "secondary": "#006e1c",
+              "on-tertiary-fixed-variant": "#7f2448",
+              "inverse-on-surface": "#eff1f2"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl bg-slate-100 dark:bg-slate-800/50 flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="home_pin">home_pin</span>
+<h1 class="text-xl font-bold text-blue-900 dark:text-blue-100 tracking-tight">MyHouse</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400" data-icon="search">search</span>
+</button>
+<button class="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-7xl mx-auto">
+<!-- Header & Switcher -->
+<div class="mb-10">
+<h2 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-6">Discover &amp; Connect</h2>
+<!-- Bento-style Search & Tabs -->
+<div class="flex flex-col md:flex-row gap-4 items-center">
+<div class="relative w-full md:flex-1 group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60" data-icon="search">search</span>
+<input class="w-full pl-12 pr-6 py-4 rounded-xl border-0 bg-surface-container-low focus:ring-2 focus:ring-primary-container transition-all placeholder:text-on-surface-variant/50" placeholder="Search furniture, tools, or news..." type="text"/>
+</div>
+<div class="flex bg-surface-container-low p-1.5 rounded-xl w-full md:w-auto self-stretch">
+<button class="flex-1 md:px-8 py-2.5 rounded-lg bg-surface-container-lowest shadow-sm text-primary font-semibold transition-all">
+                        Marketplace
+                    </button>
+<button class="flex-1 md:px-8 py-2.5 rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-high transition-all">
+                        Community
+                    </button>
+</div>
+</div>
+</div>
+<!-- Featured Carousel (Marketplace) -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h3 class="font-headline text-xl font-bold">Featured Near You</h3>
+<p class="text-on-surface-variant text-sm">Quality items from verified neighbors</p>
+</div>
+<button class="text-primary font-semibold text-sm flex items-center gap-1">
+                    See all <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="flex overflow-x-auto gap-6 hide-scrollbar pb-4 -mx-6 px-6">
+<!-- Card 1 -->
+<div class="flex-shrink-0 w-[320px] group cursor-pointer">
+<div class="relative h-[220px] w-full rounded-xl overflow-hidden mb-3">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Modern velvet green lounge chair in a bright minimalist living room with wooden flooring and sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCD7IWI-N-WvvXsIhXPKqpTKMKUT4a2ds9KK8blr5AWY5po8K9PX55viWynBLahrQc1FjloOvrn0zBWvEO7lSMpSvZrFDmOBku50NnJm-ctDh3DEPENLGqMNM_25Dgp4NK5bqIwoN8ZjI_bPhjedMun5obnTY9LkTCn65qfsbLPW_DBpfaJnhmzxuBId49nD493v5GwLcX9Z9mB8lVgwZN72uyKcz-Dfprne9pOUvwtqIwvFEFM4Qqpk4ml4uHXavjjMPiHUOsRQk"/>
+<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-sm font-bold text-primary shadow-sm">$240</div>
+<div class="absolute top-3 left-3 bg-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-on-secondary-container">New Listing</div>
+</div>
+<h4 class="font-bold text-lg mb-1">Eames Style Lounge Chair</h4>
+<div class="flex items-center gap-2 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+<span>0.4 miles away • Oak Ridge</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex-shrink-0 w-[320px] group cursor-pointer">
+<div class="relative h-[220px] w-full rounded-xl overflow-hidden mb-3">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="industrial metal floor lamp with warm edison bulb glowing against a dark textured wall" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnp0OFwhEWxqE1kA6himZ_RZM63rhhK9Y7h5ymFeRv2XZFtLBMsqzj4u-fkp2yJyEN07CZ8jLAeG_XqwH3gsiJOX0BYVYCIOre_1XQxvFFGqBYYBb3VouHaVPnuUfzQOSSDbe0CJXTQZAel4HFwGnqSdfbTBdeZMyadvcL8LqguiMZC1hYp1GHt9uLZ5keOJbd8QzZOs6C0OPpf2lbLIwMlpunTSsbAdoV1c8mBYF1F5r6W5qgmlpfHlvvGYgkx9-rx7_w0aFQC1E"/>
+<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-sm font-bold text-primary shadow-sm">$45</div>
+<div class="absolute bottom-3 left-3 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-medium text-white">Trade welcome</div>
+</div>
+<h4 class="font-bold text-lg mb-1">Industrial Floor Lamp</h4>
+<div class="flex items-center gap-2 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+<span>1.2 miles away • Sunset Hills</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="flex-shrink-0 w-[320px] group cursor-pointer">
+<div class="relative h-[220px] w-full rounded-xl overflow-hidden mb-3">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="set of wooden kitchen utensils and ceramic bowls on a clean white kitchen counter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdz2vaWjv4bSLSGLxnSMJsKAGTW4_H42Q81vNYMPtruTnLiPnjQ7kui2roEs0-7KS4_vurBZCeUkQ7yKlJUvSxMYsr6nvM0XWMm6NOR3b5aXOv4mMZaprdZjbvt6uu3xtOJm9tagoF0dMs6DnBvZL1muZOoGgobl4NV2w6A3Vc29Dd2y9lIkzYYMk77P8uQh9HmDbGQYAYjHVHH14oBrdXqMLksLRFe4ypDuGDQHblz0lt7pWZ8gwgjZcoBUEnhgTTdzSlCtL0tRE"/>
+<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-sm font-bold text-primary shadow-sm">Free</div>
+</div>
+<h4 class="font-bold text-lg mb-1">Kitchen Essentials Kit</h4>
+<div class="flex items-center gap-2 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+<span>2.5 miles away • Downtown</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Community Bento Section -->
+<section class="mb-12">
+<h3 class="font-headline text-xl font-bold mb-6">Neighborhood Pulse</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Large Announcement Card -->
+<div class="md:col-span-2 bg-primary-container text-on-primary-container p-8 rounded-xl relative overflow-hidden flex flex-col justify-between min-h-[280px]">
+<div class="relative z-10">
+<span class="bg-white/20 backdrop-blur-md text-[10px] uppercase font-bold tracking-[2px] px-3 py-1 rounded-full">Official Announcement</span>
+<h4 class="text-3xl font-extrabold mt-6 leading-tight max-w-md">Annual Block Party &amp; Neighborhood Cleanup</h4>
+<p class="mt-4 opacity-90 max-w-sm">Join us this Saturday at Central Park for coffee, community, and making our streets shine.</p>
+</div>
+<div class="mt-8 flex gap-4 items-center z-10">
+<button class="bg-surface-container-lowest text-primary px-6 py-3 rounded-full font-bold shadow-xl active:scale-95 transition-all">I'm coming</button>
+<span class="text-sm font-medium">42 neighbors attending</span>
+</div>
+<!-- Decorative background glow -->
+<div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-[80px]"></div>
+</div>
+<!-- Recommendation Card -->
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed-dim flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant" data-icon="format_quote">format_quote</span>
+</div>
+<span class="font-bold text-sm">Top Recommendation</span>
+</div>
+<p class="text-on-surface italic mb-6 leading-relaxed">"Does anyone know a reliable plumber? My basement drain is acting up again and I need someone before the weekend."</p>
+<div class="mt-auto pt-6 border-t border-outline-variant/20 flex items-center justify-between">
+<div class="flex -space-x-3">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-slate-200"></div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-slate-300"></div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-slate-400"></div>
+</div>
+<span class="text-primary font-bold text-sm">12 Replies</span>
+</div>
+</div>
+<!-- Small Community Stat Card -->
+<div class="bg-secondary-container/20 p-6 rounded-xl border border-secondary/10">
+<span class="material-symbols-outlined text-secondary text-4xl mb-4" data-icon="eco">eco</span>
+<h5 class="text-on-secondary-container font-bold text-lg">Eco-Impact</h5>
+<p class="text-on-surface-variant text-sm mt-2">Our neighborhood saved 450kg of waste this month through item trading!</p>
+</div>
+<!-- Discussion Card -->
+<div class="md:col-span-2 bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col md:flex-row gap-6 items-center border border-surface-variant">
+<img class="w-full md:w-32 h-32 rounded-lg object-cover" data-alt="top view of a rustic neighborhood street with green trees and parked vintage cars under warm afternoon light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlJZEkWnwF2Ph206orUWvhsGuSHahml2KkfzkBTitp2SHTcp98CQwq3oystWG0pdrRt0pM_WQI_orWLi_yrSnYsOPEiV1nUI1i3LlHlrle2Cgbdbn6Sl27Ml0MPgouiFwswOnHJk5fQuWFmqN8LWVxQSy7fnInfcVvAdRqqS2Gua7jKVhIWRqnzXy6rht_en3IdsnLh1KBtLsNxWtd7AgLugaHwy90XbmuK8u48_t-e33p5dz7vWe7pj9ocGDq7j7El0UD33FyhSc"/>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-2">
+<h5 class="font-bold text-lg leading-tight">Speed limit concerns on Main St.</h5>
+<span class="text-[10px] text-on-surface-variant uppercase font-medium">2h ago</span>
+</div>
+<p class="text-on-surface-variant text-sm line-clamp-2">The increasing traffic is becoming a safety issue for the kids. I'm starting a petition for new speed bumps...</p>
+<div class="flex gap-4 mt-4">
+<button class="flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="thumb_up">thumb_up</span> 128
+                            </button>
+<button class="flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="comment">comment</span> 54
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB: Post Something -->
+<button class="fixed bottom-28 right-6 z-40 bg-primary-container text-on-primary-container h-16 w-16 rounded-2xl shadow-2xl flex items-center justify-center active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-2xl z-50 rounded-t-3xl shadow-[0_-4px_24px_rgba(0,0,0,0.04)]">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="smart_toy">smart_toy</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Devices</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-blue-100/50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-2xl px-5 py-2 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="storefront" style="font-variation-settings: 'FILL' 1;">storefront</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Market</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="build">build</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Services</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Profile</span>
+</a>
+</nav>
+</body></html>

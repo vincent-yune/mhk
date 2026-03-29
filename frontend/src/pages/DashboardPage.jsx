@@ -6,6 +6,28 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 
 const HOUSE_TYPE_KO = { APARTMENT: '아파트', HOUSE: '주택', VILLA: '빌라', OFFICETEL: '오피스텔', OTHER: '기타' }
 
+/* ── Material Symbol helper ── */
+function MSI({ name, fill = false, size = 24, color, style = {} }) {
+  return (
+    <span
+      className="material-symbols-outlined"
+      style={{
+        fontSize: size,
+        fontVariationSettings: fill
+          ? `'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' ${size}`
+          : `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' ${size}`,
+        color: color || 'inherit',
+        lineHeight: 1,
+        display: 'inline-flex',
+        alignItems: 'center',
+        ...style,
+      }}
+    >
+      {name}
+    </span>
+  )
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
@@ -14,6 +36,7 @@ export default function DashboardPage() {
   const [expiringItems, setExpiringItems] = useState([])
   const [reorderItems, setReorderItems] = useState([])
   const [zones, setZones] = useState([])
+  const [iotDevices, setIotDevices] = useState([])
   const [loading, setLoading] = useState(true)
 
   const feeData = [
@@ -46,6 +69,7 @@ export default function DashboardPage() {
         iot:   iotRes.value?.data?.data?.length   || 0,
         posts: postsRes.value?.data?.data?.totalElements || 0,
       })
+      setIotDevices(iotRes.value?.data?.data?.slice(0, 5) || [])
       setExpiringItems(expiringRes.value?.data?.data || [])
       setReorderItems(reorderRes.value?.data?.data   || [])
       setZones(zonesRes.value?.data?.data || [])
@@ -56,82 +80,186 @@ export default function DashboardPage() {
   /* ── No house selected ── */
   if (!selectedHouse) {
     return (
-      <div>
-        {/* Hero welcome */}
-        <div className="page-hero" style={{ paddingTop: 32, paddingBottom: 32 }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>🏠</div>
-          <div className="page-hero-eyebrow">Welcome</div>
-          <h1 className="page-hero-title">안녕하세요,<br />{user?.name || '홈오너'}님</h1>
-          <p className="page-hero-subtitle" style={{ marginTop: 12 }}>
-            첫 번째 집을 등록하고<br />스마트 홈 관리를 시작해 보세요.
+      <div style={{ padding: '0 0 24px' }}>
+        {/* Welcome Hero */}
+        <div style={{ padding: '32px 20px 28px', background: 'var(--surface-container-lowest)' }}>
+          {/* Asymmetric layout */}
+          <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--primary)' }}>
+            WELCOME
+          </div>
+          <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--on-surface)', marginBottom: 6, lineHeight: 1.2 }}>
+            안녕하세요,<br />{user?.name || '홈오너'}님
+          </h2>
+          <p style={{ color: 'var(--on-surface-variant)', fontSize: 14 }}>
+            첫 번째 집을 등록하고 스마트 홈 관리를 시작해 보세요.
           </p>
+
+          {/* Status Card - Bento style */}
+          <div style={{
+            marginTop: 20,
+            background: 'var(--surface-container-low)',
+            borderRadius: 16,
+            padding: '16px 18px',
+            display: 'flex', alignItems: 'center', gap: 14,
+          }}>
+            <div style={{
+              width: 44, height: 44, borderRadius: '50%',
+              background: 'rgba(0,110,28,0.1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <MSI name="verified_user" fill size={22} color="var(--secondary)" />
+            </div>
+            <div>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, color: 'var(--on-surface)' }}>
+                준비 완료
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginTop: 2 }}>
+                집을 등록하면 스마트 관리가 시작됩니다
+              </div>
+            </div>
+          </div>
+
           <button
-            className="btn btn-primary"
-            style={{ marginTop: 24 }}
             onClick={() => navigate('/house')}
+            style={{
+              marginTop: 20,
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '12px 24px',
+              background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
+              color: 'white',
+              border: 'none', borderRadius: 24,
+              fontWeight: 600, fontSize: 14, cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(0,91,135,0.3)',
+            }}
           >
-            🏡 첫 번째 집 등록하기
+            <MSI name="add_home" size={18} />
+            첫 번째 집 등록하기
           </button>
         </div>
 
-        {/* Feature cards */}
-        <div className="page-section">
-          <p className="section-title">주요 기능</p>
-          <div className="space-sm" />
+        {/* Feature Cards - 2x2 grid */}
+        <div style={{ padding: '24px 20px 0' }}>
+          <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700, color: 'var(--on-surface)', marginBottom: 14 }}>
+            주요 기능
+          </div>
           <div className="grid-2">
             {[
-              { icon: '📦', title: '물품 관리', desc: '유통기한·재고 스마트 관리', color: 'bg-blue-soft',  link: '/items' },
-              { icon: '🔌', title: 'IoT 기기',  desc: '자동화 시나리오 설정',     color: 'bg-green-soft', link: '/iot' },
-              { icon: '💬', title: '커뮤니티',  desc: '이웃과 중고 물품 거래',    color: 'bg-orange-soft', link: '/community' },
-              { icon: '📊', title: '홈 인사이트', desc: '관리비 리포트 분석',    color: 'bg-purple-soft', link: '/dashboard' },
+              { icon: 'inventory_2',  title: '물품 관리',   desc: '유통기한·재고 스마트 관리', bg: '#cce8f4', color: '#005b87', link: '/items' },
+              { icon: 'smart_toy',    title: 'IoT 기기',    desc: '자동화 시나리오 설정',     bg: '#b6f2be', color: '#006e1c', link: '/iot' },
+              { icon: 'storefront',   title: '커뮤니티',    desc: '이웃과 중고 물품 거래',    bg: '#ffd9e4', color: '#923357', link: '/community' },
+              { icon: 'bar_chart',    title: '홈 인사이트', desc: '관리비 리포트 분석',       bg: '#e8d5f0', color: '#7b4fa6', link: '/dashboard' },
             ].map((f, i) => (
               <div
                 key={i}
-                className={`card card-hover ${f.color}`}
-                style={{ padding: 18 }}
                 onClick={() => navigate(f.link)}
+                style={{
+                  background: 'var(--surface-container-lowest)',
+                  borderRadius: 16, padding: 18, cursor: 'pointer',
+                  transition: 'transform 0.15s, box-shadow 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-float)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}
+                onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
+                onTouchEnd={e => e.currentTarget.style.transform = ''}
               >
-                <div style={{ fontSize: 32, marginBottom: 10 }}>{f.icon}</div>
-                <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, marginBottom: 4, color: 'var(--on-surface)' }}>{f.title}</div>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 12,
+                  background: f.bg,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginBottom: 12,
+                }}>
+                  <MSI name={f.icon} fill size={20} color={f.color} />
+                </div>
+                <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, color: 'var(--on-surface)', marginBottom: 4 }}>{f.title}</div>
                 <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.5 }}>{f.desc}</div>
               </div>
             ))}
           </div>
         </div>
-        <div className="space-xl" />
+        <div style={{ height: 48 }} />
       </div>
     )
   }
 
   const alerts = [
-    ...expiringItems.map(i => ({ type: 'warning', text: `${i.name} 유통기한 임박`, sub: i.expiryDate })),
-    ...reorderItems.map(i => ({ type: 'danger',  text: `${i.name} 재주문 필요`,  sub: `${i.quantity}${i.unit}` })),
+    ...expiringItems.map(i => ({ type: 'warning', icon: 'schedule', text: `${i.name} 유통기한 임박`, sub: i.expiryDate })),
+    ...reorderItems.map(i => ({ type: 'danger', icon: 'shopping_cart', text: `${i.name} 재주문 필요`, sub: `${i.quantity}${i.unit}` })),
   ]
 
   return (
-    <div>
-      {/* ── Hero House Card ── */}
-      <div style={{ padding: '16px 20px 0' }}>
-        <div className="card-hero">
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 6 }}>
-              {HOUSE_TYPE_KO[selectedHouse.houseType] || '주택'}
-            </div>
-            <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, fontWeight: 800, letterSpacing: '-0.4px', marginBottom: 4 }}>
-              {selectedHouse.name}
-            </h2>
-            <p style={{ fontSize: 13, opacity: 0.8 }}>{selectedHouse.address || '주소 미등록'}</p>
+    <div style={{ paddingBottom: 24 }}>
 
-            {/* Mini stats row */}
-            <div style={{ display: 'flex', gap: 20, marginTop: 18 }}>
+      {/* ── Welcome Hero Section (Asymmetrical) ── */}
+      <div style={{ padding: '28px 20px 20px', background: 'var(--surface-container-lowest)' }}>
+        <div style={{ marginBottom: 4 }}>
+          <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--on-surface)', lineHeight: 1.2 }}>
+            안녕하세요, {user?.name || '홈오너'}님
+          </h2>
+          <p style={{ color: 'var(--on-surface-variant)', fontSize: 14, marginTop: 4 }}>
+            {selectedHouse.name}이 준비되어 있습니다.
+          </p>
+        </div>
+
+        {/* Status badge */}
+        <div style={{
+          marginTop: 16,
+          background: 'var(--surface-container-low)',
+          borderRadius: 14,
+          padding: '12px 16px',
+          display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: '50%',
+            background: 'rgba(0,110,28,0.1)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <MSI name="verified_user" fill size={20} color="var(--secondary)" />
+          </div>
+          <div>
+            <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13, color: 'var(--on-surface)' }}>
+              시스템 상태 정상
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginTop: 1 }}>
+              {alerts.length > 0 ? `${alerts.length}건 주의 필요` : '모든 항목이 정상입니다'}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Climate Card (Featured Glassmorphism) ── */}
+      <div style={{ padding: '16px 20px 0' }}>
+        <div style={{
+          background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
+          borderRadius: 20,
+          padding: '22px 20px',
+          color: 'white',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Background icon */}
+          <div style={{ position: 'absolute', top: 8, right: 8, opacity: 0.08 }}>
+            <MSI name="home_work" size={100} color="white" />
+          </div>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', opacity: 0.8, marginBottom: 8 }}>
+              {HOUSE_TYPE_KO[selectedHouse.houseType] || '주택'} • {selectedHouse.address || '주소 미등록'}
+            </div>
+            <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 24, fontWeight: 800, letterSpacing: '-0.4px', marginBottom: 4 }}>
+              {selectedHouse.name}
+            </div>
+            {/* Stats row */}
+            <div style={{ display: 'flex', gap: 24, marginTop: 16 }}>
               {[
-                { value: stats.items, label: '물품' },
-                { value: stats.iot,   label: 'IoT' },
-                { value: zones.length, label: '구역' },
+                { value: stats.items, label: '물품', icon: 'inventory_2' },
+                { value: stats.iot,   label: 'IoT',  icon: 'smart_toy' },
+                { value: zones.length, label: '구역', icon: 'room' },
               ].map((s, i) => (
-                <div key={i} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 20, fontWeight: 800, fontFamily: 'Manrope, sans-serif' }}>{s.value}</div>
-                  <div style={{ fontSize: 11, opacity: 0.7 }}>{s.label}</div>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <MSI name={s.icon} size={16} color="rgba(255,255,255,0.7)" />
+                  <div>
+                    <div style={{ fontSize: 18, fontWeight: 800, fontFamily: 'Manrope, sans-serif', lineHeight: 1 }}>{s.value}</div>
+                    <div style={{ fontSize: 10, opacity: 0.7, lineHeight: 1.2 }}>{s.label}</div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -140,55 +268,105 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Quick Actions ── */}
-      <div className="page-section">
-        <div className="section-header">
-          <span className="section-title">빠른 실행</span>
+      <div style={{ padding: '20px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700, color: 'var(--on-surface)' }}>빠른 실행</span>
         </div>
         <div className="scroll-row">
           {[
-            { icon: '📦', label: '물품 추가',  color: '#cce8f4', link: '/items' },
-            { icon: '🔌', label: 'IoT 제어',   color: '#b6f2be', link: '/iot' },
-            { icon: '🛒', label: '재주문',      color: '#ffedd5', link: '/items' },
-            { icon: '💬', label: '중고 거래',   color: '#fce7f3', link: '/community' },
-            { icon: '🏡', label: '집 관리',     color: '#f3e8ff', link: '/house' },
+            { icon: 'inventory_2', label: '물품 추가',  bg: '#cce8f4', color: '#005b87', link: '/items' },
+            { icon: 'smart_toy',   label: 'IoT 제어',   bg: '#b6f2be', color: '#006e1c', link: '/iot' },
+            { icon: 'shopping_cart', label: '재주문',   bg: '#ffedd5', color: '#b45309', link: '/items' },
+            { icon: 'storefront',  label: '거래',       bg: '#ffd9e4', color: '#923357', link: '/community' },
+            { icon: 'home_work',   label: '집 관리',    bg: '#e8d5f0', color: '#7b4fa6', link: '/house' },
           ].map((q, i) => (
             <button
               key={i}
               onClick={() => navigate(q.link)}
               style={{
-                background: q.color,
-                borderRadius: 16,
-                padding: '14px 16px',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 6,
-                minWidth: 72,
-                transition: 'transform 0.15s'
+                background: q.bg, borderRadius: 16, padding: '14px 12px',
+                border: 'none', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: 6, minWidth: 70,
+                transition: 'transform 0.15s',
               }}
-              onTouchStart={e => e.currentTarget.style.transform = 'scale(0.94)'}
+              onTouchStart={e => e.currentTarget.style.transform = 'scale(0.93)'}
               onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
             >
-              <span style={{ fontSize: 24 }}>{q.icon}</span>
+              <MSI name={q.icon} fill size={22} color={q.color} />
               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--on-surface)', whiteSpace: 'nowrap' }}>{q.label}</span>
             </button>
           ))}
         </div>
       </div>
 
+      {/* ── Connected Devices Carousel ── */}
+      {iotDevices.length > 0 && (
+        <div style={{ padding: '24px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700 }}>연결된 기기</span>
+            <button
+              onClick={() => navigate('/iot')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 2 }}
+            >
+              전체 <MSI name="arrow_forward" size={14} color="var(--primary)" />
+            </button>
+          </div>
+          <div className="scroll-row">
+            {iotDevices.map((d, i) => (
+              <div
+                key={i}
+                style={{
+                  flexShrink: 0, width: 130,
+                  background: 'var(--surface-container-lowest)',
+                  borderRadius: 16, padding: '14px 14px 12px',
+                }}
+              >
+                <MSI
+                  name={d.deviceType === 'THERMOSTAT' ? 'thermostat' : d.deviceType === 'LIGHT' ? 'lightbulb' : d.deviceType === 'CAMERA' ? 'nest_cam_wired_stand' : 'smart_toy'}
+                  fill size={24}
+                  color={d.status === 'ONLINE' ? 'var(--secondary)' : 'var(--on-surface-variant)'}
+                  style={{ marginBottom: 8, display: 'block' }}
+                />
+                <div style={{ fontWeight: 700, fontSize: 12, color: 'var(--on-surface)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {d.name}
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: d.status === 'ONLINE' ? 'var(--secondary)' : 'var(--on-surface-variant)' }}>
+                  {d.status === 'ONLINE' ? '● 온라인' : '○ 오프라인'}
+                </div>
+              </div>
+            ))}
+            {/* Add device */}
+            <div
+              onClick={() => navigate('/iot')}
+              style={{
+                flexShrink: 0, width: 130,
+                background: 'var(--surface-container-lowest)',
+                borderRadius: 16, padding: '14px 14px 12px',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                gap: 8, cursor: 'pointer', minHeight: 80,
+              }}
+            >
+              <MSI name="add_circle" size={24} color="var(--on-surface-variant)" />
+              <div style={{ fontWeight: 700, fontSize: 12, color: 'var(--on-surface)' }}>기기 추가</div>
+              <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>페어링</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Alerts ── */}
       {alerts.length > 0 && (
-        <div className="page-section">
-          <div className="section-header">
-            <span className="section-title">🔔 스마트 알림</span>
+        <div style={{ padding: '24px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700 }}>스마트 알림</span>
             <span style={{ fontSize: 12, color: 'var(--on-surface-variant)' }}>{alerts.length}건</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {alerts.slice(0, 3).map((a, i) => (
               <div key={i} className={`alert alert-${a.type}`}>
-                <span>{a.type === 'warning' ? '⚠️' : '📦'}</span>
+                <MSI name={a.icon} fill size={18} />
                 <div>
                   <div style={{ fontWeight: 600 }}>{a.text}</div>
                   {a.sub && <div style={{ fontSize: 11, opacity: 0.8, marginTop: 1 }}>{a.sub}</div>}
@@ -199,49 +377,101 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ── Zone Overview ── */}
+      {/* ── Zone Grid (Lighting Scenes style) ── */}
       {zones.length > 0 && (
-        <div className="page-section">
-          <div className="section-header">
-            <span className="section-title">구역 현황</span>
-            <button className="section-action" onClick={() => navigate('/items')}>전체 보기</button>
+        <div style={{ padding: '24px 20px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700 }}>구역 현황</span>
+            <button
+              className="section-action"
+              onClick={() => navigate('/items')}
+              style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--primary)' }}
+            >
+              전체 <MSI name="arrow_forward" size={14} color="var(--primary)" />
+            </button>
           </div>
           <div className="grid-2">
-            {zones.slice(0, 6).map((z, i) => (
-              <div
-                key={z.id}
-                className="card card-sm card-hover"
-                onClick={() => navigate(`/items?zone=${z.id}`)}
-                style={{ padding: '14px 16px' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div className="icon-rect bg-primary-soft" style={{ width: 38, height: 38, fontSize: 18, borderRadius: 12 }}>
-                    {z.icon || '📍'}
+            {zones.slice(0, 6).map((z, i) => {
+              const colors = ['#cce8f4', '#b6f2be', '#ffd9e4', '#ffedd5', '#e8d5f0', '#fef9c3']
+              const textColors = ['#005b87', '#006e1c', '#923357', '#b45309', '#7b4fa6', '#854d0e']
+              return (
+                <div
+                  key={z.id}
+                  onClick={() => navigate(`/items?zone=${z.id}`)}
+                  style={{
+                    background: 'var(--surface-container-lowest)',
+                    borderRadius: 16, padding: '14px 16px',
+                    cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 10,
+                    transition: 'transform 0.15s',
+                  }}
+                  onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
+                  onTouchEnd={e => e.currentTarget.style.transform = ''}
+                >
+                  <div style={{
+                    width: 38, height: 38, borderRadius: 12,
+                    background: colors[i % colors.length],
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 20,
+                  }}>
+                    {z.icon || <MSI name="room" fill size={20} color={textColors[i % textColors.length]} />}
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div>
                     <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--on-surface)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {z.name}
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
-                      📦 {z.itemCount ?? 0}개
+                    <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 2 }}>
+                      {z.itemCount ?? 0}개 물품
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}
 
+      {/* ── Recent Activity ── */}
+      <div style={{ padding: '24px 20px 0' }}>
+        <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700, marginBottom: 12 }}>최근 활동</div>
+        <div style={{ background: 'var(--surface-container-low)', borderRadius: 16, padding: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {[
+              { icon: 'inventory_2', color: '#91f78e',    bg: 'rgba(145,247,142,0.3)', text: '물품 관리', sub: '항목 관리 바로가기', link: '/items' },
+              { icon: 'smart_toy',   color: '#2374a5',    bg: 'rgba(35,116,165,0.1)',  text: 'IoT 기기 제어', sub: '기기 제어 바로가기', link: '/iot' },
+              { icon: 'storefront',  color: '#b14b6f',    bg: 'rgba(177,75,111,0.1)',  text: '마켓플레이스', sub: '이웃과 거래', link: '/community' },
+            ].map((a, i) => (
+              <div
+                key={i}
+                onClick={() => navigate(a.link)}
+                style={{ display: 'flex', gap: 14, alignItems: 'flex-start', cursor: 'pointer' }}
+              >
+                <div style={{
+                  flexShrink: 0, width: 34, height: 34, borderRadius: '50%',
+                  background: a.bg,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <MSI name={a.icon} fill size={16} color={a.color} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--on-surface)' }}>{a.text}</div>
+                  <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 2 }}>{a.sub}</div>
+                </div>
+                <MSI name="arrow_forward_ios" size={14} color="var(--on-surface-variant)" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── Fee Chart ── */}
-      <div className="page-section">
-        <div className="section-header">
-          <span className="section-title">관리비 추이</span>
+      <div style={{ padding: '24px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700 }}>관리비 추이</span>
           <span style={{ fontSize: 12, color: 'var(--on-surface-variant)' }}>최근 6개월</span>
         </div>
-        <div className="card" style={{ padding: '16px 12px 12px' }}>
-          <ResponsiveContainer width="100%" height={160}>
-            <BarChart data={feeData} barSize={18} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+        <div style={{ background: 'var(--surface-container-lowest)', borderRadius: 16, padding: '16px 12px 12px' }}>
+          <ResponsiveContainer width="100%" height={150}>
+            <BarChart data={feeData} barSize={16} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--on-surface-variant)' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: 'var(--on-surface-variant)' }} tickFormatter={v => `${(v/10000).toFixed(0)}만`} axisLine={false} tickLine={false} />
               <Tooltip
@@ -254,15 +484,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Community posts ── */}
-      <div className="page-section" style={{ paddingBottom: 0 }}>
-        <div className="section-header">
-          <span className="section-title">커뮤니티</span>
-          <button className="section-action" onClick={() => navigate('/community')}>더 보기</button>
-        </div>
-      </div>
-
-      <div className="space-xl" />
+      <div style={{ height: 48 }} />
     </div>
   )
 }

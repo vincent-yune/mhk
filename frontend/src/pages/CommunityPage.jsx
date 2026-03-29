@@ -1,10 +1,30 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, X, Eye, Heart } from 'lucide-react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
 
-const POST_TYPES = { SELL: { label: '판매', color: 'var(--primary-container)', text: 'var(--primary)', icon: '💰' }, BUY: { label: '구매', color: 'var(--secondary-container)', text: 'var(--secondary)', icon: '🛒' }, SHARE: { label: '나눔', color: '#FFF7ED', text: '#F59E0B', icon: '🎁' }, RENT: { label: '대여', color: '#FDF4FF', text: '#A855F7', icon: '🔄' }, FREE: { label: '무료', color: '#FEF2F2', text: '#EF4444', icon: '🆓' } }
-const STATUS_MAP = { ACTIVE: { label: '거래중', cls: 'badge-active' }, RESERVED: { label: '예약중', cls: 'badge-warning' }, COMPLETED: { label: '완료', cls: 'badge-gray' }, CLOSED: { label: '마감', cls: 'badge-gray' } }
+const POST_TYPES = {
+  SELL:  { label: '판매', color: '#cce8f4', text: '#005b87', icon: 'sell' },
+  BUY:   { label: '구매', color: '#b6f2be', text: '#006e1c', icon: 'shopping_cart' },
+  SHARE: { label: '나눔', color: '#ffedd5', text: '#b45309', icon: 'volunteer_activism' },
+  RENT:  { label: '대여', color: '#e8d5f0', text: '#7b4fa6', icon: 'sync_alt' },
+  FREE:  { label: '무료', color: '#ffd9e4', text: '#923357', icon: 'redeem' },
+}
+const STATUS_MAP = {
+  ACTIVE:    { label: '거래중', bg: '#b6f2be', color: '#006e1c' },
+  RESERVED:  { label: '예약중', bg: '#fef3c7', color: '#92400e' },
+  COMPLETED: { label: '완료',   bg: '#e6e8e9', color: '#40493d' },
+  CLOSED:    { label: '마감',   bg: '#e6e8e9', color: '#40493d' },
+}
+
+function MSI({ name, fill = false, size = 24, color, style = {} }) {
+  return (
+    <span className="material-symbols-outlined" style={{
+      fontSize: size,
+      fontVariationSettings: fill ? `'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' ${size}` : `'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' ${size}`,
+      color: color || 'inherit', lineHeight: 1, display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', ...style,
+    }}>{name}</span>
+  )
+}
 
 export default function CommunityPage() {
   const [posts, setPosts] = useState([])
@@ -22,23 +42,14 @@ export default function CommunityPage() {
     if (draft) {
       try {
         const d = JSON.parse(draft)
-        setForm({
-          title: d.title || '',
-          content: d.content || '',
-          postType: d.postType || 'SELL',
-          price: d.price || '',
-          isNegotiable: d.isNegotiable || false,
-          location: d.location || ''
-        })
+        setForm({ title: d.title || '', content: d.content || '', postType: d.postType || 'SELL', price: d.price || '', isNegotiable: d.isNegotiable || false, location: d.location || '' })
         setShowModal(true)
         sessionStorage.removeItem('communityDraft')
       } catch (e) {}
     }
   }, [])
 
-  useEffect(() => {
-    loadPosts()
-  }, [page, postType])
+  useEffect(() => { loadPosts() }, [page, postType])
 
   const loadPosts = async () => {
     try {
@@ -58,9 +69,7 @@ export default function CommunityPage() {
       setShowModal(false)
       setForm({ title: '', content: '', postType: 'SELL', price: '', isNegotiable: false, location: '' })
       loadPosts()
-    } catch (e) {
-      toast.error(e.response?.data?.message || '게시글 등록 실패')
-    }
+    } catch (e) { toast.error(e.response?.data?.message || '게시글 등록 실패') }
   }
 
   const handleDelete = async (id, e) => {
@@ -71,141 +80,253 @@ export default function CommunityPage() {
       toast.success('삭제되었습니다.')
       loadPosts()
       if (selectedPost?.id === id) setSelectedPost(null)
-    } catch (e) {
-      toast.error('삭제에 실패했습니다.')
-    }
+    } catch (e) { toast.error('삭제에 실패했습니다.') }
   }
 
   const filtered = posts.filter(p => p.title.includes(search) || p.content.includes(search))
 
   return (
-    <div>
-      {/* 헤더 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <div>
-          <h2 style={{ fontSize: 20, fontWeight: 800 }}>이웃과 물품 거래</h2>
-          <p style={{ color: 'var(--on-surface-variant)', fontSize: 14 }}>신뢰 기반 로컬 커뮤니티</p>
+    <div style={{ paddingBottom: 24 }}>
+
+      {/* ── Hero ── */}
+      <div style={{ padding: '28px 20px 20px', background: 'var(--surface-container-lowest)' }}>
+        <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 26, fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--on-surface)', marginBottom: 4 }}>
+          Discover & Connect
+        </h2>
+        <p style={{ color: 'var(--on-surface-variant)', fontSize: 13 }}>이웃과 신뢰 기반 로컬 거래를 시작하세요</p>
+
+        {/* Search */}
+        <div style={{ position: 'relative', marginTop: 14 }}>
+          <MSI name="search" size={18} color="var(--on-surface-variant)" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.6 }} />
+          <input
+            className="form-input"
+            style={{ paddingLeft: 44, borderRadius: 16 }}
+            placeholder="가구, 도구, 소식 검색..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}><Plus size={16} /> 게시글 등록</button>
+
+        {/* Tab switcher */}
+        <div style={{ display: 'flex', background: 'var(--surface-container-low)', borderRadius: 14, padding: 4, marginTop: 12, gap: 2 }}>
+          <button
+            onClick={() => { setPostType(''); setPage(0) }}
+            style={{
+              flex: 1, padding: '9px', borderRadius: 10, border: 'none',
+              background: !postType ? 'var(--surface-container-lowest)' : 'transparent',
+              color: !postType ? 'var(--primary)' : 'var(--on-surface-variant)',
+              fontWeight: 600, fontSize: 13, cursor: 'pointer',
+              boxShadow: !postType ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
+            }}
+          >마켓플레이스</button>
+          <button
+            onClick={() => { setPostType('SHARE'); setPage(0) }}
+            style={{
+              flex: 1, padding: '9px', borderRadius: 10, border: 'none',
+              background: postType === 'SHARE' ? 'var(--surface-container-lowest)' : 'transparent',
+              color: postType === 'SHARE' ? 'var(--primary)' : 'var(--on-surface-variant)',
+              fontWeight: 500, fontSize: 13, cursor: 'pointer',
+              boxShadow: postType === 'SHARE' ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
+            }}
+          >커뮤니티</button>
+        </div>
       </div>
 
-      {/* 필터 탭 */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        <button onClick={() => { setPostType(''); setPage(0) }}
-          style={{ padding: '6px 16px', borderRadius: 20, border: '1.5px solid', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-            borderColor: !postType ? 'var(--primary)' : 'var(--outline-variant)', background: !postType ? 'var(--primary-container)' : 'white', color: !postType ? 'var(--primary)' : 'var(--on-surface-variant)' }}>
-          전체
-        </button>
-        {Object.entries(POST_TYPES).map(([k, v]) => (
-          <button key={k} onClick={() => { setPostType(k); setPage(0) }}
-            style={{ padding: '6px 16px', borderRadius: 20, border: '1.5px solid', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-              borderColor: postType === k ? v.text : 'var(--outline-variant)', background: postType === k ? v.color : 'white', color: postType === k ? v.text : 'var(--on-surface-variant)' }}>
-            {v.icon} {v.label}
+      {/* ── Filter Type Chips ── */}
+      <div style={{ padding: '12px 20px 0' }}>
+        <div className="scroll-row" style={{ paddingBottom: 4 }}>
+          {Object.entries(POST_TYPES).map(([k, v]) => (
+            <button
+              key={k}
+              onClick={() => { setPostType(postType === k ? '' : k); setPage(0) }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '7px 14px', borderRadius: 20, border: 'none', flexShrink: 0,
+                background: postType === k ? v.color : 'var(--surface-container-lowest)',
+                color: postType === k ? v.text : 'var(--on-surface-variant)',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              <MSI name={v.icon} fill={postType === k} size={14} />
+              {v.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Featured Section (Bento) ── */}
+      <div style={{ padding: '20px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div>
+            <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700 }}>최근 게시글</div>
+            <div style={{ fontSize: 12, color: 'var(--on-surface-variant)' }}>이웃의 물품 거래</div>
+          </div>
+          <button
+            onClick={() => setShowModal(true)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '10px 16px',
+              background: 'linear-gradient(135deg, var(--primary-light), var(--primary))',
+              color: 'white', border: 'none', borderRadius: 20,
+              fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            }}
+          >
+            <MSI name="add" size={16} />글 등록
           </button>
-        ))}
-      </div>
+        </div>
 
-      {/* 검색 */}
-      <div style={{ position: 'relative', marginBottom: 16 }}>
-        <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-        <input className="form-input" style={{ paddingLeft: 40 }} placeholder="게시글 검색..." value={search} onChange={e => setSearch(e.target.value)} />
-      </div>
-
-      <div style={{ display: 'flex', gap: 20 }}>
-        {/* 게시글 목록 */}
-        <div style={{ flex: 1 }}>
-          {filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state-icon">💬</div><h3>게시글이 없습니다</h3>
-              <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => setShowModal(true)}>첫 게시글 쓰기</button></div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-              {filtered.map(post => {
-                const pt = POST_TYPES[post.postType]
-                return (
-                  <div key={post.id} className="card" style={{ cursor: 'pointer' }} onClick={() => setSelectedPost(post)}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <span style={{ background: pt.color, color: pt.text, padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
-                        {pt.icon} {pt.label}
-                      </span>
-                      <span className={`badge ${STATUS_MAP[post.status]?.cls}`}>{STATUS_MAP[post.status]?.label}</span>
+        {filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--on-surface-variant)' }}>
+            <MSI name="storefront" size={52} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 12px' }} />
+            <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 700, color: 'var(--on-surface)', marginBottom: 8 }}>게시글이 없습니다</div>
+            <button onClick={() => setShowModal(true)} style={{ marginTop: 8, padding: '12px 24px', background: 'linear-gradient(135deg, var(--primary), var(--primary-light))', color: 'white', border: 'none', borderRadius: 24, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+              첫 게시글 쓰기
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {filtered.map(post => {
+              const pt = POST_TYPES[post.postType] || POST_TYPES.SELL
+              const st = STATUS_MAP[post.status] || STATUS_MAP.ACTIVE
+              return (
+                <div
+                  key={post.id}
+                  onClick={() => setSelectedPost(selectedPost?.id === post.id ? null : post)}
+                  style={{
+                    background: 'var(--surface-container-lowest)',
+                    borderRadius: 20, overflow: 'hidden', cursor: 'pointer',
+                    transition: 'transform 0.15s',
+                    outline: selectedPost?.id === post.id ? '2px solid rgba(0,91,135,0.25)' : 'none',
+                  }}
+                  onTouchStart={e => e.currentTarget.style.transform = 'scale(0.98)'}
+                  onTouchEnd={e => e.currentTarget.style.transform = ''}
+                >
+                  <div style={{ padding: '14px 16px' }}>
+                    {/* Top row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: pt.color, color: pt.text, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                          <MSI name={pt.icon} fill size={12} color={pt.text} />{pt.label}
+                        </span>
+                        <span style={{ background: st.bg, color: st.color, padding: '3px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600 }}>
+                          {st.label}
+                        </span>
+                      </div>
+                      <button
+                        onClick={e => handleDelete(post.id, e)}
+                        style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(186,26,26,0.08)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <MSI name="delete" size={13} color="var(--error)" />
+                      </button>
                     </div>
-                    <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.title}</h3>
-                    <p style={{ fontSize: 13, color: 'var(--on-surface-variant)', marginBottom: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.content}</p>
+
+                    {/* Title */}
+                    <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {post.title}
+                    </h3>
+                    <p style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginBottom: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {post.content}
+                    </p>
+
+                    {/* Footer */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--primary)' }}>
+                      <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 800, color: 'var(--primary)' }}>
                         {post.price ? `${Number(post.price).toLocaleString()}원` : '가격문의'}
-                        {post.isNegotiable && <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', marginLeft: 6 }}>협의가능</span>}
+                        {post.isNegotiable && <span style={{ fontSize: 10, fontWeight: 500, color: 'var(--on-surface-variant)', marginLeft: 4 }}>협의가능</span>}
                       </span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}><Eye size={13} /> {post.viewCount}</span>
-                        <button style={{ fontSize: 12, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
-                          onClick={e => handleDelete(post.id, e)}>🗑️</button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <MSI name="visibility" size={13} color="var(--on-surface-variant)" />
+                        <span style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>{post.viewCount}</span>
+                        {post.location && (
+                          <>
+                            <MSI name="location_on" size={13} color="var(--on-surface-variant)" />
+                            <span style={{ fontSize: 11, color: 'var(--on-surface-variant)', maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.location}</span>
+                          </>
+                        )}
                       </div>
                     </div>
-                    {post.location && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>📍 {post.location}</div>}
                   </div>
-                )
-              })}
-            </div>
-          )}
 
-          {/* 페이지네이션 */}
-          {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 24 }}>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button key={i} onClick={() => setPage(i)}
-                  style={{ width: 32, height: 32, borderRadius: 8, border: '1.5px solid', cursor: 'pointer', fontWeight: 600, fontSize: 13,
-                    borderColor: page === i ? 'var(--primary)' : 'var(--outline-variant)', background: page === i ? 'var(--primary-container)' : 'white', color: page === i ? 'var(--primary)' : 'var(--on-surface-variant)' }}>
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+                  {/* Expanded detail */}
+                  {selectedPost?.id === post.id && (
+                    <div style={{ padding: '0 16px 16px' }}>
+                      <div style={{ background: 'var(--surface-container-low)', borderRadius: 14, padding: 14 }}>
+                        <p style={{ fontSize: 13, color: 'var(--on-surface)', lineHeight: 1.7, marginBottom: 12 }}>{post.content}</p>
+                        <button
+                          onClick={() => toast('채팅 기능 준비 중!', { icon: '💬' })}
+                          style={{
+                            width: '100%', padding: '12px', borderRadius: 14,
+                            background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
+                            color: 'white', border: 'none', cursor: 'pointer',
+                            fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                          }}
+                        >
+                          <MSI name="chat" fill size={18} />채팅으로 문의하기
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
 
-        {/* 게시글 상세 패널 */}
-        {selectedPost && (
-          <div className="card" style={{ width: 320, flexShrink: 0, alignSelf: 'flex-start', position: 'sticky', top: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <span style={{ background: POST_TYPES[selectedPost.postType].color, color: POST_TYPES[selectedPost.postType].text, padding: '4px 12px', borderRadius: 20, fontSize: 13, fontWeight: 700 }}>
-                {POST_TYPES[selectedPost.postType].icon} {POST_TYPES[selectedPost.postType].label}
-              </span>
-              <button className="btn-icon" onClick={() => setSelectedPost(null)}><X size={16} /></button>
-            </div>
-            <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 8 }}>{selectedPost.title}</h3>
-            <p style={{ fontSize: 14, color: 'var(--on-surface-variant)', lineHeight: 1.7, marginBottom: 16 }}>{selectedPost.content}</p>
-            <div className="divider" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-muted)' }}>가격</span>
-                <span style={{ fontWeight: 700, color: 'var(--primary)' }}>
-                  {selectedPost.price ? `${Number(selectedPost.price).toLocaleString()}원` : '가격문의'}
-                </span>
-              </div>
-              {selectedPost.location && <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-muted)' }}>거래장소</span>
-                <span style={{ fontWeight: 600 }}>📍 {selectedPost.location}</span>
-              </div>}
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-muted)' }}>조회수</span>
-                <span>{selectedPost.viewCount}</span>
-              </div>
-            </div>
-            <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 16 }}
-              onClick={() => toast('채팅 기능 준비 중!', { icon: '💬' })}>
-              💬 채팅으로 문의하기
-            </button>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 24 }}>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                style={{
+                  width: 32, height: 32, borderRadius: 10, border: 'none', cursor: 'pointer',
+                  fontWeight: 600, fontSize: 13,
+                  background: page === i ? 'var(--primary-container)' : 'var(--surface-container-lowest)',
+                  color: page === i ? 'var(--primary)' : 'var(--on-surface-variant)',
+                }}
+              >{i + 1}</button>
+            ))}
           </div>
         )}
       </div>
 
-      {/* 게시글 등록 모달 */}
+      {/* ── Community Stat Banner ── */}
+      <div style={{ padding: '24px 20px 0' }}>
+        <div style={{
+          background: 'rgba(0,110,28,0.06)',
+          borderRadius: 20, padding: '16px 18px',
+          display: 'flex', alignItems: 'center', gap: 14,
+        }}>
+          <MSI name="eco" fill size={36} color="var(--secondary)" />
+          <div>
+            <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, color: 'var(--on-surface)' }}>Eco-Impact</div>
+            <p style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginTop: 2, lineHeight: 1.5 }}>
+              이웃 간 물품 거래로 폐기물을 줄이고 지속가능한 공동체를 만들어요!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* FAB */}
+      <button
+        onClick={() => setShowModal(true)}
+        className="fab"
+      >
+        <MSI name="add" size={26} />
+      </button>
+
+      {/* ── Create Post Modal ── */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-handle" />
             <div className="modal-header">
               <div className="modal-title">게시글 등록</div>
-              <button className="btn-icon" onClick={() => setShowModal(false)}><X size={18} /></button>
+              <button onClick={() => setShowModal(false)} style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--surface-container-low)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <MSI name="close" size={18} color="var(--on-surface-variant)" />
+              </button>
             </div>
             <form onSubmit={handleCreatePost}>
               <div className="modal-body">
@@ -213,11 +334,19 @@ export default function CommunityPage() {
                   <label className="form-label">거래 유형</label>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {Object.entries(POST_TYPES).map(([k, v]) => (
-                      <button key={k} type="button" style={{
-                        padding: '6px 14px', borderRadius: 20, border: '1.5px solid', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-                        borderColor: form.postType === k ? v.text : 'var(--outline-variant)',
-                        background: form.postType === k ? v.color : 'white', color: form.postType === k ? v.text : 'var(--on-surface-variant)'
-                      }} onClick={() => setForm({ ...form, postType: k })}>{v.icon} {v.label}</button>
+                      <button
+                        key={k} type="button"
+                        onClick={() => setForm({ ...form, postType: k })}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                          fontSize: 12, fontWeight: 600,
+                          background: form.postType === k ? v.color : 'var(--surface-container-low)',
+                          color: form.postType === k ? v.text : 'var(--on-surface-variant)',
+                        }}
+                      >
+                        <MSI name={v.icon} fill={form.postType === k} size={14} />{v.label}
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -245,8 +374,8 @@ export default function CommunityPage() {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>취소</button>
-                <button type="submit" className="btn btn-primary">등록</button>
+                <button type="submit" className="btn btn-primary btn-block">등록</button>
+                <button type="button" className="btn btn-secondary btn-block" onClick={() => setShowModal(false)}>취소</button>
               </div>
             </form>
           </div>
