@@ -60,7 +60,7 @@ public class House extends BaseEntity {
     @Builder.Default
     private Boolean isPrimary = true;
 
-    @Column(name = "map_image_url", length = 500)
+    @Column(name = "map_image_url", columnDefinition = "MEDIUMTEXT")
     private String mapImageUrl;
 
     @OneToMany(mappedBy = "house", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
