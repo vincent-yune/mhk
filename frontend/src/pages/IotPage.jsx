@@ -17,10 +17,37 @@ const DEVICE_TYPE_MAP = {
 
 const PLATFORM_LABELS = {
   SMARTTHINGS: 'SmartThings',
+  LG_THINQ: 'LG ThinQ',
   GOOGLE_HOME: 'Google Home',
   APPLE_HOME: 'Apple Home',
   TUYA: 'Tuya',
   OTHER: '기타'
+}
+
+// LG ThinQ 기기 타입 한글 매핑
+const LG_DEVICE_TYPE_KO = {
+  DEVICE_AIR_CONDITIONER: '에어컨',
+  DEVICE_AIR_PURIFIER: '공기청정기',
+  DEVICE_AIR_PURIFIER_FAN: '공기청정 선풍기',
+  DEVICE_REFRIGERATOR: '냉장고',
+  DEVICE_KIMCHI_REFRIGERATOR: '김치냉장고',
+  DEVICE_WASHER: '세탁기',
+  DEVICE_DRYER: '건조기',
+  DEVICE_STYLER: '스타일러',
+  DEVICE_DISHWASHER: '식기세척기',
+  DEVICE_DISH_WASHER: '식기세척기',
+  DEVICE_ROBOT_CLEANER: '로봇청소기',
+  DEVICE_STICK_CLEANER: '스틱청소기',
+  DEVICE_OVEN: '오븐',
+  DEVICE_MICROWAVE_OVEN: '전자레인지',
+  DEVICE_HUMIDIFIER: '가습기',
+  DEVICE_DEHUMIDIFIER: '제습기',
+  DEVICE_SYSTEM_BOILER: '시스템 보일러',
+  DEVICE_WATER_HEATER: '온수기',
+  DEVICE_VENTILATOR: '환기장치',
+  DEVICE_COOKTOP: '쿡탑',
+  DEVICE_HOOD: '후드',
+  DEVICE_WINE_CELLAR: '와인셀러',
 }
 
 function MSI({ name, fill = false, size = 24, color, style = {} }) {
@@ -33,6 +60,406 @@ function MSI({ name, fill = false, size = 24, color, style = {} }) {
       color: color || 'inherit', lineHeight: 1,
       display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', ...style,
     }}>{name}</span>
+  )
+}
+
+// ── LG ThinQ 연결 모달 ──────────────────────────────────────────────────────────
+function LgThinqConnectModal({ onClose, onConnected }) {
+  const [pat, setPat] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [step, setStep] = useState(1)
+
+  const handleConnect = async (e) => {
+    e.preventDefault()
+    if (!pat.trim()) return toast.error('PAT 토큰을 입력해주세요.')
+    setLoading(true)
+    try {
+      const res = await api.post('/lgthinq/connect', { token: pat.trim() })
+      toast.success(res.data.message || 'LG ThinQ 연결 완료!')
+      onConnected()
+      onClose()
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'LG ThinQ 연결 실패. 토큰을 확인해주세요.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+        <div className="modal-handle" />
+
+        {/* Header */}
+        <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 12,
+              background: 'linear-gradient(135deg, #C0392B, #a93226)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ color: 'white', fontWeight: 900, fontSize: 13, fontFamily: 'Manrope, sans-serif' }}>LG</span>
+            </div>
+            <div>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 16 }}>LG ThinQ</div>
+              <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>LG 가전 연동</div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{
+            width: 32, height: 32, borderRadius: '50%',
+            background: 'var(--surface-container-low)', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <MSI name="close" size={18} color="var(--on-surface-variant)" />
+          </button>
+        </div>
+
+        {step === 1 ? (
+          <div style={{ padding: 20 }}>
+            {/* 안내 카드 */}
+            <div style={{
+              background: 'linear-gradient(135deg, #C0392B 0%, #922B21 100%)',
+              borderRadius: 20, padding: 20, marginBottom: 20,
+              color: 'white', position: 'relative', overflow: 'hidden',
+            }}>
+              <div style={{ position: 'absolute', top: -10, right: -10, fontSize: 80, opacity: 0.1 }}>🏠</div>
+              <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 8 }}>LG ThinQ PAT 연동</div>
+              <div style={{ fontSize: 12, opacity: 0.9, lineHeight: 1.6 }}>
+                LG ThinQ Developer 사이트에서<br />
+                Personal Access Token을 발급받아<br />
+                LG 가전을 MyHouse에서 제어하세요.
+              </div>
+            </div>
+
+            {/* 지원 기기 목록 */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13, marginBottom: 10 }}>지원 LG 기기</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {[
+                  { icon: 'kitchen', label: '냉장고/김치냉장고', color: '#cce8f4' },
+                  { icon: 'local_laundry_service', label: '세탁기/건조기', color: '#b6f2be' },
+                  { icon: 'air', label: '에어컨/공기청정기', color: '#e3f2fd' },
+                  { icon: 'wash', label: '식기세척기/스타일러', color: '#e8d5f0' },
+                  { icon: 'cleaning_services', label: '로봇청소기', color: '#ffedd5' },
+                  { icon: 'thermostat', label: '보일러/온수기', color: '#ffd9e4' },
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    padding: '10px 12px', borderRadius: 12,
+                    background: item.color, display: 'flex', alignItems: 'center', gap: 8,
+                  }}>
+                    <MSI name={item.icon} fill size={18} />
+                    <span style={{ fontSize: 12, fontWeight: 600 }}>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* PAT 발급 안내 */}
+            <div style={{
+              padding: 16, borderRadius: 16,
+              background: 'var(--surface-container-low)',
+              marginBottom: 20,
+            }}>
+              <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 8 }}>PAT 발급 방법</div>
+              {[
+                { step: '1', text: 'connect-pat.lgthinq.com 방문' },
+                { step: '2', text: 'LG 계정으로 로그인' },
+                { step: '3', text: 'Create Token 클릭 후 토큰 복사' },
+              ].map((s, i) => (
+                <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: i < 2 ? 8 : 0 }}>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: '50%',
+                    background: '#C0392B', color: 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 11, fontWeight: 800, flexShrink: 0,
+                  }}>{s.step}</div>
+                  <span style={{ fontSize: 13, lineHeight: 1.5, paddingTop: 2 }}>{s.text}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <a
+                href="https://connect-pat.lgthinq.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1, padding: '14px', borderRadius: 16,
+                  background: 'var(--surface-container-low)',
+                  border: 'none', cursor: 'pointer',
+                  fontWeight: 700, fontSize: 14, textAlign: 'center',
+                  color: 'var(--on-surface)', textDecoration: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                }}
+              >
+                <MSI name="open_in_new" size={16} />
+                PAT 발급하기
+              </a>
+              <button
+                onClick={() => setStep(2)}
+                style={{
+                  flex: 1, padding: '14px', borderRadius: 16,
+                  background: 'linear-gradient(135deg, #C0392B, #922B21)',
+                  border: 'none', cursor: 'pointer',
+                  color: 'white', fontWeight: 700, fontSize: 14,
+                }}
+              >
+                토큰 입력하기
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleConnect} style={{ padding: 20 }}>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, marginBottom: 8 }}>
+                LG ThinQ Personal Access Token
+              </div>
+              <textarea
+                value={pat}
+                onChange={e => setPat(e.target.value)}
+                placeholder="connect-pat.lgthinq.com에서 발급받은 PAT 토큰"
+                rows={3}
+                style={{
+                  width: '100%', padding: '12px 14px', borderRadius: 14,
+                  border: '1.5px solid var(--outline-variant)',
+                  background: 'var(--surface-container-low)',
+                  fontSize: 13, resize: 'none', boxSizing: 'border-box',
+                  fontFamily: 'monospace',
+                }}
+              />
+              <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 4 }}>
+                토큰은 암호화되어 안전하게 저장됩니다.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button type="button" onClick={() => setStep(1)} style={{
+                flex: 1, padding: 14, borderRadius: 16,
+                background: 'var(--surface-container-low)', border: 'none',
+                fontWeight: 700, fontSize: 14, cursor: 'pointer', color: 'var(--on-surface)',
+              }}>뒤로</button>
+              <button type="submit" disabled={loading} style={{
+                flex: 2, padding: 14, borderRadius: 16,
+                background: loading ? 'var(--surface-container-high)' : 'linear-gradient(135deg, #C0392B, #922B21)',
+                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                color: loading ? 'var(--on-surface-variant)' : 'white',
+                fontWeight: 700, fontSize: 14,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              }}>
+                {loading && <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
+                {loading ? '연결 중...' : 'LG ThinQ 연결'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── LG ThinQ 기기 가져오기 모달 ──────────────────────────────────────────────────
+function LgThinqImportModal({ onClose, onImported, houseId }) {
+  const [devices, setDevices] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [importing, setImporting] = useState({})
+
+  useEffect(() => {
+    loadDevices()
+  }, [])
+
+  const loadDevices = async () => {
+    setLoading(true)
+    try {
+      const res = await api.get('/lgthinq/devices', { params: { houseId } })
+      setDevices(res.data.data || [])
+    } catch (e) {
+      toast.error('LG ThinQ 기기 목록을 불러올 수 없습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleImport = async (device) => {
+    if (device.alreadyLinked) return
+    setImporting(prev => ({ ...prev, [device.deviceId]: true }))
+    try {
+      await api.post(`/lgthinq/devices/${device.deviceId}/import`, { houseId })
+      toast.success(`${device.name} 등록 완료!`)
+      setDevices(prev => prev.map(d =>
+        d.deviceId === device.deviceId ? { ...d, alreadyLinked: true } : d
+      ))
+      onImported()
+    } catch (e) {
+      toast.error(e.response?.data?.message || '기기 등록 실패')
+    } finally {
+      setImporting(prev => ({ ...prev, [device.deviceId]: false }))
+    }
+  }
+
+  const handleImportAll = async () => {
+    const notLinked = devices.filter(d => !d.alreadyLinked)
+    for (const d of notLinked) {
+      await handleImport(d)
+    }
+  }
+
+  const getDeviceIcon = (typeIcon) => {
+    const iconMap = {
+      AC: 'air', REFRIGERATOR: 'kitchen', WASHER: 'local_laundry_service',
+      THERMOSTAT: 'thermostat', TV: 'tv', LIGHT: 'lightbulb',
+      LOCK: 'lock', CAMERA: 'nest_cam_wired_stand', OTHER: 'smart_toy',
+    }
+    return iconMap[typeIcon] || 'smart_toy'
+  }
+
+  const getDeviceTypeName = (lgType, typeIcon) => {
+    if (lgType && LG_DEVICE_TYPE_KO[lgType]) return LG_DEVICE_TYPE_KO[lgType]
+    const nameMap = { AC: '에어컨', REFRIGERATOR: '냉장고', WASHER: '세탁/건조', THERMOSTAT: '온도조절', TV: 'TV', LIGHT: '조명', OTHER: '기타' }
+    return nameMap[typeIcon] || '기타'
+  }
+
+  const notLinkedCount = devices.filter(d => !d.alreadyLinked).length
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+        <div className="modal-handle" />
+
+        {/* Header */}
+        <div style={{ padding: '20px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 12,
+              background: 'linear-gradient(135deg, #C0392B, #922B21)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ color: 'white', fontWeight: 900, fontSize: 13 }}>LG</span>
+            </div>
+            <div>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 16 }}>LG ThinQ 기기 가져오기</div>
+              <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
+                {loading ? '불러오는 중...' : `${devices.length}개 발견 · ${devices.filter(d => d.alreadyLinked).length}개 등록됨`}
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{
+            width: 32, height: 32, borderRadius: '50%',
+            background: 'var(--surface-container-low)', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <MSI name="close" size={18} color="var(--on-surface-variant)" />
+          </button>
+        </div>
+
+        <div style={{ padding: '0 20px 20px' }}>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--on-surface-variant)' }}>
+              <div style={{
+                width: 32, height: 32, border: '3px solid var(--surface-container-high)',
+                borderTopColor: '#C0392B', borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite', margin: '0 auto 12px',
+              }} />
+              LG ThinQ에서 기기 목록 불러오는 중...
+            </div>
+          ) : devices.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--on-surface-variant)' }}>
+              <MSI name="devices_fold" size={40} style={{ display: 'block', margin: '0 auto 10px' }} />
+              <div style={{ fontSize: 14 }}>연결된 LG ThinQ 기기가 없습니다.</div>
+            </div>
+          ) : (
+            <>
+              {/* 전체 가져오기 버튼 */}
+              {notLinkedCount > 0 && (
+                <button
+                  onClick={handleImportAll}
+                  style={{
+                    width: '100%', padding: '12px', marginBottom: 16,
+                    background: 'linear-gradient(135deg, #C0392B, #922B21)',
+                    border: 'none', borderRadius: 14, color: 'white',
+                    fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  }}
+                >
+                  <MSI name="download" size={18} />
+                  전체 가져오기 ({notLinkedCount}개)
+                </button>
+              )}
+
+              {/* 기기 목록 */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {devices.map(device => {
+                  const icon = getDeviceIcon(device.deviceTypeIcon)
+                  const typeName = getDeviceTypeName(device.lgDeviceType, device.deviceTypeIcon)
+                  const isImporting = importing[device.deviceId]
+                  return (
+                    <div key={device.deviceId} style={{
+                      padding: '14px 16px', borderRadius: 16,
+                      background: device.alreadyLinked ? 'rgba(0,110,28,0.06)' : 'var(--surface-container-low)',
+                      border: device.alreadyLinked ? '1.5px solid rgba(0,110,28,0.2)' : '1.5px solid transparent',
+                      display: 'flex', alignItems: 'center', gap: 12,
+                    }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: 14,
+                        background: device.alreadyLinked ? '#b6f2be' : '#fde8e8',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0,
+                      }}>
+                        <MSI name={icon} fill size={22} color={device.alreadyLinked ? '#006e1c' : '#C0392B'} />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {device.name || device.label}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{
+                            fontSize: 11, fontWeight: 600,
+                            padding: '2px 8px', borderRadius: 20,
+                            background: '#fde8e8', color: '#C0392B',
+                          }}>{typeName}</span>
+                          {device.modelName && (
+                            <span style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>{device.modelName}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ flexShrink: 0 }}>
+                        {device.alreadyLinked ? (
+                          <div style={{
+                            padding: '6px 12px', borderRadius: 12,
+                            background: '#b6f2be', color: '#006e1c',
+                            fontSize: 12, fontWeight: 700,
+                            display: 'flex', alignItems: 'center', gap: 4,
+                          }}>
+                            <MSI name="check_circle" fill size={14} color="#006e1c" />
+                            등록됨
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleImport(device)}
+                            disabled={isImporting}
+                            style={{
+                              padding: '8px 14px', borderRadius: 12,
+                              background: isImporting ? 'var(--surface-container-high)' : 'linear-gradient(135deg, #C0392B, #922B21)',
+                              border: 'none', cursor: isImporting ? 'not-allowed' : 'pointer',
+                              color: isImporting ? 'var(--on-surface-variant)' : 'white',
+                              fontSize: 13, fontWeight: 700,
+                              display: 'flex', alignItems: 'center', gap: 4,
+                            }}
+                          >
+                            {isImporting
+                              ? <div style={{ width: 14, height: 14, border: '2px solid var(--outline-variant)', borderTopColor: 'var(--on-surface-variant)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                              : <MSI name="add_link" size={14} />}
+                            {isImporting ? '등록 중' : '등록'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -610,28 +1037,55 @@ function DeviceControlModal({ device, onClose, onUpdated }) {
   const [loading, setLoading] = useState(false)
   const [commanding, setCommanding] = useState(false)
 
+  const isLgDevice = device.platform === 'LG_THINQ' && !!device.lgThinqDeviceId
+  const isSTDevice = device.platform === 'SMARTTHINGS' && !!device.smartThingsDeviceId
+
   useEffect(() => {
-    if (device.smartThingsDeviceId) loadStatus()
+    if (isSTDevice) loadSTStatus()
+    else if (isLgDevice) loadLGStatus()
   }, [device])
 
-  const loadStatus = async () => {
+  const loadSTStatus = async () => {
     setLoading(true)
     try {
       const res = await api.get(`/smartthings/devices/${device.smartThingsDeviceId}/status`)
       setStatus(res.data.data)
     } catch (e) {
-      console.warn('상태 조회 실패')
+      console.warn('SmartThings 상태 조회 실패')
     } finally {
       setLoading(false)
     }
   }
 
+  const loadLGStatus = async () => {
+    setLoading(true)
+    try {
+      const res = await api.get(`/lgthinq/devices/${device.lgThinqDeviceId}/state`)
+      setStatus(res.data.data)
+    } catch (e) {
+      console.warn('LG ThinQ 상태 조회 실패')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadStatus = isLgDevice ? loadLGStatus : loadSTStatus
+
   const sendCommand = async (capability, command, args = []) => {
     setCommanding(true)
     try {
-      await api.post(`/smartthings/devices/${device.smartThingsDeviceId}/command`, {
-        capability, command, arguments: args,
-      })
+      if (isLgDevice) {
+        // LG ThinQ 제어: capability → resource, command → property, args[0] → value
+        await api.post(`/lgthinq/devices/${device.lgThinqDeviceId}/control`, {
+          resource: capability,
+          property: command,
+          value: args[0] !== undefined ? args[0] : command,
+        })
+      } else {
+        await api.post(`/smartthings/devices/${device.smartThingsDeviceId}/command`, {
+          capability, command, arguments: args,
+        })
+      }
       toast.success('명령 전송 완료!')
       setTimeout(() => { loadStatus(); onUpdated() }, 1000)
     } catch (err) {
@@ -642,7 +1096,7 @@ function DeviceControlModal({ device, onClose, onUpdated }) {
   }
 
   const dType = DEVICE_TYPE_MAP[device.deviceType] || DEVICE_TYPE_MAP.OTHER
-  const isConnected = !!device.smartThingsDeviceId
+  const isConnected = isSTDevice || isLgDevice
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -663,7 +1117,7 @@ function DeviceControlModal({ device, onClose, onUpdated }) {
               <div>
                 <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 16 }}>{device.name}</div>
                 <div style={{ fontSize: 12, color: 'var(--on-surface-variant)' }}>
-                  {dType.label} · {device.manufacturer || 'Samsung'}
+                  {dType.label} · {device.manufacturer || (isLgDevice ? 'LG' : 'Samsung')}
                 </div>
               </div>
             </div>
@@ -675,15 +1129,17 @@ function DeviceControlModal({ device, onClose, onUpdated }) {
             </button>
           </div>
 
-          {/* SmartThings 연결 상태 뱃지 */}
+          {/* 플랫폼 연결 상태 뱃지 */}
           {isConnected && (
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               marginTop: 12, padding: '5px 12px',
-              background: 'rgba(20,40,160,0.08)', borderRadius: 20,
+              background: isLgDevice ? 'rgba(192,57,43,0.08)' : 'rgba(20,40,160,0.08)', borderRadius: 20,
             }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1428A0', boxShadow: '0 0 4px #1428A0' }} />
-              <span style={{ fontSize: 11, color: '#1428A0', fontWeight: 700 }}>Samsung SmartThings 연결됨</span>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: isLgDevice ? '#C0392B' : '#1428A0', boxShadow: `0 0 4px ${isLgDevice ? '#C0392B' : '#1428A0'}` }} />
+              <span style={{ fontSize: 11, color: isLgDevice ? '#C0392B' : '#1428A0', fontWeight: 700 }}>
+                {isLgDevice ? 'LG ThinQ 연결됨' : 'Samsung SmartThings 연결됨'}
+              </span>
             </div>
           )}
         </div>
@@ -693,21 +1149,21 @@ function DeviceControlModal({ device, onClose, onUpdated }) {
             <div style={{ textAlign: 'center', padding: '32px 0' }}>
               <MSI name="link_off" size={48} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 12px' }} />
               <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 15, marginBottom: 6 }}>
-                SmartThings 미연결 기기
+                클라우드 미연결 기기
               </div>
               <div style={{ fontSize: 13, color: 'var(--on-surface-variant)' }}>
                 수동으로 등록된 기기입니다.<br />
-                SmartThings와 연결하면 실제 제어가 가능합니다.
+                SmartThings 또는 LG ThinQ 연결 후 실제 제어가 가능합니다.
               </div>
             </div>
           ) : loading ? (
             <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--on-surface-variant)' }}>
               <div style={{
                 width: 28, height: 28, border: '3px solid var(--surface-container-high)',
-                borderTopColor: '#1428A0', borderRadius: '50%',
+                borderTopColor: isLgDevice ? '#C0392B' : '#1428A0', borderRadius: '50%',
                 animation: 'spin 0.8s linear infinite', margin: '0 auto 12px',
               }} />
-              SmartThings에서 상태 불러오는 중...
+              {isLgDevice ? 'LG ThinQ에서 상태 불러오는 중...' : 'SmartThings에서 상태 불러오는 중...'}
             </div>
           ) : (
             <div>
@@ -798,6 +1254,39 @@ function DeviceControlModal({ device, onClose, onUpdated }) {
                         </div>
                       </div>
                     )}
+                    {/* LG ThinQ 전용 상태 */}
+                    {status.power !== undefined && typeof status.power === 'string' && !['W', 'w'].some(u => String(status.power).includes(u)) && (
+                      <div style={{ padding: 12, background: status.power === 'on' ? 'rgba(0,110,28,0.08)' : 'rgba(192,57,43,0.06)', borderRadius: 12 }}>
+                        <div style={{ fontSize: 10, color: 'var(--on-surface-variant)', marginBottom: 4 }}>전원</div>
+                        <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 18, color: status.power === 'on' ? '#006e1c' : '#C0392B' }}>
+                          {status.power === 'on' ? '켜짐' : '꺼짐'}
+                        </div>
+                      </div>
+                    )}
+                    {status.runState !== undefined && (
+                      <div style={{ padding: 12, background: '#b6f2be', borderRadius: 12 }}>
+                        <div style={{ fontSize: 10, color: 'var(--on-surface-variant)', marginBottom: 4 }}>동작 상태</div>
+                        <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13, color: '#006e1c' }}>
+                          {status.runState}
+                        </div>
+                      </div>
+                    )}
+                    {status.temperature !== undefined && (
+                      <div style={{ padding: 12, background: 'rgba(0,91,135,0.08)', borderRadius: 12 }}>
+                        <div style={{ fontSize: 10, color: 'var(--on-surface-variant)', marginBottom: 4 }}>현재 온도</div>
+                        <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 18, color: '#005b87' }}>
+                          {status.temperature}°C
+                        </div>
+                      </div>
+                    )}
+                    {status.targetTemperature !== undefined && (
+                      <div style={{ padding: 12, background: '#cce8f4', borderRadius: 12 }}>
+                        <div style={{ fontSize: 10, color: 'var(--on-surface-variant)', marginBottom: 4 }}>설정 온도</div>
+                        <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 18, color: '#005b87' }}>
+                          {status.targetTemperature}°C
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -809,31 +1298,49 @@ function DeviceControlModal({ device, onClose, onUpdated }) {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 
-                  {/* 전원 제어 (switch 지원 기기) */}
+                  {/* 전원 제어 */}
                   {(device.deviceType !== 'OTHER') && (
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button
-                        onClick={() => sendCommand('switch', 'on')}
-                        disabled={commanding || status?.switch === 'on'}
+                        onClick={() => {
+                          if (isLgDevice) {
+                            // LG ThinQ: 에어컨은 COOL 모드, 나머지는 POWER_ON
+                            const resource = device.deviceType === 'AC' ? 'airConditionerJobMode' : 'operation'
+                            const prop = device.deviceType === 'AC' ? 'airConOperationMode' : 'washerOperationMode'
+                            const val = device.deviceType === 'AC' ? 'COOL' : 'POWER_ON'
+                            sendCommand(resource, prop, [val])
+                          } else {
+                            sendCommand('switch', 'on')
+                          }
+                        }}
+                        disabled={commanding || status?.switch === 'on' || status?.power === 'on'}
                         style={{
                           flex: 1, padding: '12px 0',
-                          background: status?.switch === 'on' ? 'var(--secondary)' : 'var(--surface-container-low)',
-                          color: status?.switch === 'on' ? 'white' : 'var(--on-surface)',
+                          background: (status?.switch === 'on' || status?.power === 'on') ? (isLgDevice ? '#C0392B' : 'var(--secondary)') : 'var(--surface-container-low)',
+                          color: (status?.switch === 'on' || status?.power === 'on') ? 'white' : 'var(--on-surface)',
                           border: 'none', borderRadius: 12,
                           fontWeight: 700, fontSize: 13, cursor: commanding ? 'not-allowed' : 'pointer',
                           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                         }}
                       >
-                        <MSI name="power_settings_new" fill={status?.switch === 'on'} size={18} />
+                        <MSI name="power_settings_new" fill={status?.switch === 'on' || status?.power === 'on'} size={18} />
                         켜기
                       </button>
                       <button
-                        onClick={() => sendCommand('switch', 'off')}
-                        disabled={commanding || status?.switch === 'off'}
+                        onClick={() => {
+                          if (isLgDevice) {
+                            const resource = device.deviceType === 'AC' ? 'airConditionerJobMode' : 'operation'
+                            const prop = device.deviceType === 'AC' ? 'airConOperationMode' : 'washerOperationMode'
+                            sendCommand(resource, prop, ['POWER_OFF'])
+                          } else {
+                            sendCommand('switch', 'off')
+                          }
+                        }}
+                        disabled={commanding || status?.switch === 'off' || status?.power === 'off'}
                         style={{
                           flex: 1, padding: '12px 0',
-                          background: status?.switch === 'off' ? 'var(--error)' : 'var(--surface-container-low)',
-                          color: status?.switch === 'off' ? 'white' : 'var(--on-surface)',
+                          background: (status?.switch === 'off' || status?.power === 'off') ? 'var(--error)' : 'var(--surface-container-low)',
+                          color: (status?.switch === 'off' || status?.power === 'off') ? 'white' : 'var(--on-surface)',
                           border: 'none', borderRadius: 12,
                           fontWeight: 700, fontSize: 13, cursor: commanding ? 'not-allowed' : 'pointer',
                           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -938,6 +1445,10 @@ export default function IotPage() {
   const [showSTImport, setShowSTImport] = useState(false)
   const [controlDevice, setControlDevice] = useState(null)
   const [stConnected, setStConnected] = useState(false)
+  const [lgConnected, setLgConnected] = useState(false)
+  const [showLGConnect, setShowLGConnect] = useState(false)
+  const [showLGImport, setShowLGImport] = useState(false)
+  const [lgSyncing, setLgSyncing] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [form, setForm] = useState({
     name: '', deviceType: 'LIGHT', manufacturer: '', model: '',
@@ -948,6 +1459,7 @@ export default function IotPage() {
     if (selectedHouse) {
       loadAll()
       checkSTStatus()
+      checkLGStatus()
     }
   }, [selectedHouse])
 
@@ -955,6 +1467,13 @@ export default function IotPage() {
     try {
       const res = await api.get('/smartthings/status')
       setStConnected(res.data.data?.connected || false)
+    } catch (e) {}
+  }
+
+  const checkLGStatus = async () => {
+    try {
+      const res = await api.get('/lgthinq/status')
+      setLgConnected(res.data.data?.connected || false)
     } catch (e) {}
   }
 
@@ -979,13 +1498,33 @@ export default function IotPage() {
           command: newSwitch,
           arguments: [],
         })
-        // DB 상태도 업데이트
         const newStatus = device.status === 'ONLINE' ? 'STANDBY' : 'ONLINE'
         await api.patch(`/houses/${selectedHouse.id}/iot/${device.id}/status`, { status: newStatus })
         loadAll()
         toast.success(`${device.name} ${newSwitch === 'on' ? '켜짐' : '꺼짐'}`)
       } catch (e) {
         toast.error('SmartThings 명령 실패')
+      }
+    } else if (device.lgThinqDeviceId && lgConnected) {
+      // LG ThinQ 연결 기기 제어
+      const isPowerOn = device.status === 'ONLINE'
+      try {
+        // LG ThinQ 기기 타입별 전원 명령
+        const resource = device.deviceType === 'AC' ? 'airConditionerJobMode' : 'operation'
+        const property = device.deviceType === 'AC' ? 'airConOperationMode'
+          : device.deviceType === 'WASHER' ? 'washerOperationMode'
+          : 'operation'
+        const offValue = device.deviceType === 'AC' ? 'POWER_OFF' : 'POWER_OFF'
+        const onValue = device.deviceType === 'AC' ? 'COOL' : 'POWER_ON'
+        await api.post(`/lgthinq/devices/${device.lgThinqDeviceId}/control`, {
+          resource, property, value: isPowerOn ? offValue : onValue,
+        })
+        const newStatus = isPowerOn ? 'STANDBY' : 'ONLINE'
+        await api.patch(`/houses/${selectedHouse.id}/iot/${device.id}/status`, { status: newStatus })
+        loadAll()
+        toast.success(`${device.name} ${isPowerOn ? '꺼짐' : '켜짐'}`)
+      } catch (e) {
+        toast.error('LG ThinQ 명령 실패')
       }
     } else {
       // 일반 토글
@@ -1025,6 +1564,28 @@ export default function IotPage() {
     } catch (e) { toast.error('해제 실패') }
   }
 
+  const handleLGDisconnect = async () => {
+    if (!confirm('LG ThinQ 연결을 해제하시겠습니까?')) return
+    try {
+      await api.delete('/lgthinq/connect')
+      setLgConnected(false)
+      toast.success('LG ThinQ 연결이 해제되었습니다.')
+    } catch (e) { toast.error('해제 실패') }
+  }
+
+  const handleLGSync = async () => {
+    setLgSyncing(true)
+    try {
+      const res = await api.post(`/lgthinq/sync/${selectedHouse.id}`)
+      toast.success(res.data.message || 'LG ThinQ 동기화 완료!')
+      loadAll()
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'LG ThinQ 동기화 실패')
+    } finally {
+      setLgSyncing(false)
+    }
+  }
+
   const handleSync = async () => {
     setSyncing(true)
     try {
@@ -1040,6 +1601,7 @@ export default function IotPage() {
 
   const online = devices.filter(d => d.status === 'ONLINE').length
   const stDevices = devices.filter(d => d.platform === 'SMARTTHINGS')
+  const lgDevices = devices.filter(d => d.platform === 'LG_THINQ')
 
   if (!selectedHouse) return (
     <div style={{ textAlign: 'center', padding: '80px 24px', color: 'var(--on-surface-variant)' }}>
@@ -1208,6 +1770,125 @@ export default function IotPage() {
         )}
       </div>
 
+      {/* ── LG ThinQ 연동 배너 ── */}
+      <div style={{ padding: '12px 20px 0' }}>
+        {lgConnected ? (
+          /* LG 연결된 상태 */
+          <div style={{
+            background: 'linear-gradient(135deg, #C0392B 0%, #922B21 100%)',
+            borderRadius: 20, padding: '18px 20px',
+            color: 'white', position: 'relative', overflow: 'hidden',
+          }}>
+            <div style={{ position: 'absolute', top: -20, right: -20, opacity: 0.08, fontSize: 120 }}>🏠</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80', animation: 'pulse 2s ease-in-out infinite' }} />
+                  <span style={{ fontSize: 11, fontWeight: 700, opacity: 0.9, letterSpacing: '0.5px' }}>LG THINQ</span>
+                </div>
+                <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 17, marginBottom: 4 }}>
+                  LG 스마트홈 연결됨
+                </div>
+                <div style={{ fontSize: 12, opacity: 0.8 }}>
+                  {lgDevices.length}개 LG 기기 연결 중
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={handleLGSync}
+                  disabled={lgSyncing}
+                  style={{
+                    padding: '8px 14px',
+                    background: 'rgba(255,255,255,0.15)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    borderRadius: 12, color: 'white',
+                    fontWeight: 700, fontSize: 12, cursor: lgSyncing ? 'not-allowed' : 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  <MSI name="sync" size={14} style={{ animation: lgSyncing ? 'spin 1s linear infinite' : 'none' }} />
+                  {lgSyncing ? '동기화...' : '동기화'}
+                </button>
+                <button
+                  onClick={() => setShowLGImport(true)}
+                  style={{
+                    padding: '8px 14px',
+                    background: 'rgba(255,255,255,0.2)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    borderRadius: 12, color: 'white',
+                    fontWeight: 700, fontSize: 12, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  <MSI name="add_link" size={14} />
+                  기기 추가
+                </button>
+              </div>
+            </div>
+
+            {/* LG 가전 아이콘 줄 */}
+            <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+              {['kitchen', 'local_laundry_service', 'air', 'cleaning_services', 'wash'].map((icon, i) => (
+                <div key={i} style={{
+                  width: 34, height: 34, borderRadius: 10,
+                  background: 'rgba(255,255,255,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <MSI name={icon} fill size={18} color="white" />
+                </div>
+              ))}
+              <button
+                onClick={handleLGDisconnect}
+                style={{
+                  marginLeft: 'auto', padding: '4px 10px',
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: 8, color: 'rgba(255,255,255,0.7)',
+                  fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                연결 해제
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* LG 미연결 상태 */
+          <div
+            onClick={() => setShowLGConnect(true)}
+            style={{
+              background: 'var(--surface-container-lowest)',
+              borderRadius: 20, padding: '18px 20px', cursor: 'pointer',
+              border: '2px dashed rgba(192,57,43,0.3)',
+              display: 'flex', alignItems: 'center', gap: 16,
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(192,57,43,0.04)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-container-lowest)'}
+          >
+            <div style={{
+              width: 52, height: 52, borderRadius: 16,
+              background: 'linear-gradient(135deg, #C0392B, #922B21)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <span style={{ color: 'white', fontWeight: 900, fontSize: 18, fontFamily: 'Manrope, sans-serif', letterSpacing: '-1px' }}>LG</span>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 15, marginBottom: 3, color: '#C0392B' }}>
+                LG ThinQ 연결
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.5 }}>
+                냉장고, 세탁기, 에어컨 등 LG 가전을<br />
+                MyHouse에서 실시간 제어하세요
+              </div>
+            </div>
+            <MSI name="chevron_right" size={24} color="#C0392B" />
+          </div>
+        )}
+      </div>
+
       {/* ── 자동화 시나리오 ── */}
       <div style={{ padding: '20px 20px 0' }}>
         <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700, marginBottom: 12 }}>자동화 시나리오</div>
@@ -1313,6 +1994,7 @@ export default function IotPage() {
               const dType = DEVICE_TYPE_MAP[d.deviceType] || DEVICE_TYPE_MAP.OTHER
               const isOnline = d.status === 'ONLINE'
               const isSmartThings = d.platform === 'SMARTTHINGS'
+              const isLgThinq = d.platform === 'LG_THINQ'
 
               return (
                 <div
@@ -1320,7 +2002,8 @@ export default function IotPage() {
                   style={{
                     background: 'var(--surface-container-lowest)',
                     borderRadius: 20, padding: '16px 18px',
-                    border: isSmartThings ? '1.5px solid rgba(20,40,160,0.12)' : 'none',
+                    border: isSmartThings ? '1.5px solid rgba(20,40,160,0.12)'
+                      : isLgThinq ? '1.5px solid rgba(192,57,43,0.15)' : 'none',
                     cursor: 'pointer',
                     transition: 'box-shadow 0.15s',
                   }}
@@ -1345,6 +2028,18 @@ export default function IotPage() {
                             border: '2px solid white',
                           }}>
                             <span style={{ color: 'white', fontSize: 8, fontWeight: 900 }}>S</span>
+                          </div>
+                        )}
+                        {/* LG ThinQ 뱃지 */}
+                        {isLgThinq && (
+                          <div style={{
+                            position: 'absolute', bottom: -4, right: -4,
+                            width: 16, height: 16, borderRadius: '50%',
+                            background: '#C0392B',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            border: '2px solid white',
+                          }}>
+                            <span style={{ color: 'white', fontSize: 6, fontWeight: 900, letterSpacing: '-0.5px' }}>LG</span>
                           </div>
                         )}
                       </div>
@@ -1388,6 +2083,14 @@ export default function IotPage() {
                         }}>
                           <span style={{ color: '#1428A0', fontWeight: 700 }}>SmartThings</span>
                         </span>
+                      ) : isLgThinq ? (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          padding: '2px 8px', borderRadius: 20,
+                          background: 'rgba(192,57,43,0.08)', fontSize: 10,
+                        }}>
+                          <span style={{ color: '#C0392B', fontWeight: 700 }}>LG ThinQ</span>
+                        </span>
                       ) : (
                         <span style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
                           {PLATFORM_LABELS[d.platform] || d.platform}
@@ -1399,7 +2102,7 @@ export default function IotPage() {
                       onClick={() => handleToggle(d)}
                       style={{
                         width: 44, height: 24, borderRadius: 12,
-                        background: isOnline ? (isSmartThings ? '#1428A0' : 'var(--secondary)') : 'var(--surface-container-high)',
+                        background: isOnline ? (isSmartThings ? '#1428A0' : isLgThinq ? '#C0392B' : 'var(--secondary)') : 'var(--surface-container-high)',
                         border: 'none', cursor: 'pointer',
                         position: 'relative', transition: 'background 0.2s',
                       }}
@@ -1489,37 +2192,71 @@ export default function IotPage() {
             </div>
             <form onSubmit={handleAdd}>
               <div className="modal-body">
-                {/* Samsung SmartThings 연결 안내 */}
-                {!stConnected && (
-                  <div
-                    onClick={() => { setShowModal(false); setShowSTConnect(true) }}
-                    style={{
-                      padding: '12px 14px', marginBottom: 16,
-                      background: 'rgba(20,40,160,0.06)',
-                      borderRadius: 12, cursor: 'pointer',
-                      border: '1px solid rgba(20,40,160,0.15)',
-                      display: 'flex', alignItems: 'center', gap: 10,
-                    }}
-                  >
-                    <div style={{
-                      width: 32, height: 32, borderRadius: 8,
-                      background: 'linear-gradient(135deg, #1428A0, #1e3a8a)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
-                    }}>
-                      <span style={{ color: 'white', fontWeight: 900, fontSize: 11 }}>S</span>
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#1428A0' }}>
-                        Samsung SmartThings 연결하기
+                {/* 플랫폼 연결 안내 배너 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+                  {/* Samsung SmartThings */}
+                  {!stConnected && (
+                    <div
+                      onClick={() => { setShowModal(false); setShowSTConnect(true) }}
+                      style={{
+                        padding: '12px 14px',
+                        background: 'rgba(20,40,160,0.06)',
+                        borderRadius: 12, cursor: 'pointer',
+                        border: '1px solid rgba(20,40,160,0.15)',
+                        display: 'flex', alignItems: 'center', gap: 10,
+                      }}
+                    >
+                      <div style={{
+                        width: 32, height: 32, borderRadius: 8,
+                        background: 'linear-gradient(135deg, #1428A0, #1e3a8a)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0,
+                      }}>
+                        <span style={{ color: 'white', fontWeight: 900, fontSize: 11 }}>S</span>
                       </div>
-                      <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
-                        삼성 가전을 자동으로 가져와 제어하세요
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: '#1428A0' }}>
+                          Samsung SmartThings 연결하기
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
+                          삼성 가전을 자동으로 가져와 제어하세요
+                        </div>
                       </div>
+                      <MSI name="chevron_right" size={18} color="#1428A0" />
                     </div>
-                    <MSI name="chevron_right" size={18} color="#1428A0" />
-                  </div>
-                )}
+                  )}
+                  {/* LG ThinQ */}
+                  {!lgConnected && (
+                    <div
+                      onClick={() => { setShowModal(false); setShowLGConnect(true) }}
+                      style={{
+                        padding: '12px 14px',
+                        background: 'rgba(192,57,43,0.06)',
+                        borderRadius: 12, cursor: 'pointer',
+                        border: '1px solid rgba(192,57,43,0.15)',
+                        display: 'flex', alignItems: 'center', gap: 10,
+                      }}
+                    >
+                      <div style={{
+                        width: 32, height: 32, borderRadius: 8,
+                        background: 'linear-gradient(135deg, #C0392B, #922B21)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0,
+                      }}>
+                        <span style={{ color: 'white', fontWeight: 900, fontSize: 10, letterSpacing: '-0.5px' }}>LG</span>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: '#C0392B' }}>
+                          LG ThinQ 연결하기
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
+                          LG 가전을 자동으로 가져와 제어하세요
+                        </div>
+                      </div>
+                      <MSI name="chevron_right" size={18} color="#C0392B" />
+                    </div>
+                  )}
+                </div>
 
                 <div className="grid-2">
                   <div className="form-group">
@@ -1574,6 +2311,23 @@ export default function IotPage() {
       {showSTImport && (
         <SmartThingsImportModal
           onClose={() => setShowSTImport(false)}
+          onImported={loadAll}
+          houseId={selectedHouse.id}
+        />
+      )}
+
+      {/* ── LG ThinQ 연결 모달 ── */}
+      {showLGConnect && (
+        <LgThinqConnectModal
+          onClose={() => setShowLGConnect(false)}
+          onConnected={() => { setLgConnected(true); setShowLGImport(true) }}
+        />
+      )}
+
+      {/* ── LG ThinQ 기기 가져오기 모달 ── */}
+      {showLGImport && (
+        <LgThinqImportModal
+          onClose={() => setShowLGImport(false)}
           onImported={loadAll}
           houseId={selectedHouse.id}
         />

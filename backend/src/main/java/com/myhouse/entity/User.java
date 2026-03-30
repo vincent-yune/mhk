@@ -54,11 +54,16 @@ public class User extends BaseEntity {
     @JsonIgnore
     private String smartThingsToken;
 
+    @Column(length = 500)
+    @JsonIgnore
+    private String lgThinqToken;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     @JsonIgnore
     private List<House> houses = new ArrayList<>();
 
     public enum Role { USER, ADMIN }
+
     public enum Grade { BRONZE, SILVER, GOLD, PLATINUM }
 }
