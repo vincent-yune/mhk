@@ -66,6 +66,14 @@ public class User extends BaseEntity {
     @JsonIgnore
     private String hueUsername;
 
+    // SNS 로그인
+    @Column(length = 20)
+    private String provider;       // KAKAO, NAVER, GOOGLE
+
+    @Column(length = 200)
+    @JsonIgnore
+    private String providerId;     // SNS 고유 ID (실제 OAuth 미연동 시 email 사용)
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     @JsonIgnore

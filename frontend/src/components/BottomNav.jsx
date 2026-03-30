@@ -4,7 +4,7 @@ const NAV_ITEMS = [
   { to: '/dashboard', icon: 'home',       iconFill: true,  label: '홈' },
   { to: '/iot',       icon: 'smart_toy',  iconFill: true,  label: 'Devices' },
   { to: '/items',     icon: 'inventory_2',iconFill: false, label: 'Items' },
-  { to: '/community', icon: 'storefront', iconFill: true,  label: 'Market' },
+  { to: '/community', icon: 'storefront', iconFill: true,  label: 'community' },
   { to: '/house',     icon: 'person',     iconFill: true,  label: 'Profile' },
 ]
 
