@@ -74,6 +74,15 @@ public class IotDevice extends BaseEntity {
 
     private LocalDateTime lastSeen;
 
+    @Column(name = "map_x")
+    private Float mapX;
+
+    @Column(name = "map_y")
+    private Float mapY;
+
+    @Column(name = "location_desc", length = 300)
+    private String locationDesc;
+
     public enum DeviceType { LIGHT, THERMOSTAT, LOCK, CAMERA, TV, AC, WASHER, REFRIGERATOR, OTHER }
     public enum Platform { SMARTTHINGS, LG_THINQ, PHILIPS_HUE, GOOGLE_HOME, APPLE_HOME, TUYA, OTHER }
     public enum DeviceStatus { ONLINE, OFFLINE, STANDBY }

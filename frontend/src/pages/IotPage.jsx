@@ -1412,10 +1412,36 @@ function SmartThingsImportModal({ onClose, onImported, houseId }) {
 }
 
 // ── 기기 제어 모달 ─────────────────────────────────────────────────────────────
-function DeviceControlModal({ device, onClose, onUpdated }) {
+function DeviceControlModal({ device, houseData, onClose, onUpdated }) {
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
   const [commanding, setCommanding] = useState(false)
+  const [markerX, setMarkerX] = useState(device.mapX ?? null)
+  const [markerY, setMarkerY] = useState(device.mapY ?? null)
+  const [locationDesc, setLocationDesc] = useState(device.locationDesc || '')
+  const [editingMarker, setEditingMarker] = useState(false)
+  const [mapMarkerSaving, setMapMarkerSaving] = useState(false)
+
+  const handleMapClick = (e) => {
+    if (!editingMarker) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = parseFloat(((e.clientX - rect.left) / rect.width * 100).toFixed(2))
+    const y = parseFloat(((e.clientY - rect.top) / rect.height * 100).toFixed(2))
+    setMarkerX(x); setMarkerY(y)
+  }
+
+  const handleSaveMarker = async () => {
+    setMapMarkerSaving(true)
+    try {
+      await api.patch(`/houses/${device.house?.id || device.houseId}/iot/${device.id}/map`, {
+        mapX: markerX, mapY: markerY, locationDesc
+      })
+      toast.success('위치가 저장되었습니다.')
+      setEditingMarker(false)
+      onUpdated()
+    } catch (e) { toast.error('위치 저장에 실패했습니다.') }
+    finally { setMapMarkerSaving(false) }
+  }
 
   const isLgDevice = device.platform === 'LG_THINQ' && !!device.lgThinqDeviceId
   const isSTDevice = device.platform === 'SMARTTHINGS' && !!device.smartThingsDeviceId
@@ -1809,6 +1835,56 @@ function DeviceControlModal({ device, onClose, onUpdated }) {
               </div>
             </div>
           )}
+
+          {/* ── 맵 위치 섹션 ── */}
+          {houseData?.mapImageUrl && (
+            <div style={{ marginTop: 20, background: 'rgba(33,150,243,0.05)', borderRadius: 12, padding: 14, border: '1px solid rgba(33,150,243,0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1565C0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <MSI name="map" fill size={16} color="#1565C0" />맵 위치
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {!editingMarker ? (
+                    <button onClick={() => setEditingMarker(true)} style={{
+                      padding: '5px 12px', borderRadius: 8, border: 'none',
+                      background: '#2196F3', color: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer'
+                    }}>{markerX != null ? '위치 수정' : '위치 등록'}</button>
+                  ) : (
+                    <>
+                      <button onClick={() => { setEditingMarker(false); setMarkerX(device.mapX ?? null); setMarkerY(device.mapY ?? null); setLocationDesc(device.locationDesc || '') }} style={{ padding: '5px 10px', borderRadius: 8, border: 'none', background: 'var(--surface-container)', color: 'var(--on-surface-variant)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>취소</button>
+                      <button onClick={() => { setMarkerX(null); setMarkerY(null) }} style={{ padding: '5px 10px', borderRadius: 8, border: 'none', background: 'rgba(186,26,26,0.1)', color: 'var(--error)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>초기화</button>
+                      <button onClick={handleSaveMarker} disabled={mapMarkerSaving} style={{ padding: '5px 12px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, #2196F3, #0D47A1)', color: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer', opacity: mapMarkerSaving ? 0.7 : 1 }}>
+                        {mapMarkerSaving ? '저장중...' : '저장'}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div
+                style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', cursor: editingMarker ? 'crosshair' : 'default', border: editingMarker ? '2px solid #2196F3' : '1px solid var(--outline-variant)' }}
+                onClick={handleMapClick}
+              >
+                <img src={houseData.mapImageUrl} alt="집 맵" style={{ width: '100%', display: 'block', maxHeight: 200, objectFit: 'contain', background: '#f8f8f8' }} draggable={false} />
+                {markerX != null && markerY != null && (
+                  <div style={{ position: 'absolute', left: `${markerX}%`, top: `${markerY}%`, transform: 'translate(-50%, -100%)', pointerEvents: 'none' }}>
+                    <div style={{ width: 24, height: 24, borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)', background: '#e65100', boxShadow: '0 3px 8px rgba(0,0,0,0.3)', border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ transform: 'rotate(45deg)', fontSize: 10 }}>💡</span>
+                    </div>
+                  </div>
+                )}
+                {editingMarker && (
+                  <div style={{ position: 'absolute', bottom: 6, left: '50%', transform: 'translateX(-50%)', background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: 10, padding: '3px 8px', borderRadius: 20, pointerEvents: 'none' }}>
+                    클릭하여 위치 설정
+                  </div>
+                )}
+              </div>
+              {editingMarker ? (
+                <input className="form-input" style={{ marginTop: 8, fontSize: 13 }} value={locationDesc} onChange={e => setLocationDesc(e.target.value)} placeholder="위치 설명 (예: 거실 천장, 침실 입구...)" />
+              ) : (locationDesc && (
+                <div style={{ marginTop: 6, fontSize: 12, color: 'var(--on-surface-variant)' }}>📍 {locationDesc}</div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -1834,6 +1910,7 @@ export default function IotPage() {
   const [showHueConnect, setShowHueConnect] = useState(false)
   const [showHueImport, setShowHueImport] = useState(false)
   const [hueSyncing, setHueSyncing] = useState(false)
+  const [houseData, setHouseData] = useState(null)
   const [form, setForm] = useState({
     name: '', deviceType: 'LIGHT', manufacturer: '', model: '',
     platform: 'OTHER', zone: null,
@@ -1842,6 +1919,7 @@ export default function IotPage() {
   useEffect(() => {
     if (selectedHouse) {
       loadAll()
+      loadHouseData()
       checkSTStatus()
       checkLGStatus()
       checkHueStatus()
@@ -1877,6 +1955,13 @@ export default function IotPage() {
       ])
       setDevices(devRes.data.data || [])
       setZones(zoneRes.data.data || [])
+    } catch (e) {}
+  }
+
+  const loadHouseData = async () => {
+    try {
+      const { data } = await api.get(`/houses/${selectedHouse.id}`)
+      setHouseData(data.data)
     } catch (e) {}
   }
 
@@ -2954,6 +3039,7 @@ export default function IotPage() {
       {controlDevice && (
         <DeviceControlModal
           device={controlDevice}
+          houseData={houseData}
           onClose={() => setControlDevice(null)}
           onUpdated={loadAll}
         />

@@ -32,6 +32,9 @@ public class ItemResponse {
     private String status;
     private Boolean isConsumable;
     private Integer reorderLevel;
+    private Float mapX;
+    private Float mapY;
+    private String locationDesc;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -58,6 +61,9 @@ public class ItemResponse {
                 .status(item.getStatus() != null ? item.getStatus().name() : null)
                 .isConsumable(item.getIsConsumable())
                 .reorderLevel(item.getReorderLevel())
+                .mapX(item.getMapX())
+                .mapY(item.getMapY())
+                .locationDesc(item.getLocationDesc())
                 .createdAt(item.getCreatedAt())
                 .updatedAt(item.getUpdatedAt())
                 .build();

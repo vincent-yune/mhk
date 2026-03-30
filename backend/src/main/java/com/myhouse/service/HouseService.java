@@ -69,6 +69,13 @@ public class HouseService {
     }
 
     @Transactional
+    public HouseResponse updateMapImage(Long houseId, String email, String mapImageUrl) {
+        House house = findAndCheckOwner(houseId, email);
+        house.setMapImageUrl(mapImageUrl);
+        return HouseResponse.from(houseRepository.save(house));
+    }
+
+    @Transactional
     public void deleteHouse(Long houseId, String email) {
         House house = findAndCheckOwner(houseId, email);
         houseRepository.delete(house);

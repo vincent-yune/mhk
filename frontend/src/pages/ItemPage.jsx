@@ -22,23 +22,20 @@ const STATUS_MAP = {
 }
 const CATEGORY_ICONS = { 1: '📺', 2: '🪑', 3: '🥕', 4: '🧴', 5: '👕', 6: '⚽', 7: '📦' }
 
-// 커뮤니티 등록 버튼 (판매/나눔 선택 드롭다운)
+// 커뮤니티 등록 버튼
 function CommunityLinkButton({ item, onSelect, mini = false }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
-
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
-
   const options = [
     { type: 'SELL', icon: '💰', label: '판매 글 올리기' },
     { type: 'FREE', icon: '🎁', label: '나눔 글 올리기' },
     { type: 'RENT', icon: '🔄', label: '대여 글 올리기' },
   ]
-
   return (
     <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
       <button
@@ -86,27 +83,115 @@ function CommunityLinkButton({ item, onSelect, mini = false }) {
   )
 }
 
+// ─── 맵 마커 선택 컴포넌트 ───
+function MapMarkerSelector({ mapImageUrl, mapX, mapY, onChange }) {
+  const imgRef = useRef(null)
+  const containerRef = useRef(null)
+
+  const handleMapClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+    onChange({ mapX: parseFloat(x.toFixed(2)), mapY: parseFloat(y.toFixed(2)) })
+  }
+
+  const handleClear = (e) => {
+    e.stopPropagation()
+    onChange({ mapX: null, mapY: null })
+  }
+
+  if (!mapImageUrl) {
+    return (
+      <div style={{
+        padding: '16px', background: 'var(--surface-container-low)', borderRadius: 12,
+        textAlign: 'center', color: 'var(--on-surface-variant)', fontSize: 12,
+        border: '1px dashed var(--outline-variant)',
+      }}>
+        <MSI name="map" size={28} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 8px' }} />
+        맵 이미지가 없습니다.<br />
+        <span style={{ fontSize: 11 }}>내집 관리 화면에서 집 도면을 먼저 등록하세요.</span>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginBottom: 8 }}>
+        📍 맵을 클릭하여 위치를 설정하세요
+        {mapX != null && (
+          <button onClick={handleClear} style={{
+            marginLeft: 8, padding: '2px 8px', borderRadius: 8, border: 'none',
+            background: 'rgba(186,26,26,0.1)', color: 'var(--error)', fontSize: 11, fontWeight: 600, cursor: 'pointer'
+          }}>✕ 초기화</button>
+        )}
+      </div>
+      <div
+        ref={containerRef}
+        onClick={handleMapClick}
+        style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', cursor: 'crosshair', border: '2px solid var(--primary-light)' }}
+      >
+        <img
+          ref={imgRef}
+          src={mapImageUrl}
+          alt="집 맵"
+          style={{ width: '100%', display: 'block', maxHeight: 260, objectFit: 'contain', background: '#f8f8f8' }}
+          draggable={false}
+        />
+        {mapX != null && mapY != null && (
+          <div
+            style={{
+              position: 'absolute',
+              left: `${mapX}%`,
+              top: `${mapY}%`,
+              transform: 'translate(-50%, -100%)',
+              pointerEvents: 'none',
+            }}
+          >
+            <div style={{
+              width: 28, height: 28,
+              borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)',
+              background: 'var(--primary)', boxShadow: '0 3px 8px rgba(0,0,0,0.3)',
+              border: '2px solid white',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ transform: 'rotate(45deg)', fontSize: 12 }}>📦</span>
+            </div>
+          </div>
+        )}
+      </div>
+      {mapX != null && (
+        <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 6 }}>
+          위치 설정됨: ({mapX.toFixed(1)}%, {mapY.toFixed(1)}%)
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function ItemPage() {
   const { selectedHouse, pendingZoneFilter, clearPendingZoneFilter } = useHouseStore()
   const navigate = useNavigate()
   const [items, setItems] = useState([])
   const [zones, setZones] = useState([])
   const [categories, setCategories] = useState([])
+  const [houseData, setHouseData] = useState(null) // 맵 이미지 포함 집 정보
   const [selectedZone, setSelectedZone] = useState(null)
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [showDetailModal, setShowDetailModal] = useState(false)
+  const [showMapView, setShowMapView] = useState(false) // 맵 뷰 토글
   const [editItem, setEditItem] = useState(null)
   const [detailItem, setDetailItem] = useState(null)
   const [activeTab, setActiveTab] = useState('all')
+  const [mapMarkerSaving, setMapMarkerSaving] = useState(false)
   const [form, setForm] = useState({
     name: '', brand: '', model: '', barcode: '', quantity: 1, unit: 'EA',
     purchaseDate: '', purchasePrice: '', expiryDate: '', warrantyExpire: '',
     isConsumable: false, reorderLevel: '', status: 'ACTIVE',
-    zone: null, category: null, description: ''
+    zone: null, category: null, description: '',
+    mapX: null, mapY: null, locationDesc: ''
   })
 
-  // HousePage에서 구역 필터가 넘어왔을 때 자동 적용
   useEffect(() => {
     if (pendingZoneFilter) {
       setSelectedZone(pendingZoneFilter.zoneId)
@@ -118,6 +203,7 @@ export default function ItemPage() {
   useEffect(() => {
     if (!selectedHouse) return
     loadAll()
+    loadHouseData()
   }, [selectedHouse, selectedZone, activeTab])
 
   const loadAll = async () => {
@@ -138,18 +224,19 @@ export default function ItemPage() {
     } catch (e) {}
   }
 
-  // 커뮤니티 연계: 물품 정보를 가져가서 커뮤니티 페이지로 이동
+  const loadHouseData = async () => {
+    try {
+      const { data } = await api.get(`/houses/${selectedHouse.id}`)
+      setHouseData(data.data)
+    } catch (e) {}
+  }
+
   const handleCommunityLink = (item, postType) => {
     const typeLabel = { SELL: '판매', FREE: '나눔', RENT: '대여' }[postType] || postType
-    // sessionStorage에 임시 저장 후 커뮤니티 페이지로 이동
     sessionStorage.setItem('communityDraft', JSON.stringify({
-      postType,
-      title: `${item.name} ${typeLabel}합니다`,
+      postType, title: `${item.name} ${typeLabel}합니다`,
       content: `${item.name}${item.brand ? ` (${item.brand})` : ''} ${typeLabel}합니다.\n구역: ${item.zoneName || '-'}\n수량: ${item.quantity}${item.unit}\n상태: ${STATUS_MAP[item.status]?.label || item.status}`,
-      price: postType === 'SELL' ? '' : '0',
-      isNegotiable: postType === 'SELL',
-      location: '',
-      itemId: item.id
+      price: postType === 'SELL' ? '' : '0', isNegotiable: postType === 'SELL', location: '', itemId: item.id
     }))
     navigate('/community')
     toast.success(`커뮤니티 ${typeLabel} 글 작성 화면으로 이동합니다.`)
@@ -160,7 +247,8 @@ export default function ItemPage() {
     setForm({
       name: '', brand: '', model: '', barcode: '', quantity: 1, unit: 'EA',
       purchaseDate: '', purchasePrice: '', expiryDate: '', warrantyExpire: '',
-      isConsumable: false, reorderLevel: '', status: 'ACTIVE', zone: null, category: null, description: ''
+      isConsumable: false, reorderLevel: '', status: 'ACTIVE', zone: null, category: null, description: '',
+      mapX: null, mapY: null, locationDesc: ''
     })
     setShowModal(true)
   }
@@ -177,7 +265,8 @@ export default function ItemPage() {
       reorderLevel: item.reorderLevel || '', status: item.status,
       zone: item.zoneId ? { id: item.zoneId } : null,
       category: item.categoryId ? { id: item.categoryId } : null,
-      description: item.description || ''
+      description: item.description || '',
+      mapX: item.mapX ?? null, mapY: item.mapY ?? null, locationDesc: item.locationDesc || ''
     })
     setShowModal(true)
   }
@@ -217,13 +306,28 @@ export default function ItemPage() {
       toast.success('삭제되었습니다.')
       setShowDetailModal(false)
       loadAll()
-    } catch (e) {
-      toast.error('삭제에 실패했습니다.')
-    }
+    } catch (e) { toast.error('삭제에 실패했습니다.') }
+  }
+
+  // 맵에서 직접 마커 저장 (상세 모달에서)
+  const handleSaveMarkerFromDetail = async (item, newMapX, newMapY, newLocationDesc) => {
+    setMapMarkerSaving(true)
+    try {
+      await api.patch(`/houses/${selectedHouse.id}/items/${item.id}/map`, {
+        mapX: newMapX, mapY: newMapY, locationDesc: newLocationDesc
+      })
+      toast.success('위치가 저장되었습니다.')
+      await loadAll()
+      // 상세 모달 데이터 업데이트
+      const updated = { ...item, mapX: newMapX, mapY: newMapY, locationDesc: newLocationDesc }
+      setDetailItem(updated)
+    } catch (e) { toast.error('위치 저장에 실패했습니다.') }
+    finally { setMapMarkerSaving(false) }
   }
 
   const selectedZoneName = zones.find(z => z.id === selectedZone)?.name
   const filtered = items.filter(i => i.name.includes(search) || (i.brand || '').includes(search))
+  const itemsWithMarker = items.filter(i => i.mapX != null && i.mapY != null)
 
   if (!selectedHouse) {
     return (
@@ -247,7 +351,6 @@ export default function ItemPage() {
           {selectedZoneName && <span style={{ marginLeft: 6, color: 'var(--secondary)', fontWeight: 700 }}>— {selectedZoneName}</span>}
         </p>
 
-        {/* Search + add */}
         <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
           <div style={{ flex: 1, position: 'relative' }}>
             <MSI name="search" size={18} color="var(--on-surface-variant)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', opacity: 0.6 }} />
@@ -259,6 +362,20 @@ export default function ItemPage() {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
+          <button
+            onClick={() => setShowMapView(v => !v)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '10px 14px',
+              background: showMapView ? 'linear-gradient(135deg, #2196F3, #0D47A1)' : 'var(--surface-container-low)',
+              color: showMapView ? 'white' : 'var(--on-surface-variant)',
+              border: 'none', borderRadius: 16,
+              fontWeight: 600, fontSize: 13, cursor: 'pointer', flexShrink: 0,
+            }}
+            title="맵 뷰"
+          >
+            <MSI name="map" size={16} />
+          </button>
           <button
             onClick={openCreate}
             style={{
@@ -273,6 +390,64 @@ export default function ItemPage() {
           </button>
         </div>
       </div>
+
+      {/* ── 맵 뷰 (토글) ── */}
+      {showMapView && (
+        <div style={{ padding: '16px 20px 0' }}>
+          <div style={{
+            background: 'var(--surface-container-lowest)',
+            borderRadius: 20, padding: '16px',
+            border: '1px solid rgba(33,150,243,0.2)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg, #2196F3, #0D47A1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <MSI name="map" fill size={14} color="white" />
+              </div>
+              <div>
+                <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14 }}>물품 맵</div>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
+                  위치 등록된 물품 {itemsWithMarker.length}개
+                </div>
+              </div>
+            </div>
+            {!houseData?.mapImageUrl ? (
+              <div style={{ textAlign: 'center', padding: '24px', background: 'var(--surface-container-low)', borderRadius: 12, border: '2px dashed var(--outline-variant)' }}>
+                <MSI name="map" size={36} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 8px' }} />
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--on-surface)', marginBottom: 4 }}>맵 이미지 없음</div>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>내집 관리에서 집 도면을 등록하세요</div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--outline-variant)' }}>
+                  <img src={houseData.mapImageUrl} alt="집 맵" style={{ width: '100%', display: 'block', maxHeight: 320, objectFit: 'contain', background: '#f8f8f8' }} draggable={false} />
+                  {itemsWithMarker.map(item => (
+                    <div
+                      key={item.id}
+                      onClick={() => openDetail(item)}
+                      style={{
+                        position: 'absolute',
+                        left: `${item.mapX}%`, top: `${item.mapY}%`,
+                        transform: 'translate(-50%, -100%)',
+                        cursor: 'pointer', zIndex: 10,
+                      }}
+                      title={item.name}
+                    >
+                      <div style={{
+                        width: 28, height: 28, borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)',
+                        background: 'var(--primary)', boxShadow: '0 3px 8px rgba(0,0,0,0.25)',
+                        border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <span style={{ transform: 'rotate(45deg)', fontSize: 12 }}>📦</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 8 }}>마커 클릭 시 물품 상세 정보를 볼 수 있어요</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Filter Chips ── */}
       <div style={{ padding: '12px 20px 0' }}>
@@ -334,6 +509,7 @@ export default function ItemPage() {
             {filtered.map(item => {
               const isExpiring = item.expiryDate && new Date(item.expiryDate) <= new Date(Date.now() + 14 * 86400000)
               const needsReorder = item.isConsumable && item.quantity <= (item.reorderLevel || 0)
+              const hasMarker = item.mapX != null && item.mapY != null
               return (
                 <div
                   key={item.id}
@@ -347,7 +523,6 @@ export default function ItemPage() {
                   onTouchStart={e => e.currentTarget.style.transform = 'scale(0.98)'}
                   onTouchEnd={e => e.currentTarget.style.transform = ''}
                 >
-                  {/* Icon box */}
                   <div style={{
                     width: 46, height: 46, borderRadius: 14,
                     background: 'var(--surface-container-low)',
@@ -356,8 +531,6 @@ export default function ItemPage() {
                   }}>
                     {CATEGORY_ICONS[item.categoryId] || '📦'}
                   </div>
-
-                  {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
                       <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</span>
@@ -367,15 +540,17 @@ export default function ItemPage() {
                       {needsReorder && (
                         <span style={{ background: 'var(--error-container)', color: 'var(--error)', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 8, flexShrink: 0 }}>재주문</span>
                       )}
+                      {hasMarker && (
+                        <span style={{ background: 'rgba(33,150,243,0.1)', color: '#1565C0', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 8, flexShrink: 0 }}>📍맵</span>
+                      )}
                     </div>
                     <div style={{ display: 'flex', gap: 8, fontSize: 11, color: 'var(--on-surface-variant)', flexWrap: 'wrap' }}>
                       {item.brand && <span>{item.brand}</span>}
                       {item.zoneName && <span>· {item.zoneName}</span>}
                       <span>· {item.quantity}{item.unit}</span>
+                      {item.locationDesc && <span>· 📍{item.locationDesc}</span>}
                     </div>
                   </div>
-
-                  {/* Status + actions */}
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
                     <span style={{
                       padding: '3px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600,
@@ -397,101 +572,20 @@ export default function ItemPage() {
             })}
           </div>
         )}
-      </div>{/* close Item List padding */}
+      </div>
 
       {/* ─── 물품 상세 모달 ─── */}
       {showDetailModal && detailItem && (
-        <div className="modal-overlay" onClick={() => setShowDetailModal(false)}>
-          <div className="modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 24 }}>{CATEGORY_ICONS[detailItem.categoryId] || '📦'}</span>
-                <div>
-                  <div className="modal-title">{detailItem.name}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>물품 상세 정보</div>
-                </div>
-              </div>
-              <button className="btn-icon" onClick={() => setShowDetailModal(false)}><MSI name="close" size={18} color="var(--on-surface-variant)" /></button>
-            </div>
-
-            <div className="modal-body">
-              {/* 상태 + 구역 배지 */}
-              <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-                <span className={`badge ${STATUS_MAP[detailItem.status]?.cls || 'badge-gray'}`} style={{ fontSize: 13, padding: '4px 12px' }}>
-                  {STATUS_MAP[detailItem.status]?.label || detailItem.status}
-                </span>
-                {detailItem.zoneName && (
-                  <span className="badge badge-info" style={{ fontSize: 13, padding: '4px 12px' }}>📍 {detailItem.zoneName}</span>
-                )}
-                {detailItem.isConsumable && (
-                  <span className="badge badge-warning" style={{ fontSize: 13, padding: '4px 12px' }}>🔄 소모품</span>
-                )}
-              </div>
-
-              {/* 정보 그리드 */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px', background: 'var(--surface)', borderRadius: 10, padding: 16, marginBottom: 16 }}>
-                {[
-                  { label: '브랜드', value: detailItem.brand },
-                  { label: '모델', value: detailItem.model },
-                  { label: '수량', value: `${detailItem.quantity} ${detailItem.unit}` },
-                  { label: '구매일', value: detailItem.purchaseDate },
-                  { label: '구매가격', value: detailItem.purchasePrice ? `${Number(detailItem.purchasePrice).toLocaleString()}원` : null },
-                  { label: '유통기한', value: detailItem.expiryDate },
-                  { label: '보증만료', value: detailItem.warrantyExpire },
-                  { label: '재주문 기준', value: detailItem.reorderLevel ? `${detailItem.reorderLevel}${detailItem.unit} 이하` : null },
-                ].filter(r => r.value).map(row => (
-                  <div key={row.label}>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{row.label}</div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--on-surface)', marginTop: 2 }}>{row.value}</div>
-                  </div>
-                ))}
-              </div>
-
-              {detailItem.description && (
-                <div style={{ background: 'var(--surface)', borderRadius: 10, padding: 12, marginBottom: 16 }}>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 4 }}>메모</div>
-                  <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.6 }}>{detailItem.description}</div>
-                </div>
-              )}
-
-              {/* 커뮤니티 연계 섹션 */}
-              <div style={{ background: 'var(--secondary-container)', borderRadius: 10, padding: 14, border: '1px solid #D1FAE5' }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#065F46', marginBottom: 10 }}>
-                  🏪 커뮤니티에서 이 물품 거래하기
-                </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {[
-                    { type: 'SELL', icon: '💰', label: '판매 글 올리기', bg: 'var(--primary-container)', color: 'var(--primary)', border: '#C7D2FE' },
-                    { type: 'FREE', icon: '🎁', label: '나눔 글 올리기', bg: '#FFF7ED', color: '#F59E0B', border: '#FDE68A' },
-                    { type: 'RENT', icon: '🔄', label: '대여 글 올리기', bg: '#FDF4FF', color: '#A855F7', border: '#E9D5FF' },
-                  ].map(opt => (
-                    <button key={opt.type}
-                      onClick={() => { setShowDetailModal(false); handleCommunityLink(detailItem, opt.type) }}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '8px 14px', borderRadius: 8,
-                        border: `1.5px solid ${opt.border}`,
-                        background: opt.bg, color: opt.color,
-                        fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                        transition: 'all 0.15s'
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
-                      onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-                    >
-                      {opt.icon} {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => { setShowDetailModal(false); handleDelete(detailItem.id) }}>🗑️ 삭제</button>
-              <button className="btn btn-secondary" onClick={() => setShowDetailModal(false)}>닫기</button>
-              <button className="btn btn-primary" onClick={() => openEdit(detailItem)}>✏️ 수정</button>
-            </div>
-          </div>
-        </div>
+        <DetailModal
+          item={detailItem}
+          houseData={houseData}
+          mapMarkerSaving={mapMarkerSaving}
+          onClose={() => setShowDetailModal(false)}
+          onEdit={() => openEdit(detailItem)}
+          onDelete={() => { setShowDetailModal(false); handleDelete(detailItem.id) }}
+          onCommunityLink={(type) => { setShowDetailModal(false); handleCommunityLink(detailItem, type) }}
+          onSaveMarker={(x, y, desc) => handleSaveMarkerFromDetail(detailItem, x, y, desc)}
+        />
       )}
 
       {/* ─── 물품 등록/수정 모달 ─── */}
@@ -588,6 +682,32 @@ export default function ItemPage() {
                     onChange={e => setForm({ ...form, description: e.target.value })}
                     placeholder="물품에 대한 메모..." />
                 </div>
+
+                {/* ── 맵 위치 설정 ── */}
+                <div style={{ marginTop: 4 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--on-surface)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <MSI name="map" size={16} color="var(--primary)" />
+                    맵 위치 설정
+                    <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--on-surface-variant)' }}>(선택)</span>
+                  </div>
+                  <MapMarkerSelector
+                    mapImageUrl={houseData?.mapImageUrl}
+                    mapX={form.mapX}
+                    mapY={form.mapY}
+                    onChange={({ mapX, mapY }) => setForm(f => ({ ...f, mapX, mapY }))}
+                  />
+                  {houseData?.mapImageUrl && (
+                    <div className="form-group" style={{ marginTop: 10 }}>
+                      <label className="form-label">위치 설명</label>
+                      <input
+                        className="form-input"
+                        value={form.locationDesc}
+                        onChange={e => setForm({ ...form, locationDesc: e.target.value })}
+                        placeholder="예: 거실 소파 옆, 주방 찬장 위..."
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>취소</button>
@@ -597,6 +717,206 @@ export default function ItemPage() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── 물품 상세 모달 (분리) ───
+function DetailModal({ item, houseData, mapMarkerSaving, onClose, onEdit, onDelete, onCommunityLink, onSaveMarker }) {
+  const [markerX, setMarkerX] = useState(item.mapX ?? null)
+  const [markerY, setMarkerY] = useState(item.mapY ?? null)
+  const [locationDesc, setLocationDesc] = useState(item.locationDesc || '')
+  const [editingMarker, setEditingMarker] = useState(false)
+
+  useEffect(() => {
+    setMarkerX(item.mapX ?? null)
+    setMarkerY(item.mapY ?? null)
+    setLocationDesc(item.locationDesc || '')
+  }, [item])
+
+  const handleMapClick = (e) => {
+    if (!editingMarker) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = parseFloat(((e.clientX - rect.left) / rect.width * 100).toFixed(2))
+    const y = parseFloat(((e.clientY - rect.top) / rect.height * 100).toFixed(2))
+    setMarkerX(x)
+    setMarkerY(y)
+  }
+
+  const handleSave = () => {
+    onSaveMarker(markerX, markerY, locationDesc)
+    setEditingMarker(false)
+  }
+
+  const handleClear = () => {
+    setMarkerX(null)
+    setMarkerY(null)
+    setLocationDesc('')
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 24 }}>{({ 1: '📺', 2: '🪑', 3: '🥕', 4: '🧴', 5: '👕', 6: '⚽', 7: '📦' })[item.categoryId] || '📦'}</span>
+            <div>
+              <div className="modal-title">{item.name}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>물품 상세 정보</div>
+            </div>
+          </div>
+          <button className="btn-icon" onClick={onClose}><MSI name="close" size={18} color="var(--on-surface-variant)" /></button>
+        </div>
+
+        <div className="modal-body">
+          {/* 상태 배지 */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+            <span className={`badge ${{ ACTIVE: 'badge-active', BROKEN: 'badge-danger', DISCARDED: 'badge-gray', SOLD: 'badge-warning' }[item.status] || 'badge-gray'}`} style={{ fontSize: 13, padding: '4px 12px' }}>
+              {{ ACTIVE: '보유중', BROKEN: '고장', DISCARDED: '폐기', SOLD: '판매됨' }[item.status] || item.status}
+            </span>
+            {item.zoneName && <span className="badge badge-info" style={{ fontSize: 13, padding: '4px 12px' }}>📍 {item.zoneName}</span>}
+            {item.isConsumable && <span className="badge badge-warning" style={{ fontSize: 13, padding: '4px 12px' }}>🔄 소모품</span>}
+            {(item.mapX != null || markerX != null) && <span style={{ fontSize: 13, padding: '4px 12px', background: 'rgba(33,150,243,0.1)', color: '#1565C0', borderRadius: 10, fontWeight: 600 }}>🗺️ 맵 위치 있음</span>}
+          </div>
+
+          {/* 정보 그리드 */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px', background: 'var(--surface)', borderRadius: 10, padding: 16, marginBottom: 16 }}>
+            {[
+              { label: '브랜드', value: item.brand },
+              { label: '모델', value: item.model },
+              { label: '수량', value: `${item.quantity} ${item.unit}` },
+              { label: '구매일', value: item.purchaseDate },
+              { label: '구매가격', value: item.purchasePrice ? `${Number(item.purchasePrice).toLocaleString()}원` : null },
+              { label: '유통기한', value: item.expiryDate },
+              { label: '보증만료', value: item.warrantyExpire },
+              { label: '재주문 기준', value: item.reorderLevel ? `${item.reorderLevel}${item.unit} 이하` : null },
+            ].filter(r => r.value).map(row => (
+              <div key={row.label}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{row.label}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--on-surface)', marginTop: 2 }}>{row.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {item.description && (
+            <div style={{ background: 'var(--surface)', borderRadius: 10, padding: 12, marginBottom: 16 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 4 }}>메모</div>
+              <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.6 }}>{item.description}</div>
+            </div>
+          )}
+
+          {/* ── 맵 위치 섹션 ── */}
+          {houseData?.mapImageUrl && (
+            <div style={{ background: 'rgba(33,150,243,0.05)', borderRadius: 12, padding: 14, marginBottom: 16, border: '1px solid rgba(33,150,243,0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1565C0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <MSI name="map" fill size={16} color="#1565C0" />맵 위치
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {!editingMarker ? (
+                    <button onClick={() => setEditingMarker(true)} style={{
+                      padding: '5px 12px', borderRadius: 8, border: 'none',
+                      background: '#2196F3', color: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer'
+                    }}>
+                      {markerX != null ? '위치 수정' : '위치 등록'}
+                    </button>
+                  ) : (
+                    <>
+                      <button onClick={() => { setEditingMarker(false); setMarkerX(item.mapX ?? null); setMarkerY(item.mapY ?? null); setLocationDesc(item.locationDesc || '') }} style={{
+                        padding: '5px 10px', borderRadius: 8, border: 'none',
+                        background: 'var(--surface-container)', color: 'var(--on-surface-variant)', fontSize: 12, fontWeight: 600, cursor: 'pointer'
+                      }}>취소</button>
+                      <button onClick={handleClear} style={{
+                        padding: '5px 10px', borderRadius: 8, border: 'none',
+                        background: 'rgba(186,26,26,0.1)', color: 'var(--error)', fontSize: 12, fontWeight: 600, cursor: 'pointer'
+                      }}>초기화</button>
+                      <button onClick={handleSave} disabled={mapMarkerSaving} style={{
+                        padding: '5px 12px', borderRadius: 8, border: 'none',
+                        background: 'linear-gradient(135deg, #2196F3, #0D47A1)', color: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                        opacity: mapMarkerSaving ? 0.7 : 1
+                      }}>
+                        {mapMarkerSaving ? '저장중...' : '저장'}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* 맵 이미지 */}
+              <div
+                style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', cursor: editingMarker ? 'crosshair' : 'default', border: editingMarker ? '2px solid #2196F3' : '1px solid var(--outline-variant)' }}
+                onClick={handleMapClick}
+              >
+                <img src={houseData.mapImageUrl} alt="집 맵" style={{ width: '100%', display: 'block', maxHeight: 220, objectFit: 'contain', background: '#f8f8f8' }} draggable={false} />
+                {markerX != null && markerY != null && (
+                  <div style={{ position: 'absolute', left: `${markerX}%`, top: `${markerY}%`, transform: 'translate(-50%, -100%)', pointerEvents: 'none' }}>
+                    <div style={{
+                      width: 26, height: 26, borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)',
+                      background: 'var(--primary)', boxShadow: '0 3px 8px rgba(0,0,0,0.3)', border: '2px solid white',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                      <span style={{ transform: 'rotate(45deg)', fontSize: 11 }}>📦</span>
+                    </div>
+                  </div>
+                )}
+                {editingMarker && (
+                  <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: 11, padding: '4px 10px', borderRadius: 20, pointerEvents: 'none' }}>
+                    클릭하여 위치 설정
+                  </div>
+                )}
+              </div>
+
+              {/* 위치 설명 */}
+              {editingMarker ? (
+                <input
+                  className="form-input"
+                  style={{ marginTop: 10, fontSize: 13 }}
+                  value={locationDesc}
+                  onChange={e => setLocationDesc(e.target.value)}
+                  placeholder="위치 설명 (예: 거실 소파 옆, 주방 찬장 위...)"
+                />
+              ) : (
+                locationDesc && (
+                  <div style={{ marginTop: 8, fontSize: 12, color: 'var(--on-surface-variant)' }}>
+                    📍 {locationDesc}
+                  </div>
+                )
+              )}
+            </div>
+          )}
+
+          {/* 커뮤니티 연계 */}
+          <div style={{ background: 'var(--secondary-container)', borderRadius: 10, padding: 14, border: '1px solid #D1FAE5' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#065F46', marginBottom: 10 }}>🏪 커뮤니티에서 이 물품 거래하기</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {[
+                { type: 'SELL', icon: '💰', label: '판매 글 올리기', bg: 'var(--primary-container)', color: 'var(--primary)', border: '#C7D2FE' },
+                { type: 'FREE', icon: '🎁', label: '나눔 글 올리기', bg: '#FFF7ED', color: '#F59E0B', border: '#FDE68A' },
+                { type: 'RENT', icon: '🔄', label: '대여 글 올리기', bg: '#FDF4FF', color: '#A855F7', border: '#E9D5FF' },
+              ].map(opt => (
+                <button key={opt.type}
+                  onClick={() => onCommunityLink(opt.type)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8,
+                    border: `1.5px solid ${opt.border}`, background: opt.bg, color: opt.color,
+                    fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                >
+                  {opt.icon} {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button className="btn btn-secondary" onClick={onDelete}>🗑️ 삭제</button>
+          <button className="btn btn-secondary" onClick={onClose}>닫기</button>
+          <button className="btn btn-primary" onClick={onEdit}>✏️ 수정</button>
+        </div>
+      </div>
     </div>
   )
 }

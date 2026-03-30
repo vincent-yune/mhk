@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -74,6 +75,20 @@ public class ItemController {
         List<ItemResponse> items = itemService.getExpiringItems(houseId, ud.getUsername(), days)
                 .stream().map(ItemResponse::from).collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.success(items));
+    }
+
+    // 맵 마커 위치 저장
+    @PatchMapping("/{itemId}/map")
+    public ResponseEntity<ApiResponse<ItemResponse>> updateItemMap(
+            @PathVariable Long houseId,
+            @PathVariable Long itemId,
+            @RequestBody Map<String, Object> body,
+            @AuthenticationPrincipal UserDetails ud) {
+        Float mapX = body.get("mapX") != null ? ((Number) body.get("mapX")).floatValue() : null;
+        Float mapY = body.get("mapY") != null ? ((Number) body.get("mapY")).floatValue() : null;
+        String locationDesc = body.get("locationDesc") != null ? body.get("locationDesc").toString() : null;
+        ItemResponse updated = ItemResponse.from(itemService.updateItemMap(itemId, ud.getUsername(), mapX, mapY, locationDesc));
+        return ResponseEntity.ok(ApiResponse.success("위치 저장 완료", updated));
     }
 
     @GetMapping("/reorder")

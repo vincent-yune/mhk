@@ -25,6 +25,7 @@ public class HouseResponse {
     private BigDecimal currentPrice;
     private String theme;
     private Boolean isPrimary;
+    private String mapImageUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<ZoneResponse> zones;
@@ -44,6 +45,7 @@ public class HouseResponse {
                 .currentPrice(house.getCurrentPrice())
                 .theme(house.getTheme() != null ? house.getTheme().name() : null)
                 .isPrimary(house.getIsPrimary())
+                .mapImageUrl(house.getMapImageUrl())
                 .createdAt(house.getCreatedAt())
                 .updatedAt(house.getUpdatedAt())
                 .build();
@@ -65,6 +67,7 @@ public class HouseResponse {
                 .currentPrice(r.getCurrentPrice())
                 .theme(r.getTheme())
                 .isPrimary(r.getIsPrimary())
+                .mapImageUrl(r.getMapImageUrl())
                 .createdAt(r.getCreatedAt())
                 .updatedAt(r.getUpdatedAt())
                 .zones(zones)

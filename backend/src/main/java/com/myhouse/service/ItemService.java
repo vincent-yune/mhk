@@ -72,6 +72,15 @@ public class ItemService {
         itemRepository.delete(item);
     }
 
+    @Transactional
+    public Item updateItemMap(Long itemId, String email, Float mapX, Float mapY, String locationDesc) {
+        Item item = getItem(itemId, email);
+        item.setMapX(mapX);
+        item.setMapY(mapY);
+        item.setLocationDesc(locationDesc);
+        return itemRepository.save(item);
+    }
+
     @Transactional(readOnly = true)
     public List<Item> getExpiringItems(Long houseId, String email, int days) {
         checkHouseOwner(houseId, email);

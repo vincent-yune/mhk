@@ -52,4 +52,17 @@ public class IotController {
         iotService.deleteDevice(deviceId, ud.getUsername());
         return ResponseEntity.ok(ApiResponse.success("기기 삭제 완료", null));
     }
+
+    // 맵 마커 위치 저장
+    @PatchMapping("/{deviceId}/map")
+    public ResponseEntity<ApiResponse<IotDevice>> updateDeviceMap(
+            @PathVariable Long houseId,
+            @PathVariable Long deviceId,
+            @RequestBody Map<String, Object> body,
+            @AuthenticationPrincipal UserDetails ud) {
+        Float mapX = body.get("mapX") != null ? ((Number) body.get("mapX")).floatValue() : null;
+        Float mapY = body.get("mapY") != null ? ((Number) body.get("mapY")).floatValue() : null;
+        String locationDesc = body.get("locationDesc") != null ? body.get("locationDesc").toString() : null;
+        return ResponseEntity.ok(ApiResponse.success("위치 저장 완료", iotService.updateDeviceMap(deviceId, ud.getUsername(), mapX, mapY, locationDesc)));
+    }
 }

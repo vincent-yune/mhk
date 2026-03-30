@@ -52,6 +52,19 @@ public class IotService {
         deviceRepository.save(device);
     }
 
+    @Transactional
+    public IotDevice updateDeviceMap(Long deviceId, String email, Float mapX, Float mapY, String locationDesc) {
+        IotDevice device = deviceRepository.findById(deviceId)
+                .orElseThrow(() -> new ResourceNotFoundException("기기를 찾을 수 없습니다."));
+        if (!device.getHouse().getUser().getEmail().equals(email)) {
+            throw new UnauthorizedException("접근 권한이 없습니다.");
+        }
+        device.setMapX(mapX);
+        device.setMapY(mapY);
+        device.setLocationDesc(locationDesc);
+        return deviceRepository.save(device);
+    }
+
     private House checkOwner(Long houseId, String email) {
         House house = houseRepository.findById(houseId)
                 .orElseThrow(() -> new ResourceNotFoundException("집 정보를 찾을 수 없습니다."));

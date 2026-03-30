@@ -75,5 +75,14 @@ public class Item extends BaseEntity {
 
     private Integer reorderLevel;
 
+    @Column(name = "map_x")
+    private Float mapX;
+
+    @Column(name = "map_y")
+    private Float mapY;
+
+    @Column(name = "location_desc", length = 300)
+    private String locationDesc;
+
     public enum ItemStatus { ACTIVE, BROKEN, DISCARDED, SOLD }
 }
