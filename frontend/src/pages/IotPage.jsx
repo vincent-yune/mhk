@@ -18,6 +18,7 @@ const DEVICE_TYPE_MAP = {
 const PLATFORM_LABELS = {
   SMARTTHINGS: 'SmartThings',
   LG_THINQ: 'LG ThinQ',
+  PHILIPS_HUE: 'Philips Hue',
   GOOGLE_HOME: 'Google Home',
   APPLE_HOME: 'Apple Home',
   TUYA: 'Tuya',
@@ -60,6 +61,385 @@ function MSI({ name, fill = false, size = 24, color, style = {} }) {
       color: color || 'inherit', lineHeight: 1,
       display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', ...style,
     }}>{name}</span>
+  )
+}
+
+// ── Philips Hue 연결 모달 ────────────────────────────────────────────────────────
+function PhilipsHueConnectModal({ onClose, onConnected }) {
+  const [step, setStep] = useState(1)         // 1=방법선택, 2=Bridge버튼, 3=직접입력
+  const [bridgeIp, setBridgeIp] = useState('')
+  const [hueUsername, setHueUsername] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [bridges, setBridges] = useState([])
+  const [discovering, setDiscovering] = useState(false)
+  const [pairStatus, setPairStatus] = useState(null)  // null | 'waiting' | 'success' | 'error'
+  const [pairMsg, setPairMsg] = useState('')
+
+  // Bridge 자동 탐색
+  const handleDiscover = async () => {
+    setDiscovering(true)
+    try {
+      const res = await api.get('/philipshue/discover')
+      const list = res.data.data || []
+      setBridges(list)
+      if (list.length > 0) setBridgeIp(list[0].internalipaddress || '')
+    } catch (e) {
+      toast.error('Bridge 탐색 실패')
+    } finally {
+      setDiscovering(false)
+    }
+  }
+
+  // 버튼 누르기 방식으로 페어링
+  const handlePair = async () => {
+    if (!bridgeIp.trim()) { toast.error('Bridge IP를 입력해주세요.'); return }
+    setLoading(true)
+    setPairStatus('waiting')
+    setPairMsg('Bridge 버튼을 누른 뒤 30초 이내에 이 버튼을 눌러주세요.')
+    try {
+      const res = await api.post('/philipshue/pair', { bridgeIp: bridgeIp.trim() })
+      if (res.data.success) {
+        setPairStatus('success')
+        setPairMsg(res.data.message || 'Philips Hue 연결 완료!')
+        toast.success(res.data.message || 'Philips Hue 연결 완료!')
+        setTimeout(() => { onConnected(); onClose() }, 1200)
+      } else {
+        setPairStatus('error')
+        setPairMsg(res.data.message || '연결 실패')
+      }
+    } catch (e) {
+      setPairStatus('error')
+      setPairMsg(e.response?.data?.message || 'Bridge 연결 실패. Bridge 버튼을 먼저 누르셨나요?')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 직접 입력 방식으로 연결
+  const handleDirectConnect = async () => {
+    if (!bridgeIp.trim()) { toast.error('Bridge IP를 입력해주세요.'); return }
+    if (!hueUsername.trim()) { toast.error('Hue Username을 입력해주세요.'); return }
+    setLoading(true)
+    try {
+      const res = await api.post('/philipshue/connect', {
+        bridgeIp: bridgeIp.trim(),
+        hueUsername: hueUsername.trim(),
+      })
+      if (res.data.success) {
+        toast.success(res.data.message || 'Philips Hue 연결 완료!')
+        onConnected()
+        onClose()
+      } else {
+        toast.error(res.data.message || '연결 실패')
+      }
+    } catch (e) {
+      toast.error(e.response?.data?.message || '연결 실패: IP 또는 Username을 확인해주세요.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-handle" />
+        <div className="modal-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #f97316, #ea580c)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <MSI name="lightbulb" fill size={18} color="white" />
+            </div>
+            <div>
+              <div className="modal-title">Philips Hue 연결</div>
+              <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Hue Bridge를 통해 조명 제어</div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--surface-container-low)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <MSI name="close" size={18} color="var(--on-surface-variant)" />
+          </button>
+        </div>
+
+        <div className="modal-body">
+          {step === 1 && (
+            <>
+              {/* 안내 */}
+              <div style={{ background: 'rgba(249,115,22,0.06)', borderRadius: 12, padding: '12px 14px', marginBottom: 16, fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.7 }}>
+                <strong style={{ color: '#ea580c' }}>Philips Hue Bridge</strong>가 같은 Wi-Fi 네트워크에 연결되어 있어야 합니다.<br />
+                연결 방법을 선택해주세요.
+              </div>
+
+              {/* 방법 선택 */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div
+                  onClick={() => { handleDiscover(); setStep(2) }}
+                  style={{ padding: '16px', background: 'var(--surface-container-lowest)', borderRadius: 14, cursor: 'pointer', border: '1.5px solid rgba(249,115,22,0.2)', display: 'flex', alignItems: 'center', gap: 14 }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(249,115,22,0.04)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-container-lowest)'}
+                >
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <MSI name="sensors" size={20} color="#ea580c" />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--on-surface)', marginBottom: 2 }}>Bridge 버튼으로 연결 (권장)</div>
+                    <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Bridge의 링크 버튼을 눌러 자동 인증</div>
+                  </div>
+                  <MSI name="chevron_right" size={18} color="var(--on-surface-variant)" />
+                </div>
+                <div
+                  onClick={() => setStep(3)}
+                  style={{ padding: '16px', background: 'var(--surface-container-lowest)', borderRadius: 14, cursor: 'pointer', border: '1px solid var(--outline-variant)', display: 'flex', alignItems: 'center', gap: 14 }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-container-low)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-container-lowest)'}
+                >
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-container-low)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <MSI name="edit" size={20} color="var(--on-surface-variant)" />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--on-surface)', marginBottom: 2 }}>직접 입력</div>
+                    <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Bridge IP와 Username을 직접 입력</div>
+                  </div>
+                  <MSI name="chevron_right" size={18} color="var(--on-surface-variant)" />
+                </div>
+              </div>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <button onClick={() => setStep(1)} style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--surface-container-low)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <MSI name="arrow_back" size={16} color="var(--on-surface-variant)" />
+                </button>
+                <span style={{ fontWeight: 700, fontSize: 13 }}>Bridge 버튼으로 연결</span>
+              </div>
+
+              {/* Bridge 탐색 결과 */}
+              <div className="form-group">
+                <label className="form-label">Bridge IP 주소</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input className="form-input" value={bridgeIp} onChange={e => setBridgeIp(e.target.value)} placeholder="192.168.1.100" style={{ flex: 1 }} />
+                  <button
+                    type="button"
+                    onClick={handleDiscover}
+                    disabled={discovering}
+                    style={{ padding: '0 12px', background: 'var(--surface-container-low)', border: '1px solid var(--outline-variant)', borderRadius: 10, cursor: 'pointer', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}
+                  >
+                    {discovering ? '탐색...' : '자동 탐색'}
+                  </button>
+                </div>
+                {bridges.length > 0 && (
+                  <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {bridges.map((b, i) => (
+                      <div key={i} onClick={() => setBridgeIp(b.internalipaddress || '')}
+                        style={{ padding: '8px 10px', background: bridgeIp === b.internalipaddress ? 'rgba(249,115,22,0.1)' : 'var(--surface-container-lowest)', borderRadius: 8, cursor: 'pointer', fontSize: 12, border: '1px solid', borderColor: bridgeIp === b.internalipaddress ? '#ea580c' : 'var(--outline-variant)', display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <MSI name="router" size={14} color="#ea580c" />
+                        <span style={{ fontWeight: 600 }}>{b.internalipaddress}</span>
+                        <span style={{ color: 'var(--on-surface-variant)', fontSize: 10 }}>ID: {b.id?.substring(0, 8)}...</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 연결 안내 */}
+              <div style={{ background: '#fff7ed', borderRadius: 12, padding: '12px 14px', marginBottom: 12, fontSize: 12, color: '#7c2d12', lineHeight: 1.7 }}>
+                <strong>연결 방법:</strong><br />
+                1. Hue Bridge의 <strong>링크 버튼(큰 원형 버튼)</strong>을 누르세요<br />
+                2. 버튼을 누른 후 <strong>30초 이내</strong>에 아래 "연결하기" 버튼을 클릭하세요
+              </div>
+
+              {/* 상태 메시지 */}
+              {pairStatus && (
+                <div style={{ padding: '10px 12px', borderRadius: 10, marginBottom: 12, fontSize: 12, fontWeight: 600,
+                  background: pairStatus === 'success' ? '#dcfce7' : pairStatus === 'error' ? '#fee2e2' : '#fef9c3',
+                  color: pairStatus === 'success' ? '#166534' : pairStatus === 'error' ? '#991b1b' : '#713f12',
+                }}>
+                  <MSI name={pairStatus === 'success' ? 'check_circle' : pairStatus === 'error' ? 'error' : 'info'} size={14} style={{ marginRight: 6 }} />
+                  {pairMsg}
+                </div>
+              )}
+
+              <button
+                onClick={handlePair}
+                disabled={loading || !bridgeIp.trim()}
+                style={{
+                  width: '100%', padding: '13px', borderRadius: 14,
+                  background: loading || !bridgeIp.trim() ? 'var(--surface-container-high)' : 'linear-gradient(135deg, #f97316, #ea580c)',
+                  color: loading || !bridgeIp.trim() ? 'var(--on-surface-variant)' : 'white',
+                  border: 'none', fontWeight: 700, fontSize: 14, cursor: loading || !bridgeIp.trim() ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}
+              >
+                {loading ? <><MSI name="sync" size={16} style={{ animation: 'spin 1s linear infinite' }} />연결 중...</> : <><MSI name="link" size={16} />연결하기</>}
+              </button>
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <button onClick={() => setStep(1)} style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--surface-container-low)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <MSI name="arrow_back" size={16} color="var(--on-surface-variant)" />
+                </button>
+                <span style={{ fontWeight: 700, fontSize: 13 }}>직접 입력으로 연결</span>
+              </div>
+
+              <div style={{ background: 'rgba(249,115,22,0.06)', borderRadius: 12, padding: '12px 14px', marginBottom: 14, fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.7 }}>
+                Hue 앱 → 설정 → Hue Bridge → 정보에서 IP 주소를 확인할 수 있습니다.<br />
+                Username은 이전에 발급받은 API 키입니다.
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Bridge IP 주소 *</label>
+                <input className="form-input" value={bridgeIp} onChange={e => setBridgeIp(e.target.value)} placeholder="예: 192.168.1.100" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Hue Username (API Key) *</label>
+                <input className="form-input" value={hueUsername} onChange={e => setHueUsername(e.target.value)} placeholder="발급받은 Username을 입력하세요" />
+              </div>
+
+              <button
+                onClick={handleDirectConnect}
+                disabled={loading || !bridgeIp.trim() || !hueUsername.trim()}
+                style={{
+                  width: '100%', padding: '13px', borderRadius: 14,
+                  background: (loading || !bridgeIp.trim() || !hueUsername.trim()) ? 'var(--surface-container-high)' : 'linear-gradient(135deg, #f97316, #ea580c)',
+                  color: (loading || !bridgeIp.trim() || !hueUsername.trim()) ? 'var(--on-surface-variant)' : 'white',
+                  border: 'none', fontWeight: 700, fontSize: 14, cursor: (loading || !bridgeIp.trim() || !hueUsername.trim()) ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}
+              >
+                {loading ? <><MSI name="sync" size={16} style={{ animation: 'spin 1s linear infinite' }} />연결 중...</> : <><MSI name="link" size={16} />연결하기</>}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Philips Hue 조명 가져오기 모달 ──────────────────────────────────────────────
+function PhilipsHueImportModal({ onClose, onImported, houseId }) {
+  const [lights, setLights] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [importing, setImporting] = useState({})
+
+  useEffect(() => {
+    fetchLights()
+  }, [])
+
+  const fetchLights = async () => {
+    setLoading(true)
+    try {
+      const res = await api.get('/philipshue/lights', { params: { houseId } })
+      setLights(res.data.data || [])
+    } catch (e) {
+      toast.error('조명 목록 조회 실패')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleImport = async (lightId) => {
+    setImporting(prev => ({ ...prev, [lightId]: true }))
+    try {
+      const res = await api.post(`/philipshue/lights/${lightId}/import`, { houseId })
+      toast.success(res.data.message || '조명이 등록되었습니다!')
+      onImported()
+      setLights(prev => prev.map(l => l.lightId === lightId ? { ...l, alreadyLinked: true } : l))
+    } catch (e) {
+      toast.error(e.response?.data?.message || '등록 실패')
+    } finally {
+      setImporting(prev => ({ ...prev, [lightId]: false }))
+    }
+  }
+
+  const handleImportAll = async () => {
+    const unlinked = lights.filter(l => !l.alreadyLinked)
+    for (const l of unlinked) {
+      await handleImport(l.lightId)
+    }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-handle" />
+        <div className="modal-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #f97316, #ea580c)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <MSI name="lightbulb" fill size={18} color="white" />
+            </div>
+            <div>
+              <div className="modal-title">Hue 조명 가져오기</div>
+              <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>Bridge에서 조명을 불러와 등록합니다</div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--surface-container-low)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <MSI name="close" size={18} color="var(--on-surface-variant)" />
+          </button>
+        </div>
+
+        <div className="modal-body">
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--on-surface-variant)' }}>
+              <MSI name="sync" size={32} style={{ display: 'block', margin: '0 auto 12px', animation: 'spin 1s linear infinite' }} />
+              Bridge에서 조명을 불러오는 중...
+            </div>
+          ) : lights.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--on-surface-variant)' }}>
+              <MSI name="lightbulb_outline" size={40} style={{ display: 'block', margin: '0 auto 12px' }} />
+              연결된 조명이 없습니다
+            </div>
+          ) : (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <span style={{ fontSize: 13, color: 'var(--on-surface-variant)' }}>
+                  총 {lights.length}개 조명 / 미등록 {lights.filter(l => !l.alreadyLinked).length}개
+                </span>
+                {lights.some(l => !l.alreadyLinked) && (
+                  <button
+                    onClick={handleImportAll}
+                    style={{ padding: '6px 12px', background: 'linear-gradient(135deg, #f97316, #ea580c)', color: 'white', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                  >
+                    <MSI name="add_link" size={13} />전체 등록
+                  </button>
+                )}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {lights.map(light => (
+                  <div key={light.lightId} style={{ padding: '12px 14px', background: 'var(--surface-container-lowest)', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 12, border: light.alreadyLinked ? '1px solid rgba(249,115,22,0.3)' : '1px solid var(--outline-variant)' }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: light.on ? '#fff7ed' : 'var(--surface-container-low)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <MSI name="lightbulb" fill={light.on} size={20} color={light.on ? '#f97316' : 'var(--on-surface-variant)'} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--on-surface)' }}>{light.name}</div>
+                      <div style={{ fontSize: 10, color: 'var(--on-surface-variant)', marginTop: 1 }}>
+                        {light.productname || light.type}
+                        {light.reachable ? <span style={{ color: '#16a34a', marginLeft: 6 }}>● 응답 중</span> : <span style={{ color: 'var(--on-surface-variant)', marginLeft: 6 }}>● 응답 없음</span>}
+                      </div>
+                    </div>
+                    {light.alreadyLinked ? (
+                      <span style={{ padding: '4px 10px', background: 'rgba(249,115,22,0.1)', color: '#ea580c', borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                        등록됨
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleImport(light.lightId)}
+                        disabled={importing[light.lightId]}
+                        style={{ padding: '6px 12px', background: importing[light.lightId] ? 'var(--surface-container-high)' : 'linear-gradient(135deg, #f97316, #ea580c)', color: importing[light.lightId] ? 'var(--on-surface-variant)' : 'white', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 11, cursor: importing[light.lightId] ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}
+                      >
+                        {importing[light.lightId] ? '등록 중...' : <><MSI name="add" size={13} />등록</>}
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -1450,6 +1830,10 @@ export default function IotPage() {
   const [showLGImport, setShowLGImport] = useState(false)
   const [lgSyncing, setLgSyncing] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const [hueConnected, setHueConnected] = useState(false)
+  const [showHueConnect, setShowHueConnect] = useState(false)
+  const [showHueImport, setShowHueImport] = useState(false)
+  const [hueSyncing, setHueSyncing] = useState(false)
   const [form, setForm] = useState({
     name: '', deviceType: 'LIGHT', manufacturer: '', model: '',
     platform: 'OTHER', zone: null,
@@ -1460,6 +1844,7 @@ export default function IotPage() {
       loadAll()
       checkSTStatus()
       checkLGStatus()
+      checkHueStatus()
     }
   }, [selectedHouse])
 
@@ -1474,6 +1859,13 @@ export default function IotPage() {
     try {
       const res = await api.get('/lgthinq/status')
       setLgConnected(res.data.data?.connected || false)
+    } catch (e) {}
+  }
+
+  const checkHueStatus = async () => {
+    try {
+      const res = await api.get('/philipshue/status')
+      setHueConnected(res.data.data?.connected || false)
     } catch (e) {}
   }
 
@@ -1526,6 +1918,18 @@ export default function IotPage() {
       } catch (e) {
         toast.error('LG ThinQ 명령 실패')
       }
+    } else if (device.hueLightId && hueConnected) {
+      // Philips Hue 조명 제어
+      const isOn = device.status === 'ONLINE'
+      try {
+        await api.put(`/philipshue/lights/${device.hueLightId}/state`, { on: !isOn })
+        const newStatus = isOn ? 'STANDBY' : 'ONLINE'
+        await api.patch(`/houses/${selectedHouse.id}/iot/${device.id}/status`, { status: newStatus })
+        loadAll()
+        toast.success(`${device.name} ${isOn ? '꺼짐' : '켜짐'}`)
+      } catch (e) {
+        toast.error('Hue 조명 제어 실패')
+      }
     } else {
       // 일반 토글
       const newStatus = device.status === 'ONLINE' ? 'STANDBY' : 'ONLINE'
@@ -1573,6 +1977,28 @@ export default function IotPage() {
     } catch (e) { toast.error('해제 실패') }
   }
 
+  const handleHueDisconnect = async () => {
+    if (!confirm('Philips Hue 연결을 해제하시겠습니까?')) return
+    try {
+      await api.delete('/philipshue/connect')
+      setHueConnected(false)
+      toast.success('Philips Hue 연결이 해제되었습니다.')
+    } catch (e) { toast.error('해제 실패') }
+  }
+
+  const handleHueSync = async () => {
+    setHueSyncing(true)
+    try {
+      const res = await api.post(`/philipshue/sync/${selectedHouse.id}`)
+      toast.success(res.data.message || 'Philips Hue 동기화 완료!')
+      loadAll()
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'Philips Hue 동기화 실패')
+    } finally {
+      setHueSyncing(false)
+    }
+  }
+
   const handleLGSync = async () => {
     setLgSyncing(true)
     try {
@@ -1602,6 +2028,7 @@ export default function IotPage() {
   const online = devices.filter(d => d.status === 'ONLINE').length
   const stDevices = devices.filter(d => d.platform === 'SMARTTHINGS')
   const lgDevices = devices.filter(d => d.platform === 'LG_THINQ')
+  const hueDevices = devices.filter(d => d.platform === 'PHILIPS_HUE')
 
   if (!selectedHouse) return (
     <div style={{ textAlign: 'center', padding: '80px 24px', color: 'var(--on-surface-variant)' }}>
@@ -1889,6 +2316,125 @@ export default function IotPage() {
         )}
       </div>
 
+      {/* ── Philips Hue 연동 배너 ── */}
+      <div style={{ padding: '12px 20px 0' }}>
+        {hueConnected ? (
+          /* Hue 연결된 상태 */
+          <div style={{
+            background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
+            borderRadius: 20, padding: '18px 20px',
+            color: 'white', position: 'relative', overflow: 'hidden',
+          }}>
+            <div style={{ position: 'absolute', top: -20, right: -20, opacity: 0.08, fontSize: 120 }}>💡</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80', animation: 'pulse 2s ease-in-out infinite' }} />
+                  <span style={{ fontSize: 11, fontWeight: 700, opacity: 0.9, letterSpacing: '0.5px' }}>PHILIPS HUE</span>
+                </div>
+                <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 17, marginBottom: 4 }}>
+                  Hue 조명 연결됨
+                </div>
+                <div style={{ fontSize: 12, opacity: 0.8 }}>
+                  {hueDevices.length}개 조명 연결 중
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={handleHueSync}
+                  disabled={hueSyncing}
+                  style={{
+                    padding: '8px 14px',
+                    background: 'rgba(255,255,255,0.15)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    borderRadius: 12, color: 'white',
+                    fontWeight: 700, fontSize: 12, cursor: hueSyncing ? 'not-allowed' : 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  <MSI name="sync" size={14} style={{ animation: hueSyncing ? 'spin 1s linear infinite' : 'none' }} />
+                  {hueSyncing ? '동기화...' : '동기화'}
+                </button>
+                <button
+                  onClick={() => setShowHueImport(true)}
+                  style={{
+                    padding: '8px 14px',
+                    background: 'rgba(255,255,255,0.2)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    borderRadius: 12, color: 'white',
+                    fontWeight: 700, fontSize: 12, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  <MSI name="add_link" size={14} />
+                  조명 추가
+                </button>
+              </div>
+            </div>
+
+            {/* Hue 조명 아이콘 줄 */}
+            <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+              {['lightbulb', 'light_group', 'lamp', 'light', 'bedtime'].map((icon, i) => (
+                <div key={i} style={{
+                  width: 34, height: 34, borderRadius: 10,
+                  background: 'rgba(255,255,255,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <MSI name={icon} fill size={18} color="white" />
+                </div>
+              ))}
+              <button
+                onClick={handleHueDisconnect}
+                style={{
+                  marginLeft: 'auto', padding: '4px 10px',
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: 8, color: 'rgba(255,255,255,0.7)',
+                  fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                연결 해제
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Hue 미연결 상태 */
+          <div
+            onClick={() => setShowHueConnect(true)}
+            style={{
+              background: 'var(--surface-container-lowest)',
+              borderRadius: 20, padding: '18px 20px', cursor: 'pointer',
+              border: '2px dashed rgba(234,88,12,0.3)',
+              display: 'flex', alignItems: 'center', gap: 16,
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(234,88,12,0.04)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-container-lowest)'}
+          >
+            <div style={{
+              width: 52, height: 52, borderRadius: 16,
+              background: 'linear-gradient(135deg, #f97316, #ea580c)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <MSI name="lightbulb" fill size={26} color="white" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 15, marginBottom: 3, color: '#ea580c' }}>
+                Philips Hue 연결
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--on-surface-variant)', lineHeight: 1.5 }}>
+                스마트 조명을 Bridge를 통해<br />
+                MyHouse에서 실시간 제어하세요
+              </div>
+            </div>
+            <MSI name="chevron_right" size={24} color="#ea580c" />
+          </div>
+        )}
+      </div>
+
       {/* ── 자동화 시나리오 ── */}
       <div style={{ padding: '20px 20px 0' }}>
         <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700, marginBottom: 12 }}>자동화 시나리오</div>
@@ -1995,6 +2541,7 @@ export default function IotPage() {
               const isOnline = d.status === 'ONLINE'
               const isSmartThings = d.platform === 'SMARTTHINGS'
               const isLgThinq = d.platform === 'LG_THINQ'
+              const isHue = d.platform === 'PHILIPS_HUE'
 
               return (
                 <div
@@ -2003,7 +2550,8 @@ export default function IotPage() {
                     background: 'var(--surface-container-lowest)',
                     borderRadius: 20, padding: '16px 18px',
                     border: isSmartThings ? '1.5px solid rgba(20,40,160,0.12)'
-                      : isLgThinq ? '1.5px solid rgba(192,57,43,0.15)' : 'none',
+                      : isLgThinq ? '1.5px solid rgba(192,57,43,0.15)'
+                      : isHue ? '1.5px solid rgba(234,88,12,0.2)' : 'none',
                     cursor: 'pointer',
                     transition: 'box-shadow 0.15s',
                   }}
@@ -2040,6 +2588,18 @@ export default function IotPage() {
                             border: '2px solid white',
                           }}>
                             <span style={{ color: 'white', fontSize: 6, fontWeight: 900, letterSpacing: '-0.5px' }}>LG</span>
+                          </div>
+                        )}
+                        {/* Philips Hue 뱃지 */}
+                        {isHue && (
+                          <div style={{
+                            position: 'absolute', bottom: -4, right: -4,
+                            width: 16, height: 16, borderRadius: '50%',
+                            background: '#ea580c',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            border: '2px solid white',
+                          }}>
+                            <MSI name="lightbulb" fill size={8} color="white" />
                           </div>
                         )}
                       </div>
@@ -2091,6 +2651,15 @@ export default function IotPage() {
                         }}>
                           <span style={{ color: '#C0392B', fontWeight: 700 }}>LG ThinQ</span>
                         </span>
+                      ) : isHue ? (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          padding: '2px 8px', borderRadius: 20,
+                          background: 'rgba(234,88,12,0.08)', fontSize: 10,
+                        }}>
+                          <MSI name="lightbulb" fill size={10} color="#ea580c" />
+                          <span style={{ color: '#ea580c', fontWeight: 700 }}>Philips Hue</span>
+                        </span>
                       ) : (
                         <span style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
                           {PLATFORM_LABELS[d.platform] || d.platform}
@@ -2102,7 +2671,7 @@ export default function IotPage() {
                       onClick={() => handleToggle(d)}
                       style={{
                         width: 44, height: 24, borderRadius: 12,
-                        background: isOnline ? (isSmartThings ? '#1428A0' : isLgThinq ? '#C0392B' : 'var(--secondary)') : 'var(--surface-container-high)',
+                        background: isOnline ? (isSmartThings ? '#1428A0' : isLgThinq ? '#C0392B' : isHue ? '#ea580c' : 'var(--secondary)') : 'var(--surface-container-high)',
                         border: 'none', cursor: 'pointer',
                         position: 'relative', transition: 'background 0.2s',
                       }}
@@ -2256,6 +2825,37 @@ export default function IotPage() {
                       <MSI name="chevron_right" size={18} color="#C0392B" />
                     </div>
                   )}
+                  {/* Philips Hue */}
+                  {!hueConnected && (
+                    <div
+                      onClick={() => { setShowModal(false); setShowHueConnect(true) }}
+                      style={{
+                        padding: '12px 14px',
+                        background: 'rgba(234,88,12,0.06)',
+                        borderRadius: 12, cursor: 'pointer',
+                        border: '1px solid rgba(234,88,12,0.15)',
+                        display: 'flex', alignItems: 'center', gap: 10,
+                      }}
+                    >
+                      <div style={{
+                        width: 32, height: 32, borderRadius: 8,
+                        background: 'linear-gradient(135deg, #f97316, #ea580c)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0,
+                      }}>
+                        <MSI name="lightbulb" fill size={16} color="white" />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: '#ea580c' }}>
+                          Philips Hue 연결하기
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
+                          스마트 조명을 Bridge를 통해 제어하세요
+                        </div>
+                      </div>
+                      <MSI name="chevron_right" size={18} color="#ea580c" />
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid-2">
@@ -2311,6 +2911,23 @@ export default function IotPage() {
       {showSTImport && (
         <SmartThingsImportModal
           onClose={() => setShowSTImport(false)}
+          onImported={loadAll}
+          houseId={selectedHouse.id}
+        />
+      )}
+
+      {/* ── Philips Hue 연결 모달 ── */}
+      {showHueConnect && (
+        <PhilipsHueConnectModal
+          onClose={() => setShowHueConnect(false)}
+          onConnected={() => { setHueConnected(true); setShowHueImport(true) }}
+        />
+      )}
+
+      {/* ── Philips Hue 조명 가져오기 모달 ── */}
+      {showHueImport && (
+        <PhilipsHueImportModal
+          onClose={() => setShowHueImport(false)}
           onImported={loadAll}
           houseId={selectedHouse.id}
         />

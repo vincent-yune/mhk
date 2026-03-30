@@ -50,6 +50,9 @@ public class IotDevice extends BaseEntity {
     @Column(length = 200)
     private String lgThinqDeviceId;
 
+    @Column(length = 50)
+    private String hueLightId;
+
     @JsonIgnore
     @Column(columnDefinition = "TEXT")
     private String smartThingsCapabilities;
@@ -72,6 +75,6 @@ public class IotDevice extends BaseEntity {
     private LocalDateTime lastSeen;
 
     public enum DeviceType { LIGHT, THERMOSTAT, LOCK, CAMERA, TV, AC, WASHER, REFRIGERATOR, OTHER }
-    public enum Platform { SMARTTHINGS, LG_THINQ, GOOGLE_HOME, APPLE_HOME, TUYA, OTHER }
+    public enum Platform { SMARTTHINGS, LG_THINQ, PHILIPS_HUE, GOOGLE_HOME, APPLE_HOME, TUYA, OTHER }
     public enum DeviceStatus { ONLINE, OFFLINE, STANDBY }
 }

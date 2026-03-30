@@ -58,6 +58,14 @@ public class User extends BaseEntity {
     @JsonIgnore
     private String lgThinqToken;
 
+    @Column(length = 50)
+    @JsonIgnore
+    private String hueBridgeIp;
+
+    @Column(length = 200)
+    @JsonIgnore
+    private String hueUsername;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     @JsonIgnore
