@@ -17,10 +17,16 @@ CREATE TABLE IF NOT EXISTS users (
     profile_img VARCHAR(500),
     role        ENUM('USER', 'ADMIN') DEFAULT 'USER',
     grade       ENUM('BRONZE', 'SILVER', 'GOLD', 'PLATINUM') DEFAULT 'BRONZE',
-    trust_score INT DEFAULT 0,
-    is_active   BOOLEAN DEFAULT TRUE,
-    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    trust_score    INT DEFAULT 0,
+    is_active      BOOLEAN DEFAULT TRUE,
+    smart_things_token VARCHAR(500) NULL,
+    lg_thinq_token     VARCHAR(500) NULL,
+    hue_bridge_ip      VARCHAR(50) NULL,
+    hue_username       VARCHAR(255) NULL,
+    provider           VARCHAR(20) NULL,
+    provider_id        VARCHAR(200) NULL,
+    created_at         DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at         DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================
