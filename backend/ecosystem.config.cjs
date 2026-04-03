@@ -5,7 +5,7 @@ module.exports = {
       script: 'java',
       args: '-jar /home/user/webapp/backend/target/myhouse-backend-1.0.0.jar',
       env: {
-        JAVA_HOME: '/usr/lib/jvm/temurin-11-jdk-amd64',
+        JAVA_HOME: '/opt/java/openjdk',
         NODE_ENV: 'development'
       },
       watch: false,
