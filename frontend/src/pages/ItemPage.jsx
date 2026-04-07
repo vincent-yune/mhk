@@ -550,6 +550,27 @@ export default function ItemPage() {
                       <span>· {item.quantity}{item.unit}</span>
                       {item.locationDesc && <span>· 📍{item.locationDesc}</span>}
                     </div>
+                    {item.purchaseDate && (() => {
+                      const days = Math.floor((new Date() - new Date(item.purchaseDate)) / (1000 * 60 * 60 * 24))
+                      return (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 5, flexWrap: 'wrap' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11, color: 'var(--on-surface-variant)' }}>
+                            <MSI name="calendar_today" size={11} color="var(--on-surface-variant)" />
+                            구매일 {item.purchaseDate}
+                          </span>
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 3,
+                            fontSize: 11, fontWeight: 600,
+                            background: days > 365 ? '#fef3c7' : 'var(--surface-container-low)',
+                            color: days > 365 ? '#92400e' : 'var(--on-surface-variant)',
+                            padding: '2px 7px', borderRadius: 8,
+                          }}>
+                            <MSI name="timelapse" size={11} />
+                            경과 {days.toLocaleString()}일
+                          </span>
+                        </div>
+                      )
+                    })()}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
                     <span style={{
