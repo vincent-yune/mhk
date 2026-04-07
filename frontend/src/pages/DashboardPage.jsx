@@ -393,14 +393,19 @@ export default function DashboardPage() {
           <div className="grid-2">
             {zones.slice(0, 6).map((z, i) => {
               const ZONE_META = {
-                LIVING_ROOM: { icon: 'weekend',       bg: '#cce8f4', color: '#005b87' },
-                KITCHEN:     { icon: 'skillet',        bg: '#ffd9e4', color: '#923357' },
-                BEDROOM:     { icon: 'bed',            bg: '#e8d5f0', color: '#7b4fa6' },
-                BATHROOM:    { icon: 'bathtub',        bg: '#b6f2be', color: '#006e1c' },
-                STUDY:       { icon: 'menu_book',      bg: '#fef9c3', color: '#854d0e' },
-                BALCONY:     { icon: 'deck',           bg: '#d1fae5', color: '#065f46' },
-                GARAGE:      { icon: 'directions_car', bg: '#e0e7ff', color: '#3730a3' },
-                OTHER:       { icon: 'room',           bg: '#f1f5f9', color: '#475569' },
+                LIVING_ROOM:  { icon: 'weekend',        bg: '#cce8f4', color: '#005b87' },
+                KITCHEN:      { icon: 'skillet',        bg: '#ffd9e4', color: '#923357' },
+                BEDROOM:      { icon: 'bed',            bg: '#e8d5f0', color: '#7b4fa6' },
+                BATHROOM:     { icon: 'bathtub',        bg: '#b6f2be', color: '#006e1c' },
+                STUDY:        { icon: 'menu_book',      bg: '#fef9c3', color: '#854d0e' },
+                BALCONY:      { icon: 'deck',           bg: '#d1fae5', color: '#065f46' },
+                GARAGE:       { icon: 'directions_car', bg: '#e0e7ff', color: '#3730a3' },
+                CORRIDOR:     { icon: 'meeting_room',   bg: '#e0e7ff', color: '#3730a3' },
+                UTILITY_ROOM: { icon: 'hvac',           bg: '#fef3c7', color: '#92400e' },
+                PANTRY:       { icon: 'shelves',        bg: '#d1fae5', color: '#065f46' },
+                TOILET:       { icon: 'wc',             bg: '#cce8f4', color: '#005b87' },
+                PARKING:      { icon: 'local_parking',  bg: '#ffd9e4', color: '#923357' },
+                OTHER:        { icon: 'room',           bg: '#f1f5f9', color: '#475569' },
               }
               const meta = ZONE_META[z.zoneType] || ZONE_META.OTHER
               const itemCount = z.itemCount ?? 0

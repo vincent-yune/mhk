@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../api/axios'
-import { useAuthStore } from '../store/useStore'
+import { useAuthStore, useHouseStore } from '../store/useStore'
 import toast from 'react-hot-toast'
 
 function MSI({ name, fill = false, size = 24, color, style = {} }) {
@@ -14,28 +14,92 @@ function MSI({ name, fill = false, size = 24, color, style = {} }) {
 }
 
 const GRADE_INFO = {
-  BRONZE: { label: '브론즈', color: '#CD7F32', bg: '#FDF4EB', emoji: '🥉', nextGrade: 'SILVER', nextScore: 100 },
-  SILVER: { label: '실버', color: '#C0C0C0', bg: '#F5F5F5', emoji: '🥈', nextGrade: 'GOLD', nextScore: 300 },
-  GOLD: { label: '골드', color: '#FFD700', bg: '#FFFBEB', emoji: '🥇', nextGrade: 'PLATINUM', nextScore: 500 },
-  PLATINUM: { label: '플래티넘', color: '#E5E4E2', bg: '#F0F4F8', emoji: '💎', nextGrade: null, nextScore: null },
+  BRONZE:   { label: '브론즈',   color: '#CD7F32', bg: '#FDF4EB', emoji: '🥉', nextGrade: 'SILVER',   nextScore: 100 },
+  SILVER:   { label: '실버',     color: '#C0C0C0', bg: '#F5F5F5', emoji: '🥈', nextGrade: 'GOLD',     nextScore: 300 },
+  GOLD:     { label: '골드',     color: '#FFD700', bg: '#FFFBEB', emoji: '🥇', nextGrade: 'PLATINUM', nextScore: 500 },
+  PLATINUM: { label: '플래티넘', color: '#E5E4E2', bg: '#F0F4F8', emoji: '💎', nextGrade: null,       nextScore: null },
+}
+
+// 추가 가능한 구역 목록 (preset)
+const ZONE_PRESETS = [
+  { name: '복도',     zoneType: 'CORRIDOR',     icon: 'meeting_room',  bg: '#e0e7ff', color: '#3730a3' },
+  { name: '실외기실', zoneType: 'UTILITY_ROOM', icon: 'hvac',          bg: '#fef3c7', color: '#92400e' },
+  { name: '팬트리',   zoneType: 'PANTRY',       icon: 'shelves',       bg: '#d1fae5', color: '#065f46' },
+  { name: '화장실',   zoneType: 'TOILET',       icon: 'wc',            bg: '#cce8f4', color: '#005b87' },
+  { name: '주차',     zoneType: 'PARKING',      icon: 'local_parking', bg: '#ffd9e4', color: '#923357' },
+]
+
+const ZONE_META = {
+  LIVING_ROOM:  { icon: 'weekend',        bg: '#cce8f4', color: '#005b87' },
+  KITCHEN:      { icon: 'skillet',        bg: '#ffd9e4', color: '#923357' },
+  BEDROOM:      { icon: 'bed',            bg: '#e8d5f0', color: '#7b4fa6' },
+  BATHROOM:     { icon: 'bathtub',        bg: '#b6f2be', color: '#006e1c' },
+  STUDY:        { icon: 'menu_book',      bg: '#fef9c3', color: '#854d0e' },
+  BALCONY:      { icon: 'deck',           bg: '#d1fae5', color: '#065f46' },
+  GARAGE:       { icon: 'directions_car', bg: '#e0e7ff', color: '#3730a3' },
+  CORRIDOR:     { icon: 'meeting_room',   bg: '#e0e7ff', color: '#3730a3' },
+  UTILITY_ROOM: { icon: 'hvac',           bg: '#fef3c7', color: '#92400e' },
+  PANTRY:       { icon: 'shelves',        bg: '#d1fae5', color: '#065f46' },
+  TOILET:       { icon: 'wc',            bg: '#cce8f4', color: '#005b87' },
+  PARKING:      { icon: 'local_parking',  bg: '#ffd9e4', color: '#923357' },
+  OTHER:        { icon: 'room',           bg: '#f1f5f9', color: '#475569' },
 }
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuthStore()
+  const { selectedHouse } = useHouseStore()
   const [editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ name: '', phone: '' })
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
   const [showPwChange, setShowPwChange] = useState(false)
-  const [activeTab, setActiveTab] = useState('profile') // profile | activity | settings
+  const [activeTab, setActiveTab] = useState('profile') // profile | zones | security
+
+  // 구역 관련 state
+  const [zones, setZones] = useState([])
+  const [zonesLoading, setZonesLoading] = useState(false)
 
   const grade = GRADE_INFO[user?.grade] || GRADE_INFO.BRONZE
 
   useEffect(() => {
-    if (user) {
-      setForm({ name: user.name || '', phone: user.phone || '' })
-    }
+    if (user) setForm({ name: user.name || '', phone: user.phone || '' })
   }, [user])
+
+  useEffect(() => {
+    if (activeTab === 'zones' && selectedHouse) loadZones()
+  }, [activeTab, selectedHouse])
+
+  const loadZones = async () => {
+    if (!selectedHouse) return
+    setZonesLoading(true)
+    try {
+      const { data } = await api.get(`/houses/${selectedHouse.id}/zones`)
+      setZones(data.data || [])
+    } catch (e) { toast.error('구역 로드 실패') }
+    finally { setZonesLoading(false) }
+  }
+
+  const handleAddZone = async (preset) => {
+    if (!selectedHouse) { toast.error('집을 먼저 선택해주세요'); return }
+    try {
+      await api.post(`/houses/${selectedHouse.id}/zones`, {
+        name: preset.name,
+        zoneType: preset.zoneType,
+        icon: preset.icon,
+      })
+      toast.success(`'${preset.name}' 구역이 추가되었습니다`)
+      loadZones()
+    } catch (e) { toast.error('구역 추가 실패') }
+  }
+
+  const handleDeleteZone = async (zone) => {
+    if (!confirm(`'${zone.name}' 구역을 삭제하시겠습니까?\n해당 구역의 물품 연결이 해제됩니다.`)) return
+    try {
+      await api.delete(`/houses/${selectedHouse.id}/zones/${zone.id}`)
+      toast.success(`'${zone.name}' 구역이 삭제되었습니다`)
+      loadZones()
+    } catch (e) { toast.error('구역 삭제 실패') }
+  }
 
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error('이름을 입력해주세요'); return }
@@ -198,6 +262,7 @@ export default function ProfilePage() {
       <div style={{ display: 'flex', background: 'var(--surface-container-low)', borderRadius: 14, padding: 4, marginBottom: 16, gap: 2 }}>
         {[
           { id: 'profile', label: '개인정보', icon: 'person' },
+          { id: 'zones',   label: '구역 관리', icon: 'room_preferences' },
           { id: 'security', label: '보안 설정', icon: 'lock' },
         ].map(tab => (
           <button
@@ -205,14 +270,14 @@ export default function ProfilePage() {
             onClick={() => setActiveTab(tab.id)}
             style={{
               flex: 1, padding: '9px', borderRadius: 10, border: 'none', cursor: 'pointer',
-              fontSize: 13, fontWeight: activeTab === tab.id ? 700 : 500,
+              fontSize: 12, fontWeight: activeTab === tab.id ? 700 : 500,
               background: activeTab === tab.id ? 'var(--surface-container-lowest)' : 'transparent',
               color: activeTab === tab.id ? 'var(--primary)' : 'var(--on-surface-variant)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
               boxShadow: activeTab === tab.id ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
             }}
           >
-            <MSI name={tab.icon} fill={activeTab === tab.id} size={16} />{tab.label}
+            <MSI name={tab.icon} fill={activeTab === tab.id} size={15} />{tab.label}
           </button>
         ))}
       </div>
@@ -252,8 +317,111 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* 보안 설정 탭 */}
-      {activeTab === 'security' && (
+      {/* ── 구역 관리 탭 ── */}
+      {activeTab === 'zones' && (
+        <div className="card">
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4, color: 'var(--on-surface)', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <MSI name="room_preferences" fill size={18} color="var(--primary)" /> 구역 관리
+          </h3>
+          <p style={{ fontSize: 12, color: 'var(--on-surface-variant)', marginBottom: 20 }}>
+            {selectedHouse ? `${selectedHouse.name}의 구역을 관리합니다` : '집을 먼저 선택해주세요'}
+          </p>
+
+          {!selectedHouse ? (
+            <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--on-surface-variant)' }}>
+              <MSI name="home" size={40} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 8px' }} />
+              <div style={{ fontSize: 14 }}>홈 화면에서 집을 먼저 선택해주세요</div>
+            </div>
+          ) : (
+            <>
+              {/* 현재 구역 목록 */}
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--on-surface)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <MSI name="format_list_bulleted" size={15} color="var(--primary)" />
+                  등록된 구역 {zones.length}개
+                </div>
+                {zonesLoading ? (
+                  <div style={{ textAlign: 'center', padding: 20, color: 'var(--on-surface-variant)', fontSize: 13 }}>불러오는 중...</div>
+                ) : zones.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: 20, color: 'var(--on-surface-variant)', fontSize: 13 }}>등록된 구역이 없습니다</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {zones.map(z => {
+                      const meta = ZONE_META[z.zoneType] || ZONE_META.OTHER
+                      return (
+                        <div key={z.id} style={{
+                          display: 'flex', alignItems: 'center', gap: 12,
+                          background: 'var(--surface-container-low)', borderRadius: 14, padding: '10px 14px',
+                        }}>
+                          <div style={{ width: 36, height: 36, borderRadius: 10, background: meta.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <MSI name={meta.icon} fill size={18} color={meta.color} />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--on-surface)' }}>{z.name}</div>
+                            <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 1 }}>물품 {z.itemCount ?? 0}개</div>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteZone(z)}
+                            style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(186,26,26,0.08)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                          >
+                            <MSI name="delete" size={15} color="var(--error)" />
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* 추가 가능한 구역 목록 */}
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--on-surface)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <MSI name="add_circle" size={15} color="var(--secondary)" />
+                  추가 가능한 구역
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {ZONE_PRESETS.map(preset => {
+                    const alreadyAdded = zones.some(z => z.zoneType === preset.zoneType)
+                    return (
+                      <div key={preset.zoneType} style={{
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        background: alreadyAdded ? 'var(--surface-container-low)' : 'var(--surface-container-lowest)',
+                        borderRadius: 14, padding: '10px 14px',
+                        opacity: alreadyAdded ? 0.5 : 1,
+                        border: alreadyAdded ? 'none' : '1px dashed var(--outline-variant)',
+                      }}>
+                        <div style={{ width: 36, height: 36, borderRadius: 10, background: preset.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <MSI name={preset.icon} fill size={18} color={preset.color} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--on-surface)' }}>{preset.name}</div>
+                          {alreadyAdded && <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>이미 추가됨</div>}
+                        </div>
+                        <button
+                          onClick={() => !alreadyAdded && handleAddZone(preset)}
+                          disabled={alreadyAdded}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 4,
+                            padding: '6px 14px', borderRadius: 20, border: 'none',
+                            background: alreadyAdded ? 'var(--surface-container-high)' : 'var(--primary)',
+                            color: alreadyAdded ? 'var(--on-surface-variant)' : 'white',
+                            fontSize: 12, fontWeight: 600, cursor: alreadyAdded ? 'default' : 'pointer', flexShrink: 0,
+                          }}
+                        >
+                          <MSI name={alreadyAdded ? 'check' : 'add'} size={14} />
+                          {alreadyAdded ? '완료' : '추가'}
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* 보안 설정 탭 */}      {activeTab === 'security' && (
         <div className="card">
           <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: 'var(--on-surface)' }}>🔒 비밀번호 변경</h3>
           {!showPwChange ? (

@@ -38,6 +38,8 @@ public class Zone extends BaseEntity {
 
     public enum ZoneType {
         LIVING_ROOM, KITCHEN, BEDROOM, BATHROOM,
-        STUDY, BALCONY, GARAGE, OTHER
+        STUDY, BALCONY, GARAGE,
+        CORRIDOR, UTILITY_ROOM, PANTRY, TOILET, PARKING,
+        OTHER
     }
 }

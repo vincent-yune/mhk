@@ -103,6 +103,14 @@ public class HouseService {
         return ZoneResponse.from(zoneRepository.save(zone));
     }
 
+    @Transactional
+    public void deleteZone(Long houseId, Long zoneId, String email) {
+        findAndCheckOwner(houseId, email);
+        Zone zone = zoneRepository.findById(zoneId)
+                .orElseThrow(() -> new com.myhouse.exception.ResourceNotFoundException("구역을 찾을 수 없습니다."));
+        zoneRepository.delete(zone);
+    }
+
     private void createDefaultZones(House house) {
         String[][] defaults = {
             {"거실", "LIVING_ROOM", "sofa", "0"},

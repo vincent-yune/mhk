@@ -96,4 +96,13 @@ public class HouseController {
             @AuthenticationPrincipal UserDetails ud) {
         return ResponseEntity.ok(ApiResponse.success("구역 추가 완료", houseService.addZone(houseId, ud.getUsername(), zone)));
     }
+
+    @DeleteMapping("/{houseId}/zones/{zoneId}")
+    public ResponseEntity<ApiResponse<Void>> deleteZone(
+            @PathVariable Long houseId,
+            @PathVariable Long zoneId,
+            @AuthenticationPrincipal UserDetails ud) {
+        houseService.deleteZone(houseId, zoneId, ud.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("구역 삭제 완료", null));
+    }
 }
