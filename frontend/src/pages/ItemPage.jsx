@@ -682,6 +682,19 @@ export default function ItemPage() {
                       onChange={e => setForm({ ...form, expiryDate: e.target.value })} />
                   </div>
                 </div>
+                <div className="grid-2">
+                  <div className="form-group">
+                    <label className="form-label">구매금액 (원)</label>
+                    <input type="number" className="form-input" value={form.purchasePrice}
+                      onChange={e => setForm({ ...form, purchasePrice: e.target.value })}
+                      placeholder="0" min={0} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">보증기간 만료일</label>
+                    <input type="date" className="form-input" value={form.warrantyExpire}
+                      onChange={e => setForm({ ...form, warrantyExpire: e.target.value })} />
+                  </div>
+                </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                   <input type="checkbox" id="consumable" checked={form.isConsumable}
                     onChange={e => setForm({ ...form, isConsumable: e.target.checked })} />
