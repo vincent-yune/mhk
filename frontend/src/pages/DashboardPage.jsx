@@ -392,8 +392,18 @@ export default function DashboardPage() {
           </div>
           <div className="grid-2">
             {zones.slice(0, 6).map((z, i) => {
-              const colors = ['#cce8f4', '#b6f2be', '#ffd9e4', '#ffedd5', '#e8d5f0', '#fef9c3']
-              const textColors = ['#005b87', '#006e1c', '#923357', '#b45309', '#7b4fa6', '#854d0e']
+              const ZONE_META = {
+                LIVING_ROOM: { icon: 'weekend',       bg: '#cce8f4', color: '#005b87' },
+                KITCHEN:     { icon: 'skillet',        bg: '#ffd9e4', color: '#923357' },
+                BEDROOM:     { icon: 'bed',            bg: '#e8d5f0', color: '#7b4fa6' },
+                BATHROOM:    { icon: 'bathtub',        bg: '#b6f2be', color: '#006e1c' },
+                STUDY:       { icon: 'menu_book',      bg: '#fef9c3', color: '#854d0e' },
+                BALCONY:     { icon: 'deck',           bg: '#d1fae5', color: '#065f46' },
+                GARAGE:      { icon: 'directions_car', bg: '#e0e7ff', color: '#3730a3' },
+                OTHER:       { icon: 'room',           bg: '#f1f5f9', color: '#475569' },
+              }
+              const meta = ZONE_META[z.zoneType] || ZONE_META.OTHER
+              const itemCount = z.itemCount ?? 0
               return (
                 <div
                   key={z.id}
@@ -407,20 +417,32 @@ export default function DashboardPage() {
                   onTouchStart={e => e.currentTarget.style.transform = 'scale(0.96)'}
                   onTouchEnd={e => e.currentTarget.style.transform = ''}
                 >
-                  <div style={{
-                    width: 38, height: 38, borderRadius: 12,
-                    background: colors[i % colors.length],
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 20,
-                  }}>
-                    {z.icon || <MSI name="room" fill size={20} color={textColors[i % textColors.length]} />}
+                  {/* 아이콘 + 물품 수 뱃지 */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div style={{
+                      width: 40, height: 40, borderRadius: 12,
+                      background: meta.bg,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <MSI name={meta.icon} fill size={22} color={meta.color} />
+                    </div>
+                    {/* 물품 수 뱃지 */}
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 3,
+                      background: meta.bg,
+                      borderRadius: 20, padding: '3px 8px',
+                    }}>
+                      <MSI name="inventory_2" size={12} color={meta.color} />
+                      <span style={{ fontSize: 11, fontWeight: 700, color: meta.color }}>{itemCount}</span>
+                    </div>
                   </div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--on-surface)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {z.name}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 2 }}>
-                      {z.itemCount ?? 0}개 물품
+                      물품 {itemCount}개
                     </div>
                   </div>
                 </div>

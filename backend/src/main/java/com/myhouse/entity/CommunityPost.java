@@ -55,6 +55,6 @@ public class CommunityPost extends BaseEntity {
     @Column(length = 200)
     private String location;
 
-    public enum PostType { SELL, BUY, SHARE, RENT, FREE }
+    public enum PostType { SELL, BUY, SHARE, FREE_BOARD }
     public enum PostStatus { ACTIVE, RESERVED, COMPLETED, CLOSED }
 }

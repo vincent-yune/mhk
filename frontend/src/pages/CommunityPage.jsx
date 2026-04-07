@@ -3,11 +3,10 @@ import api from '../api/axios'
 import toast from 'react-hot-toast'
 
 const POST_TYPES = {
-  SELL:  { label: '판매', color: '#cce8f4', text: '#005b87', icon: 'sell' },
-  BUY:   { label: '구매', color: '#b6f2be', text: '#006e1c', icon: 'shopping_cart' },
-  SHARE: { label: '나눔', color: '#ffedd5', text: '#b45309', icon: 'volunteer_activism' },
-  RENT:  { label: '대여', color: '#e8d5f0', text: '#7b4fa6', icon: 'sync_alt' },
-  FREE:  { label: '무료', color: '#ffd9e4', text: '#923357', icon: 'redeem' },
+  SELL:       { label: '판매',     color: '#cce8f4', text: '#005b87', icon: 'sell' },
+  BUY:        { label: '구매',     color: '#b6f2be', text: '#006e1c', icon: 'shopping_cart' },
+  SHARE:      { label: '나눔',     color: '#ffedd5', text: '#b45309', icon: 'volunteer_activism' },
+  FREE_BOARD: { label: '자유게시판', color: '#e8d5f0', text: '#7b4fa6', icon: 'forum' },
 }
 const STATUS_MAP = {
   ACTIVE:    { label: '거래중', bg: '#b6f2be', color: '#006e1c' },
@@ -34,6 +33,7 @@ export default function CommunityPage() {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [selectedPost, setSelectedPost] = useState(null)
+  const [tab, setTab] = useState('trade')   // 'trade' | 'share' | 'free'
   const [form, setForm] = useState({ title: '', content: '', postType: 'SELL', price: '', isNegotiable: false, location: '' })
 
   // 물품관리에서 커뮤니티 연계로 넘어왔을 때 자동으로 모달 열기
@@ -109,51 +109,54 @@ export default function CommunityPage() {
 
         {/* Tab switcher */}
         <div style={{ display: 'flex', background: 'var(--surface-container-low)', borderRadius: 14, padding: 4, marginTop: 12, gap: 2 }}>
-          <button
-            onClick={() => { setPostType(''); setPage(0) }}
-            style={{
-              flex: 1, padding: '9px', borderRadius: 10, border: 'none',
-              background: !postType ? 'var(--surface-container-lowest)' : 'transparent',
-              color: !postType ? 'var(--primary)' : 'var(--on-surface-variant)',
-              fontWeight: 600, fontSize: 13, cursor: 'pointer',
-              boxShadow: !postType ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
-            }}
-          >마켓플레이스</button>
-          <button
-            onClick={() => { setPostType('SHARE'); setPage(0) }}
-            style={{
-              flex: 1, padding: '9px', borderRadius: 10, border: 'none',
-              background: postType === 'SHARE' ? 'var(--surface-container-lowest)' : 'transparent',
-              color: postType === 'SHARE' ? 'var(--primary)' : 'var(--on-surface-variant)',
-              fontWeight: 500, fontSize: 13, cursor: 'pointer',
-              boxShadow: postType === 'SHARE' ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
-            }}
-          >커뮤니티</button>
-        </div>
-      </div>
-
-      {/* ── Filter Type Chips ── */}
-      <div style={{ padding: '12px 20px 0' }}>
-        <div className="scroll-row" style={{ paddingBottom: 4 }}>
-          {Object.entries(POST_TYPES).map(([k, v]) => (
+          {[
+            { key: 'trade', label: '거래',      type: '' },
+            { key: 'share', label: '나눔',      type: 'SHARE' },
+            { key: 'free',  label: '자유게시판', type: 'FREE_BOARD' },
+          ].map(t => (
             <button
-              key={k}
-              onClick={() => { setPostType(postType === k ? '' : k); setPage(0) }}
+              key={t.key}
+              onClick={() => { setTab(t.key); setPostType(t.type); setPage(0) }}
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '7px 14px', borderRadius: 20, border: 'none', flexShrink: 0,
-                background: postType === k ? v.color : 'var(--surface-container-lowest)',
-                color: postType === k ? v.text : 'var(--on-surface-variant)',
-                fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                transition: 'all 0.15s',
+                flex: 1, padding: '9px', borderRadius: 10, border: 'none',
+                background: tab === t.key ? 'var(--surface-container-lowest)' : 'transparent',
+                color: tab === t.key ? 'var(--primary)' : 'var(--on-surface-variant)',
+                fontWeight: tab === t.key ? 700 : 500, fontSize: 12, cursor: 'pointer',
+                boxShadow: tab === t.key ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
+                whiteSpace: 'nowrap',
               }}
-            >
-              <MSI name={v.icon} fill={postType === k} size={14} />
-              {v.label}
-            </button>
+            >{t.label}</button>
           ))}
         </div>
       </div>
+
+      {/* ── Filter Type Chips (거래 탭에서만 표시) ── */}
+      {tab === 'trade' && (
+        <div style={{ padding: '12px 20px 0' }}>
+          <div className="scroll-row" style={{ paddingBottom: 4 }}>
+            {(['SELL','BUY'] ).map(k => {
+              const v = POST_TYPES[k]
+              return (
+                <button
+                  key={k}
+                  onClick={() => { setPostType(postType === k ? '' : k); setPage(0) }}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    padding: '7px 14px', borderRadius: 20, border: 'none', flexShrink: 0,
+                    background: postType === k ? v.color : 'var(--surface-container-lowest)',
+                    color: postType === k ? v.text : 'var(--on-surface-variant)',
+                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <MSI name={v.icon} fill={postType === k} size={14} />
+                  {v.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Featured Section (Bento) ── */}
       <div style={{ padding: '20px 20px 0' }}>
@@ -331,7 +334,7 @@ export default function CommunityPage() {
             <form onSubmit={handleCreatePost}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label className="form-label">거래 유형</label>
+                  <label className="form-label">유형</label>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {Object.entries(POST_TYPES).map(([k, v]) => (
                       <button
@@ -358,20 +361,24 @@ export default function CommunityPage() {
                   <label className="form-label">내용 *</label>
                   <textarea className="form-textarea" style={{ minHeight: 100 }} value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} required placeholder="물품 상태, 거래 방법 등을 자세히 적어주세요" />
                 </div>
-                <div className="grid-2">
-                  <div className="form-group">
-                    <label className="form-label">희망가격 (원)</label>
-                    <input type="number" className="form-input" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="0" />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">거래 장소</label>
-                    <input className="form-input" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="강남역 2번 출구" />
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <input type="checkbox" id="negotiable" checked={form.isNegotiable} onChange={e => setForm({ ...form, isNegotiable: e.target.checked })} />
-                  <label htmlFor="negotiable" style={{ fontSize: 13, fontWeight: 600, color: 'var(--on-surface-variant)', cursor: 'pointer' }}>가격 협의 가능</label>
-                </div>
+                {(form.postType === 'SELL' || form.postType === 'BUY') && (
+                  <>
+                    <div className="grid-2">
+                      <div className="form-group">
+                        <label className="form-label">희망가격 (원)</label>
+                        <input type="number" className="form-input" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="0" />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">거래 장소</label>
+                        <input className="form-input" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="강남역 2번 출구" />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <input type="checkbox" id="negotiable" checked={form.isNegotiable} onChange={e => setForm({ ...form, isNegotiable: e.target.checked })} />
+                      <label htmlFor="negotiable" style={{ fontSize: 13, fontWeight: 600, color: 'var(--on-surface-variant)', cursor: 'pointer' }}>가격 협의 가능</label>
+                    </div>
+                  </>
+                )}
               </div>
               <div className="modal-footer">
                 <button type="submit" className="btn btn-primary btn-block">등록</button>

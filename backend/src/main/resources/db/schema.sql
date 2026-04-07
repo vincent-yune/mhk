@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS community_posts (
     item_id      BIGINT COMMENT '연결된 물품(선택)',
     title        VARCHAR(200) NOT NULL,
     content      TEXT NOT NULL,
-    post_type    ENUM('SELL', 'BUY', 'SHARE', 'RENT', 'FREE') DEFAULT 'SELL',
+    post_type    ENUM('SELL', 'BUY', 'SHARE', 'FREE_BOARD') DEFAULT 'SELL',
     price        DECIMAL(12, 2),
     is_negotiable BOOLEAN DEFAULT FALSE COMMENT '가격 협의 가능',
     status       ENUM('ACTIVE', 'RESERVED', 'COMPLETED', 'CLOSED') DEFAULT 'ACTIVE',
