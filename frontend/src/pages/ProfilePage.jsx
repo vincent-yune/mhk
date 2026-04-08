@@ -47,7 +47,7 @@ const ZONE_META = {
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuthStore()
-  const { selectedHouse } = useHouseStore()
+  const { selectedHouse, selectHouse } = useHouseStore()
   const [editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ name: '', phone: '' })
@@ -64,6 +64,19 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) setForm({ name: user.name || '', phone: user.phone || '' })
   }, [user])
+
+  // selectedHouse가 없으면 집 목록을 자동으로 불러와서 첫 번째 집 선택
+  useEffect(() => {
+    if (!selectedHouse) {
+      api.get('/houses').then(({ data }) => {
+        const list = data.data || []
+        if (list.length > 0) {
+          const primary = list.find(h => h.isPrimary) || list[0]
+          selectHouse(primary)
+        }
+      }).catch(() => {})
+    }
+  }, [])
 
   useEffect(() => {
     if (activeTab === 'zones' && selectedHouse) loadZones()
