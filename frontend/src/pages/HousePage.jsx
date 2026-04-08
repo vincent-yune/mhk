@@ -9,15 +9,29 @@ const HOUSE_TYPE_ICONS = { APARTMENT: 'apartment', HOUSE: 'home', VILLA: 'holida
 const THEMES = { DEFAULT: '기본', MODERN: '모던', NATURAL: '자연', VINTAGE: '빈티지', MINIMAL: '미니멀' }
 
 const ZONE_TYPE_MAP = {
-  LIVING_ROOM: { icon: 'weekend', label: '거실', color: '#cce8f4', tc: '#005b87' },
-  KITCHEN: { icon: 'restaurant', label: '주방', color: '#b6f2be', tc: '#006e1c' },
-  BEDROOM: { icon: 'bed', label: '침실', color: '#ffd9e4', tc: '#923357' },
-  BATHROOM: { icon: 'shower', label: '욕실', color: '#cce8f4', tc: '#005b87' },
-  STUDY: { icon: 'menu_book', label: '서재', color: '#e8d5f0', tc: '#7b4fa6' },
-  BALCONY: { icon: 'grass', label: '베란다', color: '#b6f2be', tc: '#006e1c' },
-  GARAGE: { icon: 'garage', label: '차고', color: '#ffedd5', tc: '#b45309' },
-  OTHER: { icon: 'inventory_2', label: '기타', color: '#f1f3f4', tc: '#40493d' }
+  LIVING_ROOM:  { icon: 'weekend',        label: '거실',    color: '#cce8f4', tc: '#005b87' },
+  KITCHEN:      { icon: 'restaurant',     label: '주방',    color: '#b6f2be', tc: '#006e1c' },
+  BEDROOM:      { icon: 'bed',            label: '침실',    color: '#ffd9e4', tc: '#923357' },
+  BATHROOM:     { icon: 'shower',         label: '욕실',    color: '#cce8f4', tc: '#005b87' },
+  STUDY:        { icon: 'menu_book',      label: '서재',    color: '#e8d5f0', tc: '#7b4fa6' },
+  BALCONY:      { icon: 'grass',          label: '베란다',  color: '#b6f2be', tc: '#006e1c' },
+  GARAGE:       { icon: 'garage',         label: '차고',    color: '#ffedd5', tc: '#b45309' },
+  CORRIDOR:     { icon: 'meeting_room',   label: '복도',    color: '#e0e7ff', tc: '#3730a3' },
+  UTILITY_ROOM: { icon: 'hvac',           label: '실외기실', color: '#fef3c7', tc: '#92400e' },
+  PANTRY:       { icon: 'shelves',        label: '팬트리',  color: '#d1fae5', tc: '#065f46' },
+  TOILET:       { icon: 'wc',             label: '화장실',  color: '#cce8f4', tc: '#005b87' },
+  PARKING:      { icon: 'local_parking',  label: '주차',    color: '#ffd9e4', tc: '#923357' },
+  OTHER:        { icon: 'inventory_2',    label: '기타',    color: '#f1f3f4', tc: '#40493d' }
 }
+
+// 추가 가능한 구역 프리셋
+const ZONE_PRESETS = [
+  { name: '복도',     zoneType: 'CORRIDOR',     icon: 'meeting_room', sortOrder: 10 },
+  { name: '실외기실', zoneType: 'UTILITY_ROOM', icon: 'hvac',         sortOrder: 11 },
+  { name: '팬트리',   zoneType: 'PANTRY',       icon: 'shelves',      sortOrder: 12 },
+  { name: '화장실',   zoneType: 'TOILET',       icon: 'wc',           sortOrder: 13 },
+  { name: '주차',     zoneType: 'PARKING',      icon: 'local_parking',sortOrder: 14 },
+]
 
 function MSI({ name, fill = false, size = 24, color, style = {} }) {
   return (
@@ -199,6 +213,7 @@ export default function HousePage() {
   const [mapUploading, setMapUploading] = useState(false)
   const mapFileRef = useRef(null)
   const [form, setForm] = useState({ name: '우리집', houseType: 'APARTMENT', address: '', area: '', floor: '', rooms: 1, bathrooms: 1, theme: 'DEFAULT' })
+  const [showZoneAdd, setShowZoneAdd] = useState(false)
 
   useEffect(() => { loadHouses() }, [])
   useEffect(() => {
@@ -216,6 +231,26 @@ export default function HousePage() {
   const loadZones = async () => {
     try { const { data } = await api.get(`/houses/${selectedHouse.id}/zones`); setZones(data.data) }
     catch (e) {}
+  }
+
+  const handleAddZone = async (preset) => {
+    try {
+      await api.post(`/houses/${selectedHouse.id}/zones`, {
+        name: preset.name, zoneType: preset.zoneType, icon: preset.icon, sortOrder: preset.sortOrder
+      })
+      toast.success(`'${preset.name}' 구역이 추가되었습니다`)
+      loadZones()
+    } catch (e) { toast.error('구역 추가 실패') }
+  }
+
+  const handleDeleteZone = async (zone, e) => {
+    e.stopPropagation()
+    if (!confirm(`'${zone.name}' 구역을 삭제하시겠습니까?\n해당 구역의 물품 연결이 해제됩니다.`)) return
+    try {
+      await api.delete(`/houses/${selectedHouse.id}/zones/${zone.id}`)
+      toast.success(`'${zone.name}' 구역이 삭제되었습니다`)
+      loadZones()
+    } catch (e) { toast.error('구역 삭제 실패') }
   }
 
   const loadMapData = async () => {
@@ -548,51 +583,130 @@ export default function HousePage() {
         )}
       </div>
 
-      {/* ── Zone Grid ── */}
-      {selectedHouse && zones.length > 0 && (
+      {/* ── 구역 관리 ── */}
+      {selectedHouse && (
         <div style={{ padding: '24px 20px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-            <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700 }}>구역 현황</div>
-            <div style={{ fontSize: 12, color: 'var(--on-surface-variant)' }}>클릭 시 물품으로 이동</div>
-          </div>
-          <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--primary)', marginBottom: 14, marginTop: 4 }}>
-            {selectedHouse.name}
+          {/* 헤더 */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div>
+              <div style={{ fontFamily: 'Manrope, sans-serif', fontSize: 15, fontWeight: 700 }}>구역 관리</div>
+              <div style={{ fontSize: 11, color: 'var(--on-surface-variant)', marginTop: 2 }}>{selectedHouse.name} · {zones.length}개 구역</div>
+            </div>
+            <button
+              onClick={() => setShowZoneAdd(v => !v)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '7px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                background: showZoneAdd ? 'var(--surface-container-high)' : 'linear-gradient(135deg, var(--primary), var(--primary-light))',
+                color: showZoneAdd ? 'var(--on-surface-variant)' : 'white',
+                fontSize: 12, fontWeight: 700,
+              }}
+            >
+              <MSI name={showZoneAdd ? 'close' : 'add'} size={14} />
+              {showZoneAdd ? '닫기' : '구역 추가'}
+            </button>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 19, top: 8, bottom: 8, width: 2, background: 'var(--surface-container-high)' }} />
-            {zones.map((z) => {
-              const zType = ZONE_TYPE_MAP[z.zoneType] || ZONE_TYPE_MAP.OTHER
-              return (
-                <div
-                  key={z.id}
-                  style={{ position: 'relative', paddingLeft: 48, paddingBottom: 16, cursor: 'pointer' }}
-                  onClick={() => handleZoneClick(z)}
-                >
-                  <div style={{
-                    position: 'absolute', left: 0, top: 4,
-                    width: 38, height: 38, borderRadius: '50%',
-                    background: zType.color,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    zIndex: 1, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  }}>
-                    <MSI name={zType.icon} fill size={18} color={zType.tc} />
-                  </div>
-                  <div style={{ background: 'var(--surface-container-lowest)', borderRadius: 16, padding: '12px 16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{z.name}</div>
-                        <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
-                          {zType.label} · 물품 {z.itemCount ?? 0}개
+          {/* 구역 추가 패널 */}
+          {showZoneAdd && (
+            <div style={{ background: 'var(--surface-container-low)', borderRadius: 16, padding: '14px 16px', marginBottom: 16, border: '1px dashed var(--outline-variant)' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--on-surface)', marginBottom: 10 }}>추가할 구역 선택</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {ZONE_PRESETS.map(preset => {
+                  const zType = ZONE_TYPE_MAP[preset.zoneType]
+                  const alreadyAdded = zones.some(z => z.zoneType === preset.zoneType)
+                  return (
+                    <div key={preset.zoneType} style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      background: alreadyAdded ? 'var(--surface-container-lowest)' : 'white',
+                      borderRadius: 12, padding: '8px 12px',
+                      opacity: alreadyAdded ? 0.5 : 1,
+                    }}>
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: zType.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <MSI name={zType.icon} fill size={16} color={zType.tc} />
+                      </div>
+                      <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--on-surface)' }}>
+                        {preset.name}
+                        {alreadyAdded && <span style={{ marginLeft: 6, fontSize: 10, color: 'var(--on-surface-variant)' }}>이미 추가됨</span>}
+                      </div>
+                      <button
+                        disabled={alreadyAdded}
+                        onClick={() => handleAddZone(preset)}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          padding: '5px 12px', borderRadius: 16, border: 'none', cursor: alreadyAdded ? 'default' : 'pointer',
+                          background: alreadyAdded ? 'var(--surface-container-high)' : 'var(--primary)',
+                          color: alreadyAdded ? 'var(--on-surface-variant)' : 'white',
+                          fontSize: 11, fontWeight: 700, flexShrink: 0,
+                        }}
+                      >
+                        <MSI name={alreadyAdded ? 'check' : 'add'} size={12} />
+                        {alreadyAdded ? '완료' : '추가'}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* 구역 목록 */}
+          {zones.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--on-surface-variant)', fontSize: 13 }}>
+              <MSI name="room_preferences" size={36} color="var(--outline-variant)" style={{ display: 'block', margin: '0 auto 8px' }} />
+              등록된 구역이 없습니다
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, position: 'relative' }}>
+              <div style={{ position: 'absolute', left: 19, top: 8, bottom: 8, width: 2, background: 'var(--surface-container-high)' }} />
+              {zones.map((z) => {
+                const zType = ZONE_TYPE_MAP[z.zoneType] || ZONE_TYPE_MAP.OTHER
+                return (
+                  <div
+                    key={z.id}
+                    style={{ position: 'relative', paddingLeft: 48, paddingBottom: 16 }}
+                  >
+                    <div style={{
+                      position: 'absolute', left: 0, top: 4,
+                      width: 38, height: 38, borderRadius: '50%',
+                      background: zType.color,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      zIndex: 1, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    }}>
+                      <MSI name={zType.icon} fill size={18} color={zType.tc} />
+                    </div>
+                    <div style={{ background: 'var(--surface-container-lowest)', borderRadius: 16, padding: '10px 14px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div
+                          onClick={() => handleZoneClick(z)}
+                          style={{ flex: 1, cursor: 'pointer', minWidth: 0 }}
+                        >
+                          <div style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{z.name}</div>
+                          <div style={{ fontSize: 11, color: 'var(--on-surface-variant)' }}>
+                            {zType.label} · 물품 {z.itemCount ?? 0}개
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                          <button
+                            onClick={() => handleZoneClick(z)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center' }}
+                          >
+                            <MSI name="arrow_forward_ios" size={13} color="var(--on-surface-variant)" />
+                          </button>
+                          <button
+                            onClick={(e) => handleDeleteZone(z, e)}
+                            style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(186,26,26,0.08)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          >
+                            <MSI name="delete" size={13} color="var(--error)" />
+                          </button>
                         </div>
                       </div>
-                      <MSI name="arrow_forward_ios" size={14} color="var(--on-surface-variant)" />
                     </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       )}
 
