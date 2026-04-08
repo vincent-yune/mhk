@@ -1,8 +1,68 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import { useAuthStore, useHouseStore } from '../store/useStore'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+
+/* ── Google AdSense 광고 컴포넌트 ── */
+/* ※ 사용 방법:
+ *   1. index.html의 ca-pub-XXXXXXXXXXXXXXXX 를 본인 Publisher ID로 교체
+ *   2. adSlot 값을 AdSense 대시보드의 광고 단위 슬롯 ID로 교체
+ *   3. 빌드 후 실제 도메인에서만 광고가 표시됩니다 (localhost는 표시 안 됨)
+ */
+function AdBanner({ adSlot = 'XXXXXXXXXX', adClient = 'ca-pub-XXXXXXXXXXXXXXXX', style = {} }) {
+  const adRef = useRef(null)
+  const pushed = useRef(false)
+
+  useEffect(() => {
+    if (pushed.current) return
+    try {
+      if (typeof window !== 'undefined' && window.adsbygoogle) {
+        window.adsbygoogle.push({})
+        pushed.current = true
+      }
+    } catch (e) {
+      console.warn('AdSense load error:', e)
+    }
+  }, [])
+
+  return (
+    <div style={{
+      background: 'var(--surface-container-low)',
+      borderRadius: 16,
+      overflow: 'hidden',
+      minHeight: 100,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      border: '1px dashed var(--outline-variant)',
+      position: 'relative',
+      ...style,
+    }}>
+      {/* 광고 미표시 시 보여줄 placeholder */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        gap: 4, pointerEvents: 'none', zIndex: 0,
+      }}>
+        <span style={{ fontSize: 11, color: 'var(--outline-variant)', fontWeight: 600, letterSpacing: '0.5px' }}>
+          ADVERTISEMENT
+        </span>
+      </div>
+      {/* 실제 AdSense 광고 태그 */}
+      <ins
+        ref={adRef}
+        className="adsbygoogle"
+        style={{ display: 'block', width: '100%', minHeight: 100, zIndex: 1 }}
+        data-ad-client={adClient}
+        data-ad-slot={adSlot}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+    </div>
+  )
+}
 
 const HOUSE_TYPE_KO = { APARTMENT: '아파트', HOUSE: '주택', VILLA: '빌라', OFFICETEL: '오피스텔', OTHER: '기타' }
 
@@ -298,6 +358,15 @@ export default function DashboardPage() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* ── Google AdSense 광고 영역 ── */}
+      <div style={{ padding: '16px 20px 0' }}>
+        <AdBanner
+          adClient="ca-pub-XXXXXXXXXXXXXXXX"
+          adSlot="XXXXXXXXXX"
+          style={{ minHeight: 100 }}
+        />
       </div>
 
       {/* ── Connected Devices Carousel ── */}
