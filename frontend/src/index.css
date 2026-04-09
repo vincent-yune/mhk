@@ -61,12 +61,10 @@ body {
   background: var(--surface-container-low);
   color: var(--on-surface);
   line-height: 1.6;
-  height: 100%;
-  /* Mobile app feel */
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
+  min-height: 100vh;
+  /* WebView 호환을 위해 overflow:hidden, position:fixed 제거 */
   overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 #root { height: 100%; }
@@ -82,12 +80,11 @@ body {
 .app-layout {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100vh;
   background: var(--surface-container-low);
   max-width: 480px;
   margin: 0 auto;
   position: relative;
-  overflow: hidden;
   box-shadow: 0 0 60px rgba(0,0,0,0.15);
 }
 
@@ -95,14 +92,11 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  /* NO margin-left — sidebar is replaced by bottom nav */
+  /* WebView 호환: overflow 제거 */
 }
 
 .page-content {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
   padding: 0 0 calc(var(--bottom-nav-height) + 8px) 0;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
