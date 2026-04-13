@@ -23,8 +23,13 @@ import java.util.stream.Collectors;
 public class LgThinqService {
 
     // LG ThinQ Connect Open API 베이스 URL
-    private static final String LG_API_BASE = "https://api-kic.lgthinq.com";  // 한국
+    private static final String LG_API_BASE   = "https://api-kic.lgthinq.com"; // 한국(KR)
     private static final String LG_API_GLOBAL = "https://api-aic.lgthinq.com"; // 글로벌(US/EU)
+
+    // 공식 SDK의 API Key (pythinqconnect const.py 기준)
+    private static final String LG_API_KEY     = "v6GFvkweNo7DK7yD3ylIZ9w52aKBU0eJ7wLXkSR3";
+    private static final String LG_CLIENT_PREFIX = "thinq-open";
+    private static final String LG_SERVICE_PHASE = "OP";
 
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
@@ -155,17 +160,27 @@ public class LgThinqService {
         JsonNode root = objectMapper.readTree(json);
         List<Map<String, Object>> result = new ArrayList<>();
 
-        // LG ThinQ API v2 응답 구조 파싱
-        // { resultCode: "0000", result: { items: [...] } }  또는
-        // { result: [ {...}, ... ] }
+        // LG ThinQ Connect API 응답 구조:
+        // { "messageId": "...", "timestamp": "...", "response": [ { deviceId, deviceInfo: {...} }, ... ] }
+        // 또는 레거시: { resultCode: "0000", result: { items: [...] } }
         JsonNode items = null;
-        JsonNode resultNode = root.get("result");
-        if (resultNode != null) {
-            if (resultNode.isArray()) {
-                items = resultNode;
-            } else {
-                items = resultNode.get("items");
-                if (items == null) items = resultNode.get("devices");
+
+        // 신규 구조: response 배열
+        JsonNode responseNode = root.get("response");
+        if (responseNode != null && responseNode.isArray()) {
+            items = responseNode;
+        }
+
+        // 레거시 구조 fallback
+        if (items == null) {
+            JsonNode resultNode = root.get("result");
+            if (resultNode != null) {
+                if (resultNode.isArray()) {
+                    items = resultNode;
+                } else {
+                    items = resultNode.get("items");
+                    if (items == null) items = resultNode.get("devices");
+                }
             }
         }
         if (items == null) items = root.get("items");
@@ -191,12 +206,15 @@ public class LgThinqService {
                 if (alias.isEmpty()) alias = modelName;
                 if (alias.isEmpty()) alias = "LG 기기";
 
+                boolean reportable = info.path("reportable").asBoolean(
+                        item.path("reportable").asBoolean(false));
+
                 device.put("name", alias);
                 device.put("label", alias);
                 device.put("lgDeviceType", lgType);
                 device.put("modelName", modelName);
                 device.put("manufacturer", "LG");
-                device.put("reportable", item.path("reportable").asBoolean(false));
+                device.put("reportable", reportable);
                 device.put("deviceTypeIcon", resolveLgDeviceTypeIcon(lgType, alias));
 
                 result.add(device);
@@ -209,16 +227,17 @@ public class LgThinqService {
         JsonNode root = objectMapper.readTree(json);
         Map<String, Object> state = new LinkedHashMap<>();
 
-        JsonNode resultNode = root.get("result");
+        // 신규 구조: { "response": { ... } }
+        JsonNode resultNode = root.get("response");
+        // 레거시 fallback: { "result": { ... } }
+        if (resultNode == null) resultNode = root.get("result");
         if (resultNode == null) resultNode = root;
 
         // operation 상태
         JsonNode operation = resultNode.get("operation");
         if (operation != null) {
-            // 에어컨
             String acMode = getTextSafe(operation, "airConOperationMode");
             if (!acMode.isEmpty()) state.put("power", "POWER_ON".equals(acMode) ? "on" : "off");
-            // 세탁기
             String washerMode = getTextSafe(operation, "washerOperationMode");
             if (!washerMode.isEmpty()) state.put("washerMode", washerMode);
         }
@@ -231,15 +250,22 @@ public class LgThinqService {
             JsonNode target = temp.get("targetTemperatureC");
             if (target != null && !target.isNull()) state.put("targetTemperature", target.asDouble());
         }
-        // 냉장고 온도 (서브 디바이스)
+        // 냉장고
         JsonNode refrigerator = resultNode.get("refrigeration");
         if (refrigerator != null) {
             state.put("refrigerationMode", getTextSafe(refrigerator, "expressMode"));
         }
-        // run_state (세탁기/건조기/식기세척기 등)
+        // run_state (세탁기/건조기/식기세척기 등) — 신규 응답은 camelCase
         JsonNode runState = resultNode.get("runState");
         if (runState != null) {
-            state.put("runState", getTextSafe(runState, "currentState"));
+            String cs = getTextSafe(runState, "currentState");
+            if (cs.isEmpty()) cs = getTextSafe(runState, "current_state");
+            state.put("runState", cs);
+        }
+        // 문 상태
+        JsonNode doorStatus = resultNode.get("doorStatus");
+        if (doorStatus != null) {
+            state.put("doorState", getTextSafe(doorStatus, "doorState"));
         }
         // 습도
         JsonNode humidity = resultNode.get("humidity");
@@ -318,16 +344,23 @@ public class LgThinqService {
 
     private HttpHeaders buildHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();
+        // ── 공식 LG ThinQ Connect API 필수 헤더 (pythinqconnect SDK 기준) ──
         headers.set("Authorization", "Bearer " + token);
+        headers.set("x-api-key", LG_API_KEY);
+        headers.set("x-client-id", LG_CLIENT_PREFIX + "-" + UUID.randomUUID().toString().replace("-", ""));
+        headers.set("x-message-id", generateMessageId());
+        headers.set("x-country", "KR");
+        headers.set("x-service-phase", LG_SERVICE_PHASE);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        // LG ThinQ API 필수 헤더
-        headers.set("x-client-id", UUID.randomUUID().toString());
-        headers.set("x-message-id", UUID.randomUUID().toString());
-        headers.set("x-country-code", "KR");
-        headers.set("x-service-code", "SVC202");
-        headers.set("x-api-version", "2.0");
         return headers;
+    }
+
+    /** LG ThinQ 메시지 ID: base64(랜덤 9바이트) */
+    private String generateMessageId() {
+        byte[] bytes = new byte[9];
+        new java.security.SecureRandom().nextBytes(bytes);
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     private String getTextSafe(JsonNode node, String field) {
